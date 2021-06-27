@@ -1,0 +1,28 @@
+@import url("https://use.typekit.net/yne7bjc.css");
+
+:root {
+  /* Your default theme */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #edf2f7;
+  --color-bg-ordinary: theme("colors.gray.100");
+
+  --color-text-primary: #2d3748;
+  --color-text-secondary: #4a5568;
+  --color-text-accent: #2b6cb0;
+
+  /* Buttons */
+}
+
+[data-theme="dark"] {
+  --color-bg-primary: #2d3748;
+  --color-bg-secondary: #283141;
+  --color-bg-ordinary: theme("colors.gray.600");
+
+  --color-text-primary: #f7fafc;
+  --color-text-secondary: #e2e8f0;
+  --color-text-accent: #81e6d9;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
