@@ -14,7 +14,7 @@ export const Toggle = () => {
   return (
     <div>
       <button
-        className="p-2 rounded bg-ordinary"
+        className="p-2 rounded bg-ordinary dark:bg-gray-600"
         aria-label="Toggle Dark Mode"
         type="button"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}

@@ -8,7 +8,7 @@ fontFamily["sans"] = [
 
 module.exports = {
   purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: "class", // or 'media' or 'class'
   theme: {
     extend: {
       backgroundColor: {
@@ -26,7 +26,9 @@ module.exports = {
   },
 
   variants: {
-    extend: {},
+    extend: {
+      backgroundColor: ["even"],
+    },
   },
   plugins: [
     require("postcss-import"),

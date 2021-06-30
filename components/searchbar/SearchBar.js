@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 function SearchBar() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
-  const [companies, setCompanies] = useState(false);
+  const [companies, setCompanies] = useState([]);
   const router = useRouter();
 
   const getCompaniesApi = `http://localhost:8000/company`;
@@ -49,7 +49,7 @@ function SearchBar() {
   return (
     <div className="App">
       <header className="App-header">
-        <div style={{ width: 360 }}>
+        <div className="md:w-80">
           <ReactSearchAutocomplete
             items={companies}
             onSearch={handleOnSearch}
