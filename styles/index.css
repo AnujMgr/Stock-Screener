@@ -45,4 +45,7 @@
     background-color: #a0aec0;
     /*outline: 1px solid slategrey;*/
   }
+  #nprogress .bar {
+    background: red !important;
+  }
 }

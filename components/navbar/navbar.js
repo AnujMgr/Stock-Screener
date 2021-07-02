@@ -12,7 +12,7 @@ function Navbar() {
       <div className="hidden md:block shadow-sm border-b-1 bg-white dark:bg-gray-800 border-fuchsia-100 border-b border-gray-100 dark:border-gray-600">
         <div className="xl:container mx-auto flex items-center px-4">
           <h1 className="text-2xl text-primary dark:text-white mr-6">
-            <a href="/">Analytics</a>
+            <Link href="/">Analytics</Link>
           </h1>
           {/* Left Nav Items */}
           <div className="flex-grow px-2">

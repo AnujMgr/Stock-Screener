@@ -1,6 +1,7 @@
 import React, { Fragment, PureComponent } from "react";
 import { LineChart, Line, Tooltip, ResponsiveContainer, XAxis } from "recharts";
 import moment from "moment";
+import { useTheme } from "next-themes";
 
 const data = [
   {
@@ -49,6 +50,8 @@ const data = [
 
 const CustomizedDot = (props) => {
   const { cx, cy, stroke, payload, value } = props;
+  const { theme } = useTheme();
+  const bg = theme == "light" ? "#fff" : "#03e08b";
 
   return (
     <svg
@@ -63,11 +66,11 @@ const CustomizedDot = (props) => {
         <rect
           x="0"
           y="0"
-          rx="80"
+          rx="60"
           ry="80"
-          width="450"
+          width="100"
           height="350"
-          fill="#e1efff"
+          fill={bg}
         ></rect>
         <text
           x="60"
@@ -75,7 +78,8 @@ const CustomizedDot = (props) => {
           fontFamily="Muli"
           fontSize="12rem"
           fontWeight="bold"
-          fill="#003bde"
+          fill={theme == "light" ? "#003bde" : "#03e08b"}
+          overflow="hidden"
         >
           {value}
         </text>
@@ -112,17 +116,20 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export const MiniChart = () => {
+const MiniChart = () => {
+  const { theme } = useTheme();
+
   return (
     <ResponsiveContainer width="100%" height={160}>
       <LineChart data={data} height={150}>
         <Line
           type="monotone"
           dataKey="pv"
-          stroke="#003bde"
+          stroke={theme == "light" ? "#03e08b" : "#03e08b"}
           strokeWidth={2}
           // label={<CustomizedLabel />}
           dot={<CustomizedDot />}
+          activeDot={{ r: 2 }}
         />
         <Tooltip content={<CustomTooltip />} />
         {/* <XAxis dataKey="amt" color="white" /> */}
