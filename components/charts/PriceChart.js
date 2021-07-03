@@ -193,7 +193,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       <Fragment>
         {payload.map(({ value }) => {
           return (
-            <div key={value} className="bg-gray-800 p-2 text-white">
+            <div key={value} className="bg-gray-800 p-2 text-white shadow-xl">
               <p className="text-xs">
                 {moment(new Date(label)).format("DD MMM YYYY").slice(0)}
               </p>

@@ -8,37 +8,6 @@ import {
 } from "../../components/charts";
 import SecondaryNavbar from "../../components/navbar/secondaryNavbar";
 
-// export async function getStaticPaths() {
-//   const res = await fetch("http://localhost:8000/company");
-//   const companies = await res.json();
-
-//   const paths = companies.map((company) => ({
-//     params: { slug: company.slug.toString() },
-//   }));
-//   return { paths, fallback: false };
-// }
-
-// export async function getStaticProps({ params }) {
-//   const res1 = await fetch(
-//     `http://localhost:8000/company/?slug=${params.slug}`
-//   );
-
-//   const companyData = await res1.json();
-//   const [company] = companyData;
-
-//   const res2 = await fetch(
-//     `http://localhost:8000/financialStatementFact?companyId=${company.id}&&quarter=4&&_limit=5`
-//   );
-//   const res3 = await fetch(`http://localhost:8000/balanceSheet`);
-
-//   const balanceSheet = await res3.json();
-
-//   const balanceSheetData = await res2.json();
-
-//   // Pass post data to the page via props
-//   return { props: { companyData, balanceSheetData, balanceSheet } };
-// }
-
 export async function getServerSideProps({ params }) {
   // Fetch data from external API
   const data = await fetch(
@@ -169,8 +138,13 @@ export function Company({ companyData }) {
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md p-3 mb-3 rounded-lg">
-        <h2 className="font-bold text-xl mb-4 ">Company Essentials</h2>
-        <StockHoldingChart />
+        <h2 className="font-bold text-xl mb-4 ">Stock Holding Pattern</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <StockHoldingChart />
+          <div>
+            <p>sdfs</p>
+          </div>
+        </div>
       </section>
     </Layout>
   );

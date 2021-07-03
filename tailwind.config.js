@@ -28,6 +28,7 @@ module.exports = {
   variants: {
     extend: {
       backgroundColor: ["even"],
+      ringWidth: ["hover", "active"],
     },
   },
   plugins: [

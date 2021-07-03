@@ -1,14 +1,19 @@
-import React, { PureComponent } from "react";
-import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
+import React from "react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+} from "recharts";
 
 const data = [
-  { name: "Group A", value: 400 },
-  { name: "Group B", value: 300 },
-  { name: "Group C", value: 300 },
-  { name: "Group D", value: 200 },
+  { name: "Promoter", value: 7896633 },
+  { name: "Public", value: 3384272 },
 ];
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
+const COLORS = ["#1E40AF", "#10B981", "#FFBB28", "#FF8042"];
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({
@@ -39,25 +44,56 @@ const renderCustomizedLabel = ({
 
 const StockHoldingChart = () => {
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart width={400} height={400}>
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          labelLine={false}
-          label={renderCustomizedLabel}
-          outerRadius={80}
-          fill="#8884d8"
-          dataKey="value"
-        >
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-      </PieChart>
-    </ResponsiveContainer>
+    <div className="w-full h-96">
+      <ResponsiveContainer>
+        <PieChart>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            labelLine={false}
+            label={renderCustomizedLabel}
+            outerRadius={150}
+            fill="#8884d8"
+            dataKey="value"
+            strokeWidth={0}
+          >
+            {data.map((entry, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={COLORS[index % COLORS.length]}
+              />
+            ))}
+          </Pie>
+          <Tooltip content={<CustomTooltip />} />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
+};
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload != undefined) {
+    return (
+      <>
+        {payload.map(({ value, name }) => {
+          return (
+            <div key={value} className="bg-gray-800 p-2 text-white">
+              <p className="text-xs">
+                {name}:{" "}
+                <span>
+                  {typeof value === "number"
+                    ? value.toFixed(1)
+                    : (0).toFixed(1)}
+                </span>
+              </p>
+            </div>
+          );
+        })}
+      </>
+    );
+  }
+  return null;
 };
 
 export default StockHoldingChart;

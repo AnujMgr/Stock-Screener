@@ -1,110 +1,135 @@
 import React, { Fragment, PureComponent } from "react";
-import { LineChart, Line, Tooltip, ResponsiveContainer, XAxis } from "recharts";
+import {
+  LineChart,
+  Line,
+  Tooltip,
+  ResponsiveContainer,
+  Label,
+  LabelList,
+} from "recharts";
 import moment from "moment";
 import { useTheme } from "next-themes";
 
 const data = [
   {
-    name: "2014",
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
+    year: "2014",
+    ratio: 2.22,
   },
   {
-    name: "2015",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
+    year: "2015",
+    ratio: 33.22,
   },
   {
-    name: "2016",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
+    year: "2016",
+    ratio: 0.2,
   },
   {
-    name: "2017",
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
+    year: "2017",
+    ratio: -1,
   },
   {
-    name: "2018",
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
+    year: "2018",
+    ratio: 22.22,
   },
   {
-    name: "2019",
-    uv: 2390,
-    pv: 3800,
-    amt: 2500,
+    year: "2019",
+    ratio: 50.22,
   },
   {
-    name: "2020",
-    uv: 3490,
-    pv: 4300,
-    amt: 2100,
+    year: "2020",
+    ratio: 1,
   },
 ];
 
-const CustomizedDot = (props) => {
-  const { cx, cy, stroke, payload, value } = props;
+const MiniChart = () => {
   const { theme } = useTheme();
-  const bg = theme == "light" ? "#fff" : "#03e08b";
 
   return (
-    <svg
-      x={cx - 5}
-      y={cy - 0}
-      width={50}
-      height={60}
-      fill="red"
-      viewBox="0 0 1024 1024"
-    >
-      <g>
-        <rect
-          x="0"
-          y="0"
-          rx="60"
-          ry="80"
-          width="100"
-          height="350"
-          fill={bg}
-        ></rect>
-        <text
-          x="60"
-          y="230"
-          fontFamily="Muli"
-          fontSize="12rem"
-          fontWeight="bold"
-          fill={theme == "light" ? "#003bde" : "#03e08b"}
-          overflow="hidden"
+    <>
+      <ResponsiveContainer width="100%" height={160}>
+        <LineChart data={data} height={150}>
+          <Line
+            type="monotone"
+            dataKey="ratio"
+            stroke={theme == "light" ? "#34D399" : "#fff"}
+            strokeWidth={2}
+            dot={{ fill: theme == "light" ? "#34D399" : "#fff" }}
+            label={<CustomizedLabel />}
+          />
+          <Tooltip content={<CustomTooltip />} />
+        </LineChart>
+      </ResponsiveContainer>
+      <div className="grid grid-cols-3">
+        <div className="flex flex-col text-center">
+          <p className="text-xs">1 YEAR</p>
+          <p className="font-bold">5.4%</p>
+        </div>
+        <div className="flex flex-col text-center">
+          <p className="text-xs">1 YEAR</p>
+          <p className="font-bold">5.4%</p>
+        </div>
+        <div className="flex flex-col text-center">
+          <p className="text-xs">1 YEAR</p>
+          <p className="font-bold">5.4%</p>
+        </div>
+      </div>
+    </>
+  );
+};
+
+const CustomizedLabel = ({ x, y, stroke, value }) => {
+  const { theme } = useTheme();
+
+  return (
+    <svg>
+      <defs>
+        <filter
+          id="rounded-corners"
+          x="-20%"
+          width="140%"
+          y="-35%"
+          height="160%"
         >
-          {value}
-        </text>
-      </g>
+          <feFlood floodColor={theme == "light" ? "#9CA3AF" : "#1F2937"} />
+          <feGaussianBlur stdDeviation="2" />
+          <feComponentTransfer>
+            <feFuncA type="table" tableValues="0 0 0 1" />
+          </feComponentTransfer>
+
+          <feComponentTransfer>
+            <feFuncA type="table" tableValues="0 1 1 1 1 1 1 1" />
+          </feComponentTransfer>
+          <feComposite operator="over" in="SourceGraphic" />
+        </filter>
+      </defs>
+
+      <text
+        filter="url(#rounded-corners)"
+        x={x}
+        y={y}
+        dy={-10}
+        fill={theme == "light" ? "#fff" : "#fff"}
+        fontSize={10}
+        textAnchor="middle"
+      >
+        {value}
+      </text>
     </svg>
   );
+  s;
 };
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload != undefined) {
     return (
       <Fragment>
-        {payload.map(({ value, name, color }) => {
+        {payload.map(({ value, payload }) => {
           return (
-            <div className="p-2 bg-gray-100 dark:bg-black" key={value}>
-              <p className="text-xs">
-                {moment(new Date(label)).format("YYYY").slice(0)}
-              </p>
+            <div className="p-2 bg-gray-800 shadow-xl" key={value}>
+              <p className="text-xs text-white">Year: {payload.year}</p>
 
-              <p className="text-xs">
-                <span>
-                  {typeof value === "number"
-                    ? value.toFixed(1)
-                    : (0).toFixed(1)}
-                </span>
+              <p className="text-xs text-white">
+                <span>Ratio: {value}</span>
               </p>
             </div>
           );
@@ -114,28 +139,6 @@ const CustomTooltip = ({ active, payload, label }) => {
   }
 
   return null;
-};
-
-const MiniChart = () => {
-  const { theme } = useTheme();
-
-  return (
-    <ResponsiveContainer width="100%" height={160}>
-      <LineChart data={data} height={150}>
-        <Line
-          type="monotone"
-          dataKey="pv"
-          stroke={theme == "light" ? "#03e08b" : "#03e08b"}
-          strokeWidth={2}
-          // label={<CustomizedLabel />}
-          dot={<CustomizedDot />}
-          activeDot={{ r: 2 }}
-        />
-        <Tooltip content={<CustomTooltip />} />
-        {/* <XAxis dataKey="amt" color="white" /> */}
-      </LineChart>
-    </ResponsiveContainer>
-  );
 };
 
 export default MiniChart;

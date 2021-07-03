@@ -24,7 +24,7 @@ function SecondaryNavbar() {
             className="text-primary"
             href={`/company/${slug}/financialReports`}
           >
-            Financial Reports
+            Balance Sheet
           </Link>
         </div>
         <div className="px-4 py-1 hover:border-indigo-700 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">

@@ -1,14 +1,59 @@
-import Toggle from "../components/toggle";
 import Layout from "../components/layout";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const { theme } = useTheme();
+  const bg = theme === "light" ? "#4C1D95" : "#111827";
+  const [mounted, setMounted] = useState(false);
+
+  // When mounted on client, now we can show the UI
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
   return (
     <Layout>
-      <div className="xl:container mx-auto">
-        <h1 className="text-primary text-4xl text-center h-screen">
-          Welcome To Next App
+      <section className="bg-purple-900 dark:bg-gray-900 py-10 banner">
+        <div className="xl:container mx-auto">
+          <h1 className="md:max-w-4xl text-white text-4xl md:text-7xl px-3 md:px-2 text-center font-bold mx-auto mt-9">
+            The easiest way to buy and sell cryptocurrency
+          </h1>
+          <p className="md:max-w-3xl px-3 md:px-2 text-center text-white mx-auto mt-6">
+            If the image has no dimensions or intrinsic ratio, rule 4 applies,
+            and we use the background area's dimension.
+          </p>
+          <div className="flex justify-center mt-6">
+            <input
+              className="bg-gray-100 rounded-l-md py-2 px-3 text-gray-900 md:w-96 sm:w-72 shadow-xl focus:ring-2 focus:ring-blue-600"
+              placeholder="Your Email"
+              type="email"
+            />
+            <button className="bg-blue-600 px-2 py-2 rounded-r-md text-white hover:bg-blue-500 transition duration-500 ease-in-out shadow-xl">
+              Get Started
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 150">
+        <path
+          fill={bg}
+          fillOpacity="12"
+          d="M0,0L60,21.3C120,43,240,85,360,90.7C480,96,600,64,720,69.3C840,75,960,117,1080,128C1200,139,1320,117,1380,106.7L1440,96L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
+        ></path>
+      </svg>
+
+      <section className="xl:container mx-3 xl:mx-auto mt-8 p-3 rounded-lg">
+        <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-10">
+          Our Services
         </h1>
-      </div>
+        <div className="grid grid-cols-3 gap-5">
+          <div className="shadow-md p-3 dark:bg-gray-700">ss</div>
+          <div className="shadow-md p-3 dark:bg-gray-700">ss</div>
+          <div className="shadow-md p-3 dark:bg-gray-700">aaa</div>
+        </div>
+      </section>
     </Layout>
   );
 }

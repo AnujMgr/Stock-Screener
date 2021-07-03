@@ -28,7 +28,7 @@ function FinancialReports({ balanceSheetData, balanceSheet }) {
   return (
     <Layout>
       <SecondaryNavbar />
-      <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md p-3 mb-3 rounded-lg">
+      <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md px-2 py-5 md:p-5 mb-3 rounded-lg">
         <h2 className="font-bold text-xl mb-4">Yearly Balance Sheet</h2>
         <div className="flex overflow-x-auto custom-scroll">
           <div className="flex flex-col flex-auto ">
