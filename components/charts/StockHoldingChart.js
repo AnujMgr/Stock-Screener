@@ -44,30 +44,48 @@ const renderCustomizedLabel = ({
 
 const StockHoldingChart = () => {
   return (
-    <div className="w-full h-96">
-      <ResponsiveContainer>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={renderCustomizedLabel}
-            outerRadius={150}
-            fill="#8884d8"
-            dataKey="value"
-            strokeWidth={0}
-          >
-            {data.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={COLORS[index % COLORS.length]}
-              />
-            ))}
-          </Pie>
-          <Tooltip content={<CustomTooltip />} />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="flex">
+      <div className="w-full max-w-sm h-96">
+        <ResponsiveContainer>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={renderCustomizedLabel}
+              outerRadius={150}
+              fill="#8884d8"
+              dataKey="value"
+              strokeWidth={0}
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div>
+        <div className="flex">
+          <div
+            className="h-3.5 w-3.5 mr-2 mt-0.5"
+            style={{ backgroundColor: COLORS[0] }}
+          ></div>
+          <p>Promoters: 70%</p>
+        </div>
+        <div className="flex">
+          <div
+            className="h-3.5 w-3.5 mr-2 mt-0.5"
+            style={{ backgroundColor: COLORS[1] }}
+          ></div>
+          <p>Public: 30%</p>
+        </div>
+      </div>
     </div>
   );
 };

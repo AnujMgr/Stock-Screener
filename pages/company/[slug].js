@@ -1,11 +1,7 @@
 import React from "react";
 import Layout from "../../components/layout";
 import { BsFillCaretUpFill } from "react-icons/bs";
-import {
-  PriceChart,
-  MiniChart,
-  StockHoldingChart,
-} from "../../components/charts";
+import { MiniChart, StockHoldingChart } from "../../components/charts";
 import SecondaryNavbar from "../../components/navbar/secondaryNavbar";
 
 export async function getServerSideProps({ params }) {
@@ -14,17 +10,29 @@ export async function getServerSideProps({ params }) {
     `http://localhost:8000/company/?slug=${params.slug}`
   );
 
+  const companyEssentials = await fetch(
+    `http://localhost:8000/companyEssentials/?companySlug=${params.slug}`
+  );
+
+  const companyRatioData = await fetch(
+    `http://localhost:8000/companyRatios?companySlug=${params.slug}`
+  );
+
   const companyData = await data.json();
+  const companyEssentialsData = await companyEssentials.json();
+  const companyRatio = await companyRatioData.json();
 
   // Pass post data to the page via props
-  return { props: { companyData } };
+  return { props: { companyData, companyEssentialsData, companyRatio } };
 }
 
-export function Company({ companyData }) {
+export function Company({ companyData, companyEssentialsData, companyRatio }) {
   const [company] = companyData;
+  const [companyEssentials] = companyEssentialsData;
   return (
     <Layout>
       <SecondaryNavbar />
+
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow-md rounded-lg">
         <div className="grid grid-cols-1 sm:grid-cols-2">
           <div>
@@ -59,88 +67,72 @@ export function Company({ companyData }) {
         </div>
       </section>
 
+      <section className="xl:container mx-3 xl:mx-auto mt-8 ">
+        <div className="grid grid-cols-4 gap-2">
+          <div className="py-5 px-8 bg-white dark:bg-gray-900 shadow-md rounded-md">
+            <p className="text-lg">{(100000000).toLocaleString()}</p>
+            <p className="text-gray-400">Market Capital</p>
+          </div>
+          <div className="py-5 px-8 bg-white dark:bg-gray-900 shadow-md rounded-md">
+            <p className="text-lg">385.00-205.00</p>
+            <p className="text-gray-400">52 Weeks High - Low </p>
+          </div>
+          <div className="py-5 px-8 bg-white dark:bg-gray-900 shadow-md rounded-md">
+            <p className="text-lg">385.00-205.00</p>
+            <p className="text-gray-400">120 Day Average </p>
+          </div>
+          <div className="py-5 px-8 bg-white dark:bg-gray-900 shadow-md rounded-md">
+            <p className="text-lg">382,194.00</p>
+            <p className="text-gray-400">30-Day Avg. Volume </p>
+          </div>
+        </div>
+      </section>
+
       <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md p-3 mb-3 rounded-lg">
         <h2 className="font-bold text-xl mb-4 ">Company Essentials</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
+          {companyEssentials.data.map((data) => (
+            <div className="flex flex-col" key={data.name}>
+              <p className="text-xs mb-2">{data.name}</p>
+              <h4 className="m-0 font-bold text-md mb-3 text-gray-800 dark:text-gray-300">
+                {data.value.toLocaleString()}
+              </h4>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="xl:container mx-3 xl:mx-auto mt-8 mb-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="shadow-md p-3 bg-white dark:bg-gray-900 rounded-lg ">
+            <h1 className="font-bold px-3 text-xl mb-3">ROE %</h1>
+            <MiniChart data={companyRatio[0].roe} />
           </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
+          <div className="shadow-md p-3 bg-white dark:bg-gray-900 rounded-lg ">
+            <h1 className="font-bold px-3 text-xl mb-3">ROA %</h1>
+            <MiniChart data={companyRatio[0].roa} />
           </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
+          <div className="shadow-md p-3 bg-white dark:bg-gray-900 rounded-lg ">
+            <h1 className="font-bold px-3 text-xl mb-3">Net NPA %</h1>
+            <MiniChart data={companyRatio[0].netNpa} />
           </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
-          </div>
-          <div className="flex flex-col">
-            <p className="text-xs mb-2">MARKET CAP</p>
-            <h4 className="m-0 font-bold text-sm mb-3 text-gray-800 dark:text-gray-300">
-              ₹ 29,769.66 Cr.
-            </h4>
+          <div className="shadow-md p-3 bg-white dark:bg-gray-900 rounded-lg ">
+            <h1 className="font-bold px-3 text-xl mb-3">NIM %</h1>
+            <MiniChart data={companyRatio[0].nim} />
           </div>
         </div>
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md p-3 mb-3 rounded-lg">
         <h2 className="font-bold text-xl mb-4 ">Stock Holding Pattern</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <StockHoldingChart />
+        </div>
+      </section>
+
+      <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md p-3 mb-3 rounded-lg">
+        <h2 className="font-bold text-xl mb-4 ">Corporate Action</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <p>sdfs</p>
           </div>

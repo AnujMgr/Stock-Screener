@@ -27,8 +27,8 @@ module.exports = {
 
   variants: {
     extend: {
-      backgroundColor: ["even"],
-      ringWidth: ["hover", "active"],
+      backgroundColor: ["even", "checked"],
+      ringWidth: ["hover", "active", "focus"],
     },
   },
   plugins: [

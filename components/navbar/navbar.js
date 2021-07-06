@@ -11,7 +11,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="hidden md:block shadow-sm bg-white dark:bg-gray-800 dark:border-b-2 border-fuchsia-100 border-gray-100 dark:border-gray-600">
+      <div className="hidden md:block shadow-sm bg-white dark:bg-gray-800 border-b border-fuchsia-100 border-gray-100 dark:border-gray-600">
         <div className="xl:container mx-auto flex items-center px-4">
           <h1 className="text-2xl text-primary dark:text-white lg:mr-6">
             <Link href="/">Analytics</Link>
@@ -28,17 +28,17 @@ function Navbar() {
                 />
               </div>
               <div>
-                <div className="p-4 hover:border-indigo-700 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div className="p-4 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link className="text-primary" href="/">
                     Home
                   </Link>
                 </div>
-                <div className="p-4 hover:border-indigo-700 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div className="p-4 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link className="text-primary" href="/">
                     Listing
                   </Link>
                 </div>
-                <div className="p-4 hover:border-indigo-700 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div className="p-4 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link className="text-primary" href="/">
                     Market
                   </Link>
@@ -48,8 +48,8 @@ function Navbar() {
           </div>
           {/* Right Nav Items */}
           <div className="flex items-center">
-            <div className="p-4 hover:border-indigo-700 delay-200 border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
-              <button>Login</button>
+            <div className="p-4 hover:border-indigo-700 dark:hover:border-gray-50 delay-200 border-transparent border-b-2 flex-grow-0 inline-flex items-center transition duration-500 ease-in-out">
+              <Link href="/login">Login</Link>
             </div>
             <Toggle />
           </div>

@@ -1,6 +1,7 @@
 import Layout from "../components/layout";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import MicroChart from "../components/charts/MicroChart";
 
 export default function Home() {
   const { theme } = useTheme();
@@ -25,7 +26,7 @@ export default function Home() {
           </p>
           <div className="flex justify-center mt-6">
             <input
-              className="bg-gray-100 rounded-l-md py-2 px-3 text-gray-900 md:w-96 sm:w-72 shadow-xl focus:ring-2 focus:ring-blue-600"
+              className="bg-gray-100 rounded-l-md py-2 px-3 text-gray-900 md:w-96 sm:w-72 shadow-xl focus:outline-none "
               placeholder="Your Email"
               type="email"
             />
@@ -46,13 +47,51 @@ export default function Home() {
 
       <section className="xl:container mx-3 xl:mx-auto mt-8 p-3 rounded-lg">
         <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-10">
-          Our Services
+          Market Trend
         </h1>
-        <div className="grid grid-cols-3 gap-5">
-          <div className="shadow-md p-3 dark:bg-gray-700">ss</div>
-          <div className="shadow-md p-3 dark:bg-gray-700">ss</div>
-          <div className="shadow-md p-3 dark:bg-gray-700">aaa</div>
-        </div>
+
+        <table className="table-auto w-full">
+          <thead>
+            <tr className="text-gray-500 ">
+              <th className="w-1/4 py-3 px-3 text-left">Index</th>
+              <th className="w-1/4 py-3 px-3 text-center">Points</th>
+              <th className="w-1/4 py-3 px-3 text-center">24hr Change</th>
+              <th className="w-1/2 py-3 px-3 text-right">Market</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+              <td className="py-3 px-3 text-xl">Nepse</td>
+              <td className="py-3 px-3 text-xl text-center">2,843.00</td>
+              <td className="py-3 px-3 text-xl text-center text-gray-500">
+                +0.68 %
+              </td>
+              <td className="text-xl text-right">
+                <MicroChart />
+              </td>
+            </tr>
+            <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+              <td className="py-3 px-3 text-xl">Development Bank</td>
+              <td className="py-3 px-3 text-xl text-center">1,800.00</td>
+              <td className="py-3 px-3 text-xl text-center text-gray-500">
+                +1.2 %
+              </td>
+              <td className="text-xl text-right">
+                <MicroChart />
+              </td>
+            </tr>
+            <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+              <td className="py-3 px-3 text-xl">Finance</td>
+              <td className="py-3 px-3 text-xl text-center">2,300.00</td>
+              <td className="py-3 px-3 text-xl text-center text-gray-500">
+                -2.3 %
+              </td>
+              <td className="text-xl text-right">
+                <MicroChart />
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </section>
     </Layout>
   );

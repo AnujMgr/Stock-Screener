@@ -12,61 +12,39 @@ export async function getServerSideProps({ params }) {
   const [company] = companyData;
 
   const res2 = await fetch(
-    `http://localhost:8000/balanceSheet?companyId=${company.id}&&quarter=4&&_limit=5`
+    `http://localhost:8000/profitAndLoss?companyId=${company.id}&&quarter=4&&_limit=5`
   );
 
-  const balanceSheetData = await res2.json();
+  const profitAndLossData = await res2.json();
 
   // Pass post data to the page via props
-  return { props: { companyData, balanceSheetData } };
+  return { props: { profitAndLossData } };
 }
 
-function FinancialReports({ balanceSheetData }) {
+function ProfitAndLoss({ profitAndLossData }) {
   return (
     <Layout>
       <SecondaryNavbar />
       <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md px-2 py-5 md:p-5 mb-3 rounded-lg">
-        <div className="flex justify-between">
-          <h2 className="font-bold text-xl mb-4">Yearly Balance Sheet</h2>
-          <div className="flex flex-col items-center">
-            <div className="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-              <input
-                type="checkbox"
-                name="toggle"
-                id="toggle"
-                className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-blue-300 dark:border-blue-100 border-4 appearance-none cursor-pointer"
-              />
-              <label
-                htmlFor="toggle"
-                className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-300 cursor-pointer "
-              ></label>
-            </div>
-            <label
-              htmlFor="toggle"
-              className="text-xs text-gray-700 dark:text-gray-100 mt-2"
-            >
-              Simplified
-            </label>
-          </div>
-        </div>
+        <h2 className="font-bold text-xl mb-4">Yearly Balance Sheet</h2>
         <div className="flex overflow-x-auto custom-scroll">
           <div className="flex flex-col flex-auto ">
             <h4 className="m-0 font-bold text-xl dark:bg-indigo-900 bg-blue-600 p-2 mb-3 text-white dark:text-gray-200 ">
               Particulars
             </h4>
             <div>
-              {balanceSheetData[0].data.map((data) => (
+              {profitAndLossData[0].data.map((data) => (
                 <h4
                   key={data.id}
-                  className="w-60 md:w-full truncate overflow-ellipsis overflow-hidden h-10 flex items-center px-2 even:bg-gray-100
-                dark:even:bg-gray-800 mb-1"
+                  className="w-60 md:w-full truncate overflow-ellipsis overflow-hidden h-10 flex items-center px-2 even:bg-gray-100 
+            dark:even:bg-gray-800 mb-1"
                 >
                   {data.name}
                 </h4>
               ))}
             </div>
           </div>
-          {balanceSheetData.map((items) => (
+          {profitAndLossData.map((items) => (
             <div className="flex flex-col " key={items.fiscalYear}>
               <h4 className="m-0 px-6 font-bold text-lg bg-blue-600 dark:bg-indigo-900 p-2 mb-3 text-white dark:text-gray-200">
                 {items.fiscalYear}
@@ -75,7 +53,8 @@ function FinancialReports({ balanceSheetData }) {
                 {items.data.map((data) => (
                   <h4
                     key={data.id}
-                    className="h-10 flex items-center even:bg-gray-100 dark:even:bg-gray-800 px-6 mb-1"
+                    className="h-10 flex items-center even:bg-gray-100 dark:even:bg-gray-800 
+              px-6 mb-1"
                   >
                     {data.amount}
                   </h4>
@@ -89,4 +68,4 @@ function FinancialReports({ balanceSheetData }) {
   );
 }
 
-export default FinancialReports;
+export default ProfitAndLoss;

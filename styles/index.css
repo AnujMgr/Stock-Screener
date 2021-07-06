@@ -48,4 +48,25 @@
   #nprogress .bar {
     background: red !important;
   }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  @variants dark {
+    .toggle-checkbox:checked {
+      right: 0;
+      /* border-color: #68d391; */
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      /* background-color: #68d391; */
+    }
+    .custom:checked + .toggle-label {
+      @apply: bg-red-900;
+      background-color: red;
+    }
+  }
 }

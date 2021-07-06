@@ -1,64 +1,34 @@
-import React, { Fragment, PureComponent } from "react";
-import {
-  LineChart,
-  Line,
-  Tooltip,
-  ResponsiveContainer,
-  Label,
-  LabelList,
-} from "recharts";
-import moment from "moment";
+import React, { Fragment } from "react";
+import { LineChart, Line, Tooltip, ResponsiveContainer } from "recharts";
 import { useTheme } from "next-themes";
 
-const data = [
-  {
-    year: "2014",
-    ratio: 2.22,
-  },
-  {
-    year: "2015",
-    ratio: 33.22,
-  },
-  {
-    year: "2016",
-    ratio: 0.2,
-  },
-  {
-    year: "2017",
-    ratio: -1,
-  },
-  {
-    year: "2018",
-    ratio: 22.22,
-  },
-  {
-    year: "2019",
-    ratio: 50.22,
-  },
-  {
-    year: "2020",
-    ratio: 1,
-  },
-];
-
-const MiniChart = () => {
+const MiniChart = ({ data }) => {
   const { theme } = useTheme();
+  // data.reverse();
 
   return (
     <>
-      <ResponsiveContainer width="100%" height={160}>
-        <LineChart data={data} height={150}>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart
+          data={data.reverse()}
+          margin={{
+            top: 20,
+            right: 20,
+            left: 20,
+            bottom: 20,
+          }}
+        >
           <Line
             type="monotone"
-            dataKey="ratio"
-            stroke={theme == "light" ? "#34D399" : "#fff"}
+            dataKey="value"
+            stroke={theme == "light" ? "#34D399" : "#E5E7EB"}
             strokeWidth={2}
-            dot={{ fill: theme == "light" ? "#34D399" : "#fff" }}
+            dot={{ fill: theme == "light" ? "#34D399" : "#E5E7EB" }}
             label={<CustomizedLabel />}
           />
           <Tooltip content={<CustomTooltip />} />
         </LineChart>
-      </ResponsiveContainer>
+      </ResponsiveContainer>  
       <div className="grid grid-cols-3">
         <div className="flex flex-col text-center">
           <p className="text-xs">1 YEAR</p>
@@ -124,9 +94,13 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
       <Fragment>
         {payload.map(({ value, payload }) => {
+          const newDate = new Date(payload.date);
+
           return (
             <div className="p-2 bg-gray-800 shadow-xl" key={value}>
-              <p className="text-xs text-white">Year: {payload.year}</p>
+              <p className="text-xs text-white">
+                Year: {newDate.getFullYear()}
+              </p>
 
               <p className="text-xs text-white">
                 <span>Ratio: {value}</span>
