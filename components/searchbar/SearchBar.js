@@ -3,20 +3,28 @@ import React, { useEffect, useState } from "react";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { useRouter } from "next/router";
 
-function SearchBar({ bg, borderRad, width, color }) {
+function SearchBar({
+  bg,
+  borderRad,
+  width,
+  color,
+  placeholder,
+  height,
+  companies,
+}) {
   const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
-  const [companies, setCompanies] = useState([]);
+  // const [companies, setCompanies] = useState([]);
   const router = useRouter();
 
-  const getCompaniesApi = `http://localhost:8000/company`;
-  const fetchCompanies = async () => {
-    fetch(getCompaniesApi)
-      .then((response) => response.json())
-      .then((data) => setCompanies(data));
-  };
+  // const getCompaniesApi = `${process.env.url}/api/companies`;
+  // const fetchCompanies = async () => {
+  //   fetch(getCompaniesApi)
+  //     .then((response) => response.json())
+  //     .then((data) => setCompanies(data));
+  // };
 
-  useEffect(() => fetchCompanies(), []);
+  // useEffect(() => fetchCompanies(), []);
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
@@ -28,7 +36,7 @@ function SearchBar({ bg, borderRad, width, color }) {
     const slug = item.slug;
     router.push({
       pathname: "/company/[slug]",
-      query: { slug: slug },
+      query: { id: slug },
     });
   };
 
@@ -42,10 +50,10 @@ function SearchBar({ bg, borderRad, width, color }) {
             // onHover={handleOnHover}
             onSelect={handleOnSelect}
             // onFocus={handleOnFocus}
-            placeholder="Search Company..."
+            placeholder={placeholder ? placeholder : "Type Company Name..."}
             autoFocus
             styling={{
-              height: "38px",
+              height: height ? height : "38px",
               backgroundColor: bg,
               hoverBackgroundColor: theme === "light" ? "#E5E7EB" : "#6B7280",
               color: color,

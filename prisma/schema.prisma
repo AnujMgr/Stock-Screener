@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Industry {
+  id        Int       @id @default(autoincrement())
+  name      String
+  companies Company[]
+}
+
+model Company {
+  id                  Int                      @id @default(autoincrement())
+  name                String
+  slug                String                   @unique
+  symbol              String                   @unique
+  industry            Industry                 @relation(fields: [industryId], references: [id])
+  industryId          Int // relation scalar field  (used in the `@relation` attribute above)
+  balanceSheetId      Int
+  profitLossId        Int
+  financialStatements FinancialStatementFact[]
+  companyEssentials   CompanyEssentialFact[]
+  companyRatioFacts   CompanyRatioFact[]
+}
+
+//FinancialStatement is the name of the financial report. The Income Statement, Balance Sheet is an example of a FinancialStatement
+model FinancialStatement {
+  id   Int    @id @default(autoincrement())
+  name String
+  financialStatementLine FinancialStatementLineSequence[]
+}
+
+
+//FinancialStatementLine is a single line-item on a FinancialStatement. An example would be Cost of Goods Sold, Share capital, Cash and cash equivalent
+model FinancialStatementLine {
+  id                             Int                              @id @default(autoincrement())
+  name                           String
+  financialStatementFact         FinancialStatementFact[]
+  financialStatement             FinancialStatementLineSequence[]
+  parentId                       Int
+}
+
+model FinancialStatementLineSequence {
+  financialStatement        FinancialStatement     @relation(fields: [financialStatementId], references: [id])
+  financialStatementId     Int
+  financialStatementLine    FinancialStatementLine @relation(fields: [financialStatementLineId], references: [id])
+  financialStatementLineId Int
+  sequence                 Int
+   @@id([financialStatementId, financialStatementLineId])
+  
+}
+
+//FinancialStatementFact is the data for a FinancialStatementLine. For instance, what is the latest Cost of Revenue for Google?
+model FinancialStatementFact {
+  id                       Int                    @id @default(autoincrement())
+  company                  Company                @relation(fields: [companyId], references: [id])
+  companyId                Int // relation scalar field  (used in the `@relation` attribute above)
+  financialStatementLine   FinancialStatementLine @relation(fields: [financialStatementLineId], references: [id])
+  financialStatementLineId Int
+  fiscalYear               Int
+  quarter                  String
+  amount                   Float
+}
+
+model CompanyEssentialLine {
+  id                Int                    @id @default(autoincrement())
+  name              String
+  sequence          Int
+  companyEssentials CompanyEssentialFact[]
+  companyRatios     CompanyRatioFact[]
+}
+
+model CompanyEssentialFact {
+  id                      Int                  @id @default(autoincrement())
+  company                 Company              @relation(fields: [companyId], references: [id])
+  companyId               Int
+  companyEssentialsLine   CompanyEssentialLine @relation(fields: [companyEssentialLinesId], references: [id])
+  companyEssentialLinesId Int
+  fiscalYear              Int
+  value                   Float
+}
+
+model CompanyRatiosLine {
+  id   Int    @id @default(autoincrement())
+  name String
+}
+
+model CompanyRatioFact {
+  id                      Int                  @id @default(autoincrement())
+  company                 Company              @relation(fields: [companyId], references: [id])
+  companyId               Int
+  companyEssentialsLine   CompanyEssentialLine @relation(fields: [companyEssentialLinesId], references: [id])
+  companyEssentialLinesId Int
+  fiscalYear              Int
+  value                   Float
+}

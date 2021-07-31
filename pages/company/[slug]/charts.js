@@ -14,8 +14,7 @@ export async function getServerSideProps() {
 
 function Charts({ historicalData }) {
   return (
-    <Layout>
-      <SecondaryNavbar />
+    <Layout showSecondaryNavbar={true}>
       <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow-md px-3 py-5 mb-3 rounded-lg">
         <h2 className="font-bold text-2xl mb-4 px-3">Price Chart</h2>
         <PriceChart priceHistory={historicalData} />

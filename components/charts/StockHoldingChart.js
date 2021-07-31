@@ -44,8 +44,8 @@ const renderCustomizedLabel = ({
 
 const StockHoldingChart = () => {
   return (
-    <div className="flex">
-      <div className="w-full max-w-sm h-96">
+    <div className="flex flex-col">
+      <div className="w-full max-w-sm h-96 mx-auto">
         <ResponsiveContainer>
           <PieChart>
             <Pie
@@ -57,7 +57,7 @@ const StockHoldingChart = () => {
               outerRadius={150}
               fill="#8884d8"
               dataKey="value"
-              strokeWidth={0}
+              strokeWidth={1}
             >
               {data.map((entry, index) => (
                 <Cell
@@ -70,20 +70,20 @@ const StockHoldingChart = () => {
           </PieChart>
         </ResponsiveContainer>
       </div>
-      <div>
-        <div className="flex">
+      <div className="flex gap-4 justify-center">
+        <div className="flex flex-row">
           <div
             className="h-3.5 w-3.5 mr-2 mt-0.5"
             style={{ backgroundColor: COLORS[0] }}
           ></div>
-          <p>Promoters: 70%</p>
+          <p className="text-gray-900 dark:text-gray-200">Promoters: 70%</p>
         </div>
         <div className="flex">
           <div
             className="h-3.5 w-3.5 mr-2 mt-0.5"
             style={{ backgroundColor: COLORS[1] }}
           ></div>
-          <p>Public: 30%</p>
+          <p className="text-gray-900 dark:text-gray-200">Public: 30%</p>
         </div>
       </div>
     </div>
@@ -96,13 +96,16 @@ const CustomTooltip = ({ active, payload, label }) => {
       <>
         {payload.map(({ value, name }) => {
           return (
-            <div key={value} className="bg-gray-800 p-2 text-white">
-              <p className="text-xs">
+            <div
+              key={value}
+              className="bg-gray-800 p-2 text-gray-900 dark:text-gray-200"
+            >
+              <p className="text-xs text-white dark:text-gray-200">
                 {name}:{" "}
                 <span>
                   {typeof value === "number"
-                    ? value.toFixed(1)
-                    : (0).toFixed(1)}
+                    ? value.toLocaleString()
+                    : (0).toFixed(1).toLocaleString()}
                 </span>
               </p>
             </div>

@@ -44,7 +44,7 @@ const Login = () => {
             </div>
           </div>
           <div className="bg-green-400 dark:bg-gray-700 p-3 col-span-2 flex">
-            <h1 className="text-center text-xl text-white">
+            <h1 className="text-center text-2xl text-white mx-auto">
               Welcome Back Page
             </h1>
           </div>

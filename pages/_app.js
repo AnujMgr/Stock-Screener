@@ -4,16 +4,25 @@ import { ThemeProvider } from "next-themes";
 import Router from "next/router";
 import NProgress from "nprogress"; //nprogress module
 import "nprogress/nprogress.css"; //styles of nprogress
-//Binding events.
+import { useApollo } from "../lib/apollo/apolloClient";
+import { ApolloProvider } from "@apollo/client";
+import { AppWrapper } from "../lib/contexts/State";
+
 Router.events.on("routeChangeStart", () => NProgress.start());
 Router.events.on("routeChangeComplete", () => NProgress.done());
 Router.events.on("routeChangeError", () => NProgress.done());
 
 function MyApp({ Component, pageProps }) {
+  const client = useApollo(pageProps.initialApolloState);
+
   return (
-    <ThemeProvider attribute="class">
-      <Component {...pageProps} />
-    </ThemeProvider>
+    <ApolloProvider client={client}>
+      <ThemeProvider attribute="class">
+        <AppWrapper>
+          <Component {...pageProps} />
+        </AppWrapper>
+      </ThemeProvider>
+    </ApolloProvider>
   );
 }
 
