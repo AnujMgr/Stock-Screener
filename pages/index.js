@@ -1,58 +1,24 @@
 import Layout from "../components/layout";
 import { useTheme } from "next-themes";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MicroChart from "../components/charts/MicroChart";
 import SearchBar from "../components/searchbar";
 import prisma from "../prisma/client";
-import { useAppContext } from "../lib/contexts/State";
 
 export async function getServerSideProps({ params }) {
   // Fetch data from external API
   // const data = await fetch(
   //   `http://localhost:8000/company/?slug=${params.slug}`
   // );
-  var financialFact = [];
-  const financialStatementSequence =
-    await prisma.financialStatementLineSequence.findMany({
-      where: {
-        financialStatementId: Number(1),
-      },
+  const companies = await prisma.company.findMany();
 
-      include: {
-        financialStatementLine: {
-          include: {
-            financialStatementFact: true,
-          },
-        },
-      },
-    });
-
-  financialStatementSequence.map((statement) => {
-    const fact = { ...statement.financialStatementLine.financialStatementFact };
-    financialFact.push({ ...fact[0], sequence: statement.sequence });
-  });
-
-  const data = await prisma.financialStatementLine.findMany({
-    where: {
-      financialStatement: {
-        some: {
-          financialStatementId: 1,
-        },
-      },
-    },
-  });
-
-  return { props: { data, financialStatementSequence, financialFact } };
+  return {
+    props: { companies },
+  };
 }
 
-export default function Home({
-  data,
-  financialStatementSequence,
-  financialFact,
-}) {
+export default function Home({ companies }) {
   // company.setCurrentCompany({ anuj: "A" });
-
-  const { companies } = useAppContext();
   const { theme } = useTheme();
   const bg = theme === "light" ? "#4C1D95" : "#111827";
   const [mounted, setMounted] = useState(false);
@@ -81,7 +47,7 @@ export default function Home({
               placeholder={"Search for a Company..."}
               color={theme === "light" ? "#000" : "#fff"}
               height="50px"
-              companies={companies.getAllCompanies}
+              companies={companies}
             />
           </div>
         </div>

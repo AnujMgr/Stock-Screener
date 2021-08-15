@@ -99,12 +99,6 @@ const resolvers = {
       return prisma.financialStatementLine.findMany();
     },
     getFinancialStatementLineById: async (parent, args, context) => {
-      // return prisma.financialStatementLine.findFirst({
-      //   where: {
-      //     id: Number(args.id),
-      //   },
-      // });
-
       return await prisma.financialStatementLine.findMany({
         where: {
           financialStatement: {
@@ -138,18 +132,19 @@ const resolvers = {
           },
         });
 
-      financialStatementSequence.map((statement) => {
-        const fact = {
-          ...statement.financialStatementLine.financialStatementFact,
-        };
-        financialFact.push({ ...fact[0], sequence: statement.sequence });
-      });
+      financialStatementSequence.map((statement, index) => {
+        if (
+          statement.financialStatementLine.financialStatementFact.length > 0
+        ) {
+          const fact = [
+            ...statement.financialStatementLine.financialStatementFact,
+          ];
 
-      // financialStatementSequence.map((statement) => {
-      //   financialFact.push(
-      //     ...statement.financialStatementLine.financialStatementFact
-      //   );
-      // });
+          fact.map((data) => {
+            financialFact.push({ ...data, sequence: statement.sequence });
+          });
+        }
+      });
 
       return financialFact;
     },

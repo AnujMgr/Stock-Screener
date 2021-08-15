@@ -8,11 +8,6 @@ import {
   Legend,
 } from "recharts";
 
-const data = [
-  { name: "Promoter", value: 7896633 },
-  { name: "Public", value: 3384272 },
-];
-
 const COLORS = ["#1E40AF", "#10B981", "#FFBB28", "#FF8042"];
 
 const RADIAN = Math.PI / 180;
@@ -42,7 +37,7 @@ const renderCustomizedLabel = ({
   );
 };
 
-const StockHoldingChart = () => {
+const StockHoldingChart = ({ data }) => {
   return (
     <div className="flex flex-col">
       <div className="w-full max-w-sm h-96 mx-auto">
@@ -71,20 +66,25 @@ const StockHoldingChart = () => {
         </ResponsiveContainer>
       </div>
       <div className="flex gap-4 justify-center">
-        <div className="flex flex-row">
-          <div
-            className="h-3.5 w-3.5 mr-2 mt-0.5"
-            style={{ backgroundColor: COLORS[0] }}
-          ></div>
-          <p className="text-gray-900 dark:text-gray-200">Promoters: 70%</p>
-        </div>
-        <div className="flex">
+        {data.map((holding, index) => (
+          <div className="flex flex-row" key={holding.name}>
+            <div
+              className="h-3.5 w-3.5 mr-2 mt-0.5"
+              style={{ backgroundColor: COLORS[index] }}
+            ></div>
+            <p className="text-gray-900 dark:text-gray-200">
+              {holding.name}: {Number(holding.value).toLocaleString()}
+            </p>
+          </div>
+        ))}
+
+        {/* <div className="flex">
           <div
             className="h-3.5 w-3.5 mr-2 mt-0.5"
             style={{ backgroundColor: COLORS[1] }}
           ></div>
           <p className="text-gray-900 dark:text-gray-200">Public: 30%</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

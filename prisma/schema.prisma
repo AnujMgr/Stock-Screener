@@ -26,35 +26,59 @@ model Company {
   balanceSheetId      Int
   profitLossId        Int
   financialStatements FinancialStatementFact[]
-  companyEssentials   CompanyEssentialFact[]
-  companyRatioFacts   CompanyRatioFact[]
+  companyPrice        CompanyPrice[]
+  // companyRatioFacts   CompanyRatioFacts[]
+  stockHoldingFact    StockHoldingFact[]
+}
+
+model CompanyPrice {
+  id               Int      @id @default(autoincrement())
+  date             String
+  noOfTransactions Int
+  maxPrice         Float
+  minPrice         Float
+  closingPrice     Float
+  tradedShares     Int
+  amount           Float
+  previousClosing  Float
+  priceDifference  Float
+  company          Company  @relation(fields: [companyId], references: [id])
+  companyId        Int // relation scalar field  (used in the `@relation` attribute above)
+}
+
+
+model StockHoldingFact {
+  id        Int      @id @default(autoincrement())
+  name      String
+  amount    Int
+  date      String
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId Int
 }
 
 //FinancialStatement is the name of the financial report. The Income Statement, Balance Sheet is an example of a FinancialStatement
 model FinancialStatement {
-  id   Int    @id @default(autoincrement())
-  name String
+  id                     Int                              @id @default(autoincrement())
+  name                   String
   financialStatementLine FinancialStatementLineSequence[]
 }
 
-
 //FinancialStatementLine is a single line-item on a FinancialStatement. An example would be Cost of Goods Sold, Share capital, Cash and cash equivalent
 model FinancialStatementLine {
-  id                             Int                              @id @default(autoincrement())
-  name                           String
-  financialStatementFact         FinancialStatementFact[]
-  financialStatement             FinancialStatementLineSequence[]
-  parentId                       Int
+  id                     Int                              @id @default(autoincrement())
+  name                   String
+  financialStatementFact FinancialStatementFact[]
+  financialStatement     FinancialStatementLineSequence[]
+  parentId               Int
 }
 
 model FinancialStatementLineSequence {
-  financialStatement        FinancialStatement     @relation(fields: [financialStatementId], references: [id])
+  financialStatement       FinancialStatement     @relation(fields: [financialStatementId], references: [id])
   financialStatementId     Int
-  financialStatementLine    FinancialStatementLine @relation(fields: [financialStatementLineId], references: [id])
+  financialStatementLine   FinancialStatementLine @relation(fields: [financialStatementLineId], references: [id])
   financialStatementLineId Int
   sequence                 Int
-   @@id([financialStatementId, financialStatementLineId])
-  
+  @@id([financialStatementId, financialStatementLineId])
 }
 
 //FinancialStatementFact is the data for a FinancialStatementLine. For instance, what is the latest Cost of Revenue for Google?
@@ -66,38 +90,24 @@ model FinancialStatementFact {
   financialStatementLineId Int
   fiscalYear               Int
   quarter                  String
+  unit                     String
   amount                   Float
 }
 
-model CompanyEssentialLine {
-  id                Int                    @id @default(autoincrement())
-  name              String
-  sequence          Int
-  companyEssentials CompanyEssentialFact[]
-  companyRatios     CompanyRatioFact[]
-}
+// model CompanyEssentialLine {
+//   id       Int    @id @default(autoincrement())
+//   name     String
+//   sequence Int
+//   unit     String
+// }
 
-model CompanyEssentialFact {
-  id                      Int                  @id @default(autoincrement())
-  company                 Company              @relation(fields: [companyId], references: [id])
-  companyId               Int
-  companyEssentialsLine   CompanyEssentialLine @relation(fields: [companyEssentialLinesId], references: [id])
-  companyEssentialLinesId Int
-  fiscalYear              Int
-  value                   Float
-}
 
-model CompanyRatiosLine {
-  id   Int    @id @default(autoincrement())
-  name String
-}
-
-model CompanyRatioFact {
-  id                      Int                  @id @default(autoincrement())
-  company                 Company              @relation(fields: [companyId], references: [id])
-  companyId               Int
-  companyEssentialsLine   CompanyEssentialLine @relation(fields: [companyEssentialLinesId], references: [id])
-  companyEssentialLinesId Int
-  fiscalYear              Int
-  value                   Float
-}
+// model CompanyRatioFacts {
+//   id         Int     @id @default(autoincrement())
+//   name       String
+//   company    Company @relation(fields: [companyId], references: [id])
+//   companyId  Int // relation scalar field  (used in the `@relation` attribute above)
+//   fiscalYear Int
+//   unit       String
+//   amount     Float
+// }

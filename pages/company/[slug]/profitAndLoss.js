@@ -1,6 +1,7 @@
 import { useQuery } from "@apollo/client";
-import React from "react";
+import React, { useState } from "react";
 import Layout from "../../../components/layout";
+import Spinner from "../../../components/Spinner";
 import {
   GET_STATEMENT_LINES,
   GET_STATEMENT_WITH_FACTS,
@@ -10,7 +11,7 @@ import prisma from "../../../prisma/client";
 export async function getServerSideProps({ params }) {
   const company = await prisma.company.findFirst({
     where: {
-      slug: Number(params.slug),
+      slug: params.slug,
     },
   });
 
@@ -19,8 +20,10 @@ export async function getServerSideProps({ params }) {
 }
 
 function ProfitAndLoss({ company }) {
+  const [quarter, setQuarter] = useState("Q1");
+
   const { loading, error, data } = useQuery(GET_STATEMENT_WITH_FACTS, {
-    variables: { statementId: 1, quarter: "Q2", companyId: 1 },
+    variables: { statementId: 1, quarter: quarter, companyId: company.id },
   });
 
   const {
@@ -32,7 +35,7 @@ function ProfitAndLoss({ company }) {
   });
 
   if (loading || loadingR) {
-    return "loading";
+    return <Spinner />;
   }
 
   if (error || errorR) {
@@ -49,14 +52,25 @@ function ProfitAndLoss({ company }) {
   var factData = groupBy(data.getStatementWithFacts, "fiscalYear");
 
   return (
-    <Layout showSecondaryNavbar={true} company={company}>
+    <Layout showSecondaryNavbar={true}>
       <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow px-2 py-5 md:p-5 mb-1 rounded-lg">
         <div className="flex justify-between">
           <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-white">
             Yearly Balance Sheet
           </h2>
           <div className="flex flex-col items-center">
-            <div className="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
+            <select
+              name="quarters"
+              className="p-2"
+              value={quarter}
+              onChange={(e) => setQuarter(e.target.value)}
+            >
+              <option value="Q1">Q1</option>
+              <option value="Q2">Q2</option>
+              <option value="Q3">Q3</option>
+              <option value="Q4">Q4</option>
+            </select>
+            {/* <div className="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
               <input
                 type="checkbox"
                 name="toggle"
@@ -67,13 +81,13 @@ function ProfitAndLoss({ company }) {
                 htmlFor="toggle"
                 className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-300 cursor-pointer "
               ></label>
-            </div>
-            <label
+            </div> */}
+            {/* <label
               htmlFor="toggle"
               className="text-xs text-gray-700 dark:text-gray-100 mt-2"
             >
               Simplified
-            </label>
+            </label> */}
           </div>
         </div>
         <div className="flex overflow-x-auto custom-scroll">

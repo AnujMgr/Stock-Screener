@@ -36,7 +36,7 @@ function SearchBar({
     const slug = item.slug;
     router.push({
       pathname: "/company/[slug]",
-      query: { id: slug },
+      query: { slug: slug },
     });
   };
 

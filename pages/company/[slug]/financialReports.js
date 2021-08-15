@@ -5,41 +5,104 @@ import {
   GET_STATEMENT_LINES,
 } from "../../../lib/graphql/queries";
 import prisma from "../../../prisma/client";
+import Spinner from "../../../components/Spinner/Spinner";
+import { useState } from "react";
 
 export async function getServerSideProps({ params }) {
   const company = await prisma.company.findFirst({
     where: {
-      slug: Number(params.slug),
+      slug: params.slug,
+    },
+  });
+  const financialStatement = [];
+
+  if (company === null) {
+    const company = [];
+    return { props: { company, statementLines } };
+  }
+
+  const data = await prisma.financialStatementLineSequence.findMany({
+    where: {
+      financialStatementId: company.balanceSheetId,
+    },
+    include: {
+      financialStatementLine: {
+        include: {
+          financialStatementFact: {
+            where: {
+              quarter: "Q1",
+              companyId: company.id,
+            },
+            take: 5,
+            orderBy: {
+              fiscalYear: "desc",
+            },
+          },
+        },
+      },
     },
   });
 
+  data.map((fact) => {
+    financialStatement.push({
+      statement: {
+        id: fact.financialStatementLine.id,
+        name: fact.financialStatementLine.name,
+        parentId: fact.financialStatementLine.parentId,
+      },
+      facts: fact.financialStatementLine.financialStatementFact.map((line) => ({
+        id: line.id,
+        amount: line.amount,
+        fiscalYear: line.fiscalYear,
+      })),
+    });
+  });
+
   // Pass post data to the page via props
-  return { props: { company } };
+  return { props: { company, data, financialStatement } };
 }
 
-function FinancialReports({ company }) {
-  const { loading, error, data } = useQuery(GET_STATEMENT_WITH_FACTS, {
-    variables: { statementId: 1, quarter: "Q2", companyId: 1 },
-  });
+function FinancialReports({ company, data, financialStatement }) {
+  const [quarter, setQuarter] = useState("Q1");
+  console.log(financialStatement);
 
-  const {
-    data: statementLines,
-    error: errorR,
-    loading: loadingR,
-  } = useQuery(GET_STATEMENT_LINES, {
-    variables: { statementId: 1 },
-  });
+  const statementLines = [];
 
-  if (loading || loadingR) {
-    return "loading";
-  }
+  // data.map((statement) => {
+  //   // if (statementl.includes(statement.id) === false)
+  //   statementl.push({
+  //     id: statement.financialStatementLine.id,
+  //     name: statement.financialStatementLine.name,
+  //     parentId: statement.financialStatementLine.parentId,
+  //     sequence: statement.sequence,
+  //   });
+  // });
+  // console.log(statementl);
 
-  if (error || errorR) {
-    console.log(error);
-    return "error";
-  }
+  // const { loading, error, data } = useQuery(GET_STATEMENT_WITH_FACTS, {
+  //   variables: { statementId: 1, quarter: quarter, companyId: company.id },
+  // });
+  // console.log(statementLines);
+  // const {
+  //   data: statementLines,
+  //   error: errorR,
+  //   loading: loadingR,
+  // } = useQuery(GET_STATEMENT_LINES, {
+  //   variables: { statementId: 1 },
+  // });
 
-  var factData = groupBy(data.getStatementWithFacts, "fiscalYear");
+  // if (loading) {
+  //   return <Spinner />;
+  // }
+
+  // if (error) {
+  //   console.log(error);
+  //   return "error";
+  // }
+
+  // var factData = groupBy(data, "fiscalYear");
+  // console.log(factData);
+  var factData = [];
 
   return (
     <Layout showSecondaryNavbar={true} company={company}>
@@ -49,24 +112,17 @@ function FinancialReports({ company }) {
             Yearly Balance Sheet
           </h2>
           <div className="flex flex-col items-center">
-            <div className="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-              <input
-                type="checkbox"
-                name="toggle"
-                id="toggle"
-                className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white dark:bg-blue-300 dark:border-blue-100 border-4 appearance-none cursor-pointer"
-              />
-              <label
-                htmlFor="toggle"
-                className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-gray-300 cursor-pointer "
-              />
-            </div>
-            <label
-              htmlFor="toggle"
-              className="text-xs text-gray-700 dark:text-gray-100 mt-2"
+            <select
+              name="quarters"
+              className="p-2"
+              value={quarter}
+              onChange={(e) => setQuarter(e.target.value)}
             >
-              Simplified
-            </label>
+              <option value="Q1">Q1</option>
+              <option value="Q2">Q2</option>
+              <option value="Q3">Q3</option>
+              <option value="Q4">Q4</option>
+            </select>
           </div>
         </div>
         <div className="flex overflow-x-auto custom-scroll">
@@ -75,11 +131,10 @@ function FinancialReports({ company }) {
               Particulars
             </h4>
 
-            {!Array.isArray(statementLines.getFinancialStatementLineById) ||
-            !statementLines.getFinancialStatementLineById.length ? (
+            {!Array.isArray(statementLines) || !statementLines.length ? (
               <h4>No Data</h4>
             ) : (
-              statementLines.getFinancialStatementLineById.map((data) => (
+              statementLines.map((data) => (
                 <h3
                   key={data.id}
                   className="w-60 md:w-full truncate overflow-ellipsis overflow-hidden h-10 flex items-center px-2 even:bg-gray-100
@@ -95,7 +150,7 @@ function FinancialReports({ company }) {
             return (
               <div className="flex flex-col" key={factData[key][0].id}>
                 <h4 className="m-0 px-6 font-bold text-lg bg-blue-600 dark:bg-indigo-900 p-2 mb-1 text-white dark:text-gray-200 text-left	">
-                  {factData[key][0].fiscalYear}
+                  {factData[key][index].fiscalYear}
                 </h4>
                 {factData[key].map((data) => (
                   <div
