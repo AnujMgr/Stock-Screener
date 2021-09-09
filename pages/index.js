@@ -1,23 +1,10 @@
 import Layout from "../components/layout";
-import { useTheme } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import MicroChart from "../components/charts/MicroChart";
 import SearchBar from "../components/searchbar";
-import prisma from "../prisma/client";
 
-export async function getServerSideProps({ params }) {
-  // Fetch data from external API
-  // const data = await fetch(
-  //   `http://localhost:8000/company/?slug=${params.slug}`
-  // );
-  const companies = await prisma.company.findMany();
-
-  return {
-    props: { companies },
-  };
-}
-
-export default function Home({ companies }) {
+export default function Home() {
   // company.setCurrentCompany({ anuj: "A" });
   const { theme } = useTheme();
   const bg = theme === "light" ? "#4C1D95" : "#111827";
@@ -29,7 +16,7 @@ export default function Home({ companies }) {
   if (!mounted) return null;
 
   return (
-    <Layout showSearch={false}>
+    <>
       <section className="bg-purple-900 dark:bg-gray-900 py-10 banner">
         <div className="xl:container mx-auto">
           <h1 className="md:max-w-4xl text-white text-4xl md:text-7xl px-3 md:px-2 text-center font-bold mx-auto mt-9">
@@ -39,15 +26,14 @@ export default function Home({ companies }) {
             If the image has no dimensions or intrinsic ratio, rule 4 applies,
             and we use the background area's dimension.
           </p>
-          <div className="flex justify-center mt-6">
+          <div className="flex justify-center mt-6 w-100">
             <SearchBar
               bg={theme === "light" ? "#F3F4F6" : "#2d3748"}
               borderRad={"1.5em"}
-              width={"md:w-60 lg:w-120"}
+              width={"w-120 md:w-60 lg:w-120"}
               placeholder={"Search for a Company..."}
               color={theme === "light" ? "#000" : "#fff"}
               height="50px"
-              companies={companies}
             />
           </div>
         </div>
@@ -109,6 +95,6 @@ export default function Home({ companies }) {
           </tbody>
         </table>
       </section>
-    </Layout>
+    </>
   );
 }

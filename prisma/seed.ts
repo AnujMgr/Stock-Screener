@@ -22,6 +22,8 @@ async function main() {
         industryId: 1,
         balanceSheetId: 1,
         profitLossId: 1,
+        companyEssentialsId: 1,
+        companyRatioId: 1,
       },
     });
   }
@@ -31,6 +33,7 @@ async function main() {
       data: {
         name: faker.random.word(),
         parentId: 0,
+        unit: "",
       },
     });
   }
@@ -53,7 +56,6 @@ async function main() {
               fiscalYear: fiscalYear,
               quarter: "Q1",
               amount: faker.datatype.float(),
-              unit: "",
             },
           });
         }

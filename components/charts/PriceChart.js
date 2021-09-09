@@ -35,7 +35,7 @@ const PriceChart = ({ priceHistory }) => {
   return (
     <Fragment>
       <div className="flex justify-between px-3">
-        <div className="border rounded-sm ">
+        <div className="">
           {lengthOfPrice > 30 && (
             <button
               className={`px-3 py-1  ${
@@ -91,7 +91,7 @@ const PriceChart = ({ priceHistory }) => {
               5yrs
             </button>
           )}
-          <button
+          {/* <button
             className={`px-3 py-1  ${
               activeMenu === "default" &&
               "bg-blue-700 dark:bg-indigo-800 text-gray-100"
@@ -99,14 +99,14 @@ const PriceChart = ({ priceHistory }) => {
             onClick={(e) => toggleTimeSpan(lengthOfPrice, "default")}
           >
             Max
-          </button>
+          </button> */}
         </div>
-        <div>
-          <button className="border rounded-sm py-1 px-3">Volume</button>
+        <div className="flex gap-2">
+          <button className="border rounded-sm py-1 px-3">PE</button>
           <button className="border rounded-sm py-1 px-3">Volume</button>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={500}>
+      <ResponsiveContainer width="100%" height={400}>
         <AreaChart
           height={400}
           width={1300}
@@ -135,23 +135,22 @@ const PriceChart = ({ priceHistory }) => {
 
           <Area
             type="monotone"
-            dataKey="close"
+            dataKey="closingPrice"
             stroke={theme == "light" ? "#03e08b" : "#2451B7"}
             fill="url(#color)"
             strokeWidth={1.6}
           />
-          <Bar dataKey="volume" barSize={20} fill="#413ea0" />
+          <Bar dataKey="noOfTransaction" barSize={20} fill="#413ea0" />
           {/* <CartesianGrid strokeDasharray="3 0" vertical={false} opacity={0.4} /> */}
-          <Bar dataKey="volume" barSize={20} fill="#413ea0" />
+          <Bar dataKey="noOfTransaction" barSize={20} fill="#413ea0" />
           <XAxis
             color={color}
             dataKey="date"
             reversed
             tick={CustomizedAxisTick}
           />
-          <YAxis />
+          <YAxis orientation="right" />
           <Tooltip content={<CustomTooltip />} />
-
           <Brush fill={theme == "light" ? "#EFF6FF" : "#111827"} />
         </AreaChart>
       </ResponsiveContainer>
@@ -179,7 +178,7 @@ const CustomTooltip = ({ active, payload, label }) => {
                 </span>
               </p>
               <p className="text-xs">
-                Volume: <span>{payload.volume.toLocaleString()}</span>
+                Volume: <span>{payload.noOfTransactions.toLocaleString()}</span>
               </p>
             </div>
           );

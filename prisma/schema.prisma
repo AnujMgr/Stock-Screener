@@ -25,9 +25,10 @@ model Company {
   industryId          Int // relation scalar field  (used in the `@relation` attribute above)
   balanceSheetId      Int
   profitLossId        Int
+  companyEssentialsId Int
+  companyRatioId      Int
   financialStatements FinancialStatementFact[]
   companyPrice        CompanyPrice[]
-  // companyRatioFacts   CompanyRatioFacts[]
   stockHoldingFact    StockHoldingFact[]
 }
 
@@ -70,6 +71,7 @@ model FinancialStatementLine {
   financialStatementFact FinancialStatementFact[]
   financialStatement     FinancialStatementLineSequence[]
   parentId               Int
+  unit                   String
 }
 
 model FinancialStatementLineSequence {
@@ -90,7 +92,6 @@ model FinancialStatementFact {
   financialStatementLineId Int
   fiscalYear               Int
   quarter                  String
-  unit                     String
   amount                   Float
 }
 

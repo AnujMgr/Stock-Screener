@@ -9,7 +9,8 @@ import { useAppContext } from "../../lib/contexts/State";
 function Navbar({ showSearch }) {
   const [hidden, setHidden] = useState(true);
   const { theme } = useTheme();
-  const { companies } = useAppContext();
+  // const { companies } = useAppContext();
+  const companies = [];
   return (
     <>
       <div className="hidden md:block shadow-sm bg-white dark:bg-gray-700 border-b border-fuchsia-100 border-gray-100 dark:border-gray-600">
@@ -36,6 +37,9 @@ function Navbar({ showSearch }) {
                   <Link className="" href="/">
                     Home
                   </Link>
+                </div>
+                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                  <Link href={`/screener`}>Screener</Link>
                 </div>
                 <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link className="" href="/">

@@ -3,8 +3,27 @@ import prisma from "../../prisma/client";
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    const statement = await prisma.company.findMany();
-    res.json(statement);
+    const { search } = req.query;
+   
+    const companies = await prisma.company.findMany({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: `${search}`,
+              mode: "insensitive",
+            },
+          },
+          {
+            symbol: {
+              contains: `${search}`,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+    });
+    res.json(companies);
   } else {
     throw new Error(
       `The HTTP ${req.method} method is not supported at this route.`

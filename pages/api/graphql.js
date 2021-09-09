@@ -23,6 +23,23 @@ const typeDefs = gql`
     financialStatementLines: [FinancialStatementLine!]!
   }
 
+  type ScreenerFact {
+    statementId: ID!
+    name: String!
+    companyId: ID!
+    amount: Float!
+  }
+
+  type ScreenerStatement {
+    id: ID!
+    name: String!
+  }
+
+  type ScreenerData {
+    screenerFacts: [ScreenerFact]
+    statementLines: [ScreenerStatement]
+  }
+
   type FinancialStatementLine {
     id: ID!
     name: String!
@@ -40,14 +57,8 @@ const typeDefs = gql`
   }
 
   type FinancialStatementWithFacts {
-    id: ID!
-    financialStatementLineId: ID!
-    fiscalYear: Int
-    quarter: String!
-    amount: Float
-    sequence: Int!
-    statementLines: [FinancialStatementLine]
-    # financialStatementFacts: [FinancialStatementFact]
+    financialStatement: FinancialStatementLine
+    financialStatementFacts: [FinancialStatementFact]
   }
 
   type Query {
@@ -65,7 +76,10 @@ const typeDefs = gql`
       id: ID!
       quarter: String!
       companyId: ID!
+      take: Int!
     ): [FinancialStatementWithFacts]
+
+    getScreenerData(id: ID!, quarter: String!, fiscalYear: Int!): ScreenerData
   }
 `;
 
@@ -83,7 +97,7 @@ const resolvers = {
     },
 
     getAllCompanies: async () => {
-      return await prisma.company.findMany();
+      return await prisma.company.findMany({});
     },
 
     getFinancialStatementById: async (parent, args, context) => {
@@ -111,42 +125,96 @@ const resolvers = {
     },
 
     getStatementWithFacts: async (parent, args, context) => {
-      var financialFact = [];
+      const financialStatement = [];
 
-      const financialStatementSequence =
-        await prisma.financialStatementLineSequence.findMany({
-          where: {
-            financialStatementId: Number(args.id),
-          },
-          include: {
-            financialStatementLine: {
-              include: {
-                financialStatementFact: {
-                  where: {
-                    quarter: args.quarter,
-                    companyId: Number(args.companyId),
-                  },
+      const data = await prisma.financialStatementLineSequence.findMany({
+        where: {
+          financialStatementId: Number(args.id),
+        },
+        include: {
+          financialStatementLine: {
+            include: {
+              financialStatementFact: {
+                where: {
+                  quarter: args.quarter,
+                  companyId: Number(args.companyId),
                 },
+                orderBy: {
+                  fiscalYear: "desc",
+                },
+                take: Number(args.take),
               },
             },
           },
-        });
-
-      financialStatementSequence.map((statement, index) => {
-        if (
-          statement.financialStatementLine.financialStatementFact.length > 0
-        ) {
-          const fact = [
-            ...statement.financialStatementLine.financialStatementFact,
-          ];
-
-          fact.map((data) => {
-            financialFact.push({ ...data, sequence: statement.sequence });
-          });
-        }
+        },
+        orderBy: {
+          sequence: "asc",
+        },
       });
 
-      return financialFact;
+      data.map((fact) => {
+        financialStatement.push({
+          financialStatement: {
+            id: fact.financialStatementLine.id,
+            name: fact.financialStatementLine.name,
+            parentId: fact.financialStatementLine.parentId,
+          },
+          financialStatementFacts:
+            fact.financialStatementLine.financialStatementFact.map((line) => ({
+              id: line.id,
+              amount: line.amount,
+              fiscalYear: line.fiscalYear,
+            })),
+        });
+      });
+      return financialStatement;
+    },
+
+    getScreenerData: async (parent, args, context) => {
+      const statements = [];
+      const screenerData = [];
+
+      const data = await prisma.financialStatementLineSequence.findMany({
+        where: {
+          financialStatementId: Number(args.id),
+        },
+        include: {
+          financialStatementLine: {
+            include: {
+              financialStatementFact: {
+                where: {
+                  quarter: args.quarter,
+                },
+                orderBy: {
+                  fiscalYear: "desc",
+                },
+                take: 1,
+              },
+            },
+          },
+        },
+        orderBy: {
+          sequence: "asc",
+        },
+      });
+
+      data.map((statement) => {
+        statements.push({
+          id: statement.financialStatementLine.id,
+          name: statement.financialStatementLine.name,
+        });
+        if (statement.financialStatementLine.financialStatementFact.length > 0)
+          statement.financialStatementLine.financialStatementFact.map((fact) =>
+            screenerData.push({
+              statementId: statement.financialStatementLine.id,
+              name: statement.financialStatementLine.name,
+              companyId: fact.companyId,
+              amount: fact.amount,
+            })
+          );
+      });
+
+      return { statementLines: statements, screenerFacts: screenerData };
     },
   },
 

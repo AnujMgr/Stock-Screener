@@ -1,10 +1,12 @@
 import React from "react";
 import Layout from "../../components/layout";
-import { StockHoldingChart } from "../../components/charts";
+import { PriceChart, StockHoldingChart } from "../../components/charts";
 import PriceCounter from "../../components/PriceCounter/PriceCounter";
 import prisma from "../../prisma/client";
+import Custom404 from "../404";
 
 export async function getServerSideProps({ params }) {
+  console.log("Holla");
   const company = await prisma.company.findFirst({
     where: {
       slug: params.slug,
@@ -17,11 +19,11 @@ export async function getServerSideProps({ params }) {
 
   if (company === null) {
     const essentials = [];
-    const currentPrice = [];
-    return { props: { company, essentials, currentPrice } };
+    const priceHistory = [];
+    return { props: { company, essentials, priceHistory } };
   }
 
-  const currentPrice = await prisma.companyPrice.findFirst({
+  const priceHistory = await prisma.companyPrice.findMany({
     where: {
       companyId: company.id,
     },
@@ -32,14 +34,14 @@ export async function getServerSideProps({ params }) {
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
-      financialStatementId: company.id,
+      financialStatementId: company.companyEssentialsId,
     },
     include: {
       financialStatementLine: {
         include: {
           financialStatementFact: {
             where: {
-              quarter: "Q2",
+              quarter: "Q4",
               companyId: company.id,
             },
           },
@@ -59,6 +61,7 @@ export async function getServerSideProps({ params }) {
         name: statement.financialStatementLine.name,
         amount:
           statement.financialStatementLine.financialStatementFact[0].amount,
+        unit: statement.financialStatementLine.unit,
       });
   });
 
@@ -67,13 +70,13 @@ export async function getServerSideProps({ params }) {
   );
 
   // Pass post data to the page via props
-  return { props: { company, essentials, currentPrice, stockHoldingData } };
+  return { props: { company, essentials, priceHistory, stockHoldingData } };
 }
 
 export function Company({
   company,
   essentials,
-  currentPrice,
+  priceHistory,
   stockHoldingData,
 }) {
   if (company === null) {
@@ -81,7 +84,7 @@ export function Company({
   }
 
   return (
-    <Layout showSecondaryNavbar={true}>
+    <>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
         <div className="grid grid-cols-1 sm:grid-cols-2">
           <div>
@@ -106,19 +109,29 @@ export function Company({
           <div className="mt-4 sm:mt-0">
             <p className="font-light text-gray-900 dark:text-gray-200">PRICE</p>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
-              {currentPrice !== null
-                ? currentPrice.closingPrice.toLocaleString()
-                : "NaN"}
+              Rs.{" "}
+              {!Array.isArray(priceHistory) || !priceHistory.length
+                ? "NaN"
+                : priceHistory[0].closingPrice.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
             </h1>
             <div className="flex">
-              {currentPrice !== null ? (
+              {priceHistory !== null ? (
                 <PriceCounter
                   isRising={
-                    currentPrice.closingPrice < currentPrice.previousClosing
+                    priceHistory[0].closingPrice >
+                    priceHistory[0].previousClosing
                   }
-                  amount={(
-                    (Number(currentPrice.closingPrice) /
-                      Number(currentPrice.previousClosing)) *
+                  amount={
+                    Number(priceHistory[0].closingPrice) -
+                    Number(priceHistory[0].previousClosing)
+                  }
+                  rate={(
+                    ((Number(priceHistory[0].closingPrice) -
+                      Number(priceHistory[0].previousClosing)) /
+                      Number(priceHistory[0].closingPrice)) *
                     100
                   ).toFixed(2)}
                 />
@@ -126,6 +139,28 @@ export function Company({
                 <h1>Data Not Available !!</h1>
               )}
             </div>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+          <div className="pt-5 bg-white dark:bg-gray-900 rounded-md">
+            <p className="text-lg">Rs. 100</p>
+            <p className="text-gray-400 text-xs">Today's Low</p>
+          </div>
+          <div className="pt-5 bg-white dark:bg-gray-900 rounded-md">
+            <p className="text-lg">Rs. 500</p>
+            <p className="text-gray-400 text-xs">Today's High</p>
+          </div>
+          <div className="pt-5 bg-white dark:bg-gray-900 ">
+            <p className="text-lg">385.00</p>
+            <p className="text-gray-400  text-xs">52 Weeks High</p>
+          </div>
+          <div className="pt-5 bg-white dark:bg-gray-900 ">
+            <p className="text-lg">205.00</p>
+            <p className="text-gray-400  text-xs">52 Weeks Low </p>
+          </div>
+          <div className="pt-5 bg-white dark:bg-gray-900 ">
+            <p className="text-lg">382,194.00</p>
+            <p className="text-gray-400  text-xs">30-Day Avg. Volume </p>
           </div>
         </div>
       </section>
@@ -151,23 +186,36 @@ export function Company({
         </div>
       </section> */}
 
-      <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow p-3 rounded-lg">
-        <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
+      <section className="xl:container mx-3 xl:mx-auto mt-8 ">
+        {/* <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
           Company Essentials
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {!Array.isArray(essentials) || !essentials.length ? (
-            <h1>Data Not Available !!</h1>
-          ) : (
-            essentials.map((data) => (
-              <div className="flex flex-col" key={data.name}>
-                <p className="text-xs mb-2">{data.name}</p>
-                <h4 className="m-0 font-bold text-md mb-3 text-gray-800 dark:text-gray-300">
-                  {data.amount}
-                </h4>
-              </div>
-            ))
-          )}
+        </h2> */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="col-span-2 gap-4 bg-white dark:bg-gray-900 shadow p-5 rounded-lg">
+            <div className="grid grid-cols-2 md:grid-cols-3">
+              {!Array.isArray(essentials) || !essentials.length ? (
+                <h1>Data Not Available !!</h1>
+              ) : (
+                essentials.map((data) => (
+                  <div className="flex flex-col mb-4" key={data.name}>
+                    <p className="text-md mb-2">{data.name}</p>
+                    <h4 className="m-0 font-bold text-md mb-3 text-gray-800 dark:text-gray-300">
+                      {data.unit === '""' || data.unit !== "Rs"
+                        ? ""
+                        : data.unit}{" "}
+                      {data.amount.toLocaleString()}{" "}
+                      {data.unit === '""' || data.unit === "Rs"
+                        ? ""
+                        : data.unit}
+                    </h4>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+          <div className="bg-white dark:bg-gray-900 shadow p-3 rounded-lg col-span-3">
+            <PriceChart priceHistory={priceHistory} />
+          </div>
         </div>
       </section>
 
@@ -191,6 +239,9 @@ export function Company({
           </div>
         </div>
       </section> */}
+      <section className="xl:container mx-3 xl:mx-auto mt-8">
+        <div className="bg-white dark:bg-gray-900 shadow p-3 rounded-lg"></div>
+      </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2  gap-4">
@@ -204,15 +255,35 @@ export function Company({
             <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
               Corporate Action
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <p className="text-gray-900 dark:text-gray-200">sdfs</p>
-              </div>
+
+            <div className="p-3">
+              <ul className="list-disc">
+                <li className="pb-3">
+                  The bank has a very low ROA track record. Average ROA of 3
+                  years is -1.98%
+                </li>
+                <li className="pb-3">
+                  The bank has a very low ROA track record. Average ROA of 3
+                  years is -1.98%
+                </li>
+                <li className="pb-3">
+                  The bank has a very low ROA track record. Average ROA of 3
+                  years is -1.98%
+                </li>
+                <li className="pb-3">
+                  The bank has a very low ROA track record. Average ROA of 3
+                  years is -1.98%
+                </li>
+                <li className="pb-3">
+                  The bank has a very low ROA track record. Average ROA of 3
+                  years is -1.98%
+                </li>
+              </ul>
             </div>
           </div>
         </div>
       </section>
-    </Layout>
+    </>
   );
 }
 

@@ -1,11 +1,10 @@
 import React from "react";
-import Layout from "../../components/layout";
 import { HiOutlineMail, HiOutlineLockClosed } from "react-icons/hi";
 import Link from "next/link";
 
 const Login = () => {
   return (
-    <Layout>
+    <>
       <section className="xl:container mx-auto">
         <div className="grid grid-cols-5 max-w-4xl mx-auto shadow-sm my-8 rounded-md overflow-hidden">
           <div className="p-3 col-span-3 bg-white dark:bg-gray-900">
@@ -50,7 +49,7 @@ const Login = () => {
           </div>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

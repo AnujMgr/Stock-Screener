@@ -20,7 +20,7 @@ const MiniChart = ({ data }) => {
         >
           <Line
             type="monotone"
-            dataKey="value"
+            dataKey="amount"
             stroke={theme == "light" ? "#34D399" : "#E5E7EB"}
             strokeWidth={2}
             dot={{ fill: theme == "light" ? "#34D399" : "#E5E7EB" }}
@@ -28,20 +28,16 @@ const MiniChart = ({ data }) => {
           />
           <Tooltip content={<CustomTooltip />} />
         </LineChart>
-      </ResponsiveContainer>  
+      </ResponsiveContainer>
       <div className="grid grid-cols-3">
-        <div className="flex flex-col text-center">
-          <p className="text-xs">1 YEAR</p>
-          <p className="font-bold">5.4%</p>
-        </div>
-        <div className="flex flex-col text-center">
-          <p className="text-xs">1 YEAR</p>
-          <p className="font-bold">5.4%</p>
-        </div>
-        <div className="flex flex-col text-center">
-          <p className="text-xs">1 YEAR</p>
-          <p className="font-bold">5.4%</p>
-        </div>
+        {data.map((fact, index) =>
+          index === 0 || index === 2 || index === 4 ? (
+            <div key={fact.id} className="flex flex-col text-center">
+              <p className="text-xs">{fact.fiscalYear} </p>
+              <p className="font-bold">{fact.amount}%</p>
+            </div>
+          ) : null
+        )}
       </div>
     </>
   );
@@ -94,13 +90,9 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
       <Fragment>
         {payload.map(({ value, payload }) => {
-          const newDate = new Date(payload.date);
-
           return (
             <div className="p-2 bg-gray-800 shadow-xl" key={value}>
-              <p className="text-xs text-white">
-                Year: {newDate.getFullYear()}
-              </p>
+              <p className="text-xs text-white">Year: {payload.fiscalYear}</p>
 
               <p className="text-xs text-white">
                 <span>Ratio: {value}</span>
