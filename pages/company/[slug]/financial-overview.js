@@ -22,7 +22,7 @@ export async function getServerSideProps({ params }) {
           financialStatementFact: {
             where: {
               quarter: "Q4",
-              companyId: company.id,
+              companySlug: params.slug,
             },
           },
         },
@@ -46,10 +46,10 @@ export async function getServerSideProps({ params }) {
       });
   });
 
-  return { props: { data, facts } };
+  return { props: { facts } };
 }
 
-function FinancialOverview({ data, facts }) {
+function FinancialOverview({ facts }) {
   const [quarter, setQuarter] = useState(false);
   const router = useRouter();
   const { slug } = router.query;
@@ -57,32 +57,32 @@ function FinancialOverview({ data, facts }) {
   function handleChange(quarter) {
     setQuarter(quarter);
   }
-  console.log(facts);
   const balanceSheetData = [];
   const profitLossData = [];
 
-  facts[0].facts.map((fact, index) =>
-    balanceSheetData.push({
-      id: index,
-      fiscalYear: fact.fiscalYear,
-      assets: fact.amount,
-      liabilities: facts[1].facts[index].amount,
-    })
-  );
+  if (Array.isArray(facts) && facts.length) {
+    facts[0].facts.map((fact, index) =>
+      balanceSheetData.push({
+        id: index,
+        fiscalYear: fact.fiscalYear,
+        assets: fact.amount,
+        liabilities: facts[1].facts[index].amount,
+      })
+    );
 
-  facts[2].facts.map((fact, index) =>
-    profitLossData.push({
-      id: index,
-      fiscalYear: fact.fiscalYear,
-      revenue: fact.amount,
-      netIncome: facts[3].facts[index].amount,
-    })
-  );
-  console.log(balanceSheetData);
+    facts[2].facts.map((fact, index) =>
+      profitLossData.push({
+        id: index,
+        fiscalYear: fact.fiscalYear,
+        revenue: fact.amount,
+        netIncome: facts[3].facts[index].amount,
+      })
+    );
+  }
 
   return (
     <>
-      <FinancialsHeader slug={slug} active={1} />
+      <FinancialsHeader slug={slug} active={0} />
       <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 md:p-5 mb-3 rounded-b-lg">
         <div className="flex gap-3 p-2">
           <button

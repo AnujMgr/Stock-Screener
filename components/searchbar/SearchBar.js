@@ -6,20 +6,21 @@ import { GET_ALL_COMPANIES } from "../../lib/graphql/queries";
 import { useQuery } from "@apollo/client";
 import Spinner from "../Spinner";
 
-function SearchBar({ bg, borderRad, width, color, placeholder, height }) {
+function SearchBar({
+  companies,
+  bg,
+  borderRad,
+  width,
+  color,
+  placeholder,
+  height,
+}) {
   const [mounted, setMounted] = useState(false);
 
   const { theme } = useTheme();
-  const [companies, setCompanies] = useState([]);
   const router = useRouter();
 
   // const getCompaniesApi = `${process.env.url}/api/companies?search`;
-  const fetchCompanies = async (query) => {
-    console.log("fetching Companies");
-    fetch(`${process.env.url}/api/companies?search=${query}`)
-      .then((response) => response.json())
-      .then((data) => setCompanies(data));
-  };
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
@@ -38,8 +39,7 @@ function SearchBar({ bg, borderRad, width, color, placeholder, height }) {
   const handleOnSearch = (string, results) => {
     // onSearch will have as the first callback parameter
     // the string searched and for the second the results.
-    fetchCompanies(string);
-    // console.log(string, results);
+    console.log(string, results);
   };
 
   return (

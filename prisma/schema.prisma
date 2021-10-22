@@ -11,29 +11,44 @@ generator client {
 }
 
 model Industry {
-  id        Int       @id @default(autoincrement())
-  name      String
-  companies Company[]
+  id         Int       @id @default(autoincrement())
+  name       String
+  slug       String    @unique
+  companies  Company[]
+  screenerId Int
 }
 
 model Company {
-  id                  Int                      @id @default(autoincrement())
-  name                String
-  slug                String                   @unique
-  symbol              String                   @unique
-  industry            Industry                 @relation(fields: [industryId], references: [id])
-  industryId          Int // relation scalar field  (used in the `@relation` attribute above)
-  balanceSheetId      Int
-  profitLossId        Int
-  companyEssentialsId Int
-  companyRatioId      Int
-  financialStatements FinancialStatementFact[]
-  companyPrice        CompanyPrice[]
-  stockHoldingFact    StockHoldingFact[]
+  id                    Int                      @id @default(autoincrement())
+  name                  String                   @unique
+  slug                  String                   @unique
+  symbol                String                   @unique
+  description           String
+  industry              Industry                 @relation(fields: [industryId], references: [id])
+  industryId            Int // relation scalar field  (used in the `@relation` attribute above)
+  
+  companyStatementDetails CompanyStatementDetails  @relation(fields: [statementsId], references: [id])
+  statementsId     Int
+
+  // financialStatements   FinancialStatementFact[] // I dont think there is necessity of Relation between company and financial fact
+  companyPrice          CompanyPrice[]
+  stockHoldingFact      StockHoldingFact[]
+}
+
+model CompanyStatementDetails {
+  id                    Int @id @default(autoincrement())
+  name                  String @unique
+  balanceSheetId        Int
+  profitLossId          Int
+  companyEssentialsId   Int
+  companyRatioId        Int
+  financialHighlightsId Int
+  companyActionId       Int  
+  companies             Company[]
 }
 
 model CompanyPrice {
-  id               Int      @id @default(autoincrement())
+  id               Int     @id @default(autoincrement())
   date             String
   noOfTransactions Int
   maxPrice         Float
@@ -43,17 +58,16 @@ model CompanyPrice {
   amount           Float
   previousClosing  Float
   priceDifference  Float
-  company          Company  @relation(fields: [companyId], references: [id])
-  companyId        Int // relation scalar field  (used in the `@relation` attribute above)
+  company          Company @relation(fields: [companySlug], references: [slug])
+  companySlug      String // relation scalar field  (used in the `@relation` attribute above)
 }
 
-
 model StockHoldingFact {
-  id        Int      @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   name      String
   amount    Int
   date      String
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
   companyId Int
 }
 
@@ -61,17 +75,21 @@ model StockHoldingFact {
 model FinancialStatement {
   id                     Int                              @id @default(autoincrement())
   name                   String
+  slug                   String                           @unique
   financialStatementLine FinancialStatementLineSequence[]
 }
 
 //FinancialStatementLine is a single line-item on a FinancialStatement. An example would be Cost of Goods Sold, Share capital, Cash and cash equivalent
 model FinancialStatementLine {
   id                     Int                              @id @default(autoincrement())
-  name                   String
+  name                   String                           @unique
   financialStatementFact FinancialStatementFact[]
   financialStatement     FinancialStatementLineSequence[]
-  parentId               Int
-  unit                   String
+  parentId               Int?
+  parent                 FinancialStatementLine?          @relation("ParentChild", fields: [parentId], references: [id])
+  children               FinancialStatementLine[]         @relation("ParentChild")
+  unit                   String?
+  description            String?
 }
 
 model FinancialStatementLineSequence {
@@ -79,36 +97,17 @@ model FinancialStatementLineSequence {
   financialStatementId     Int
   financialStatementLine   FinancialStatementLine @relation(fields: [financialStatementLineId], references: [id])
   financialStatementLineId Int
-  sequence                 Int
+  sequence                 Float
   @@id([financialStatementId, financialStatementLineId])
 }
 
 //FinancialStatementFact is the data for a FinancialStatementLine. For instance, what is the latest Cost of Revenue for Google?
 model FinancialStatementFact {
   id                       Int                    @id @default(autoincrement())
-  company                  Company                @relation(fields: [companyId], references: [id])
   companyId                Int // relation scalar field  (used in the `@relation` attribute above)
   financialStatementLine   FinancialStatementLine @relation(fields: [financialStatementLineId], references: [id])
   financialStatementLineId Int
-  fiscalYear               Int
-  quarter                  String
+  fiscalYear               String
+  quarter                  String?
   amount                   Float
 }
-
-// model CompanyEssentialLine {
-//   id       Int    @id @default(autoincrement())
-//   name     String
-//   sequence Int
-//   unit     String
-// }
-
-
-// model CompanyRatioFacts {
-//   id         Int     @id @default(autoincrement())
-//   name       String
-//   company    Company @relation(fields: [companyId], references: [id])
-//   companyId  Int // relation scalar field  (used in the `@relation` attribute above)
-//   fiscalYear Int
-//   unit       String
-//   amount     Float
-// }

@@ -1,5 +1,4 @@
 import React from "react";
-import Layout from "../../components/layout";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
 import PriceCounter from "../../components/PriceCounter/PriceCounter";
 import prisma from "../../prisma/client";
@@ -25,7 +24,7 @@ export async function getServerSideProps({ params }) {
 
   const priceHistory = await prisma.companyPrice.findMany({
     where: {
-      companyId: company.id,
+      companySlug: params.slug,
     },
     orderBy: {
       date: "desc",
@@ -42,7 +41,7 @@ export async function getServerSideProps({ params }) {
           financialStatementFact: {
             where: {
               quarter: "Q4",
-              companyId: company.id,
+              companySlug: params.slug,
             },
           },
         },
@@ -83,6 +82,7 @@ export function Company({
     return <Custom404 />;
   }
 
+  console.log(!Array.isArray(priceHistory) || !priceHistory.length);
   return (
     <>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
@@ -106,6 +106,7 @@ export function Company({
               </p>
             </div>
           </div>
+
           <div className="mt-4 sm:mt-0">
             <p className="font-light text-gray-900 dark:text-gray-200">PRICE</p>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
@@ -118,7 +119,9 @@ export function Company({
                   })}
             </h1>
             <div className="flex">
-              {priceHistory !== null ? (
+              {!Array.isArray(priceHistory) || !priceHistory.length ? (
+                <h1>Data Not Available !!</h1>
+              ) : (
                 <PriceCounter
                   isRising={
                     priceHistory[0].closingPrice >
@@ -135,8 +138,6 @@ export function Company({
                     100
                   ).toFixed(2)}
                 />
-              ) : (
-                <h1>Data Not Available !!</h1>
               )}
             </div>
           </div>
@@ -257,7 +258,7 @@ export function Company({
             </h2>
 
             <div className="p-3">
-              <ul className="list-disc">
+              <ul className="">
                 <li className="pb-3">
                   The bank has a very low ROA track record. Average ROA of 3
                   years is -1.98%

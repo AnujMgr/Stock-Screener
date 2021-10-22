@@ -1,4 +1,5 @@
 import { ApolloServer, gql } from "apollo-server-micro";
+import { date } from "faker";
 import prisma from "../../prisma/client";
 
 const typeDefs = gql`
@@ -13,8 +14,28 @@ const typeDefs = gql`
     slug: String!
     symbol: String!
     industry: Industry!
-    balanceSheetId: Int!
-    profitLossId: Int!
+    balanceSheetSlug: String!
+    profitLossSlug: String!
+  }
+
+  type CompanyPrice {
+    id: ID!
+    date: String!
+    noOfTransactions: Int!
+    minPrice: Float!
+    maxPrice: Float!
+    closingPrice: Float!
+    tradedShares: Int!
+    amount: Float!
+    previousClosing: Float!
+    priceDifference: Float!
+  }
+
+  type CompanyWithPrice {
+    id: ID!
+    name: String!
+    symbol: String!
+    closingPrice: Float!
   }
 
   type FinancialStatement {
@@ -63,7 +84,8 @@ const typeDefs = gql`
 
   type Query {
     # get all financial Statements
-    getCompanyById(id: ID!): Company
+    getCompanyByIndustryId(id: ID!): [Company]
+    getCompanyByIndustryWithPrice(id: ID!): [CompanyWithPrice]
     getAllCompanies: [Company]
 
     getFinancialStatementById(id: ID!): FinancialStatement
@@ -85,15 +107,71 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    getCompanyById: async (parent, args, context) => {
-      return await prisma.company.findFirst({
+    getCompanyByIndustryId: async (parent, args, context) => {
+      if (Number(args.id) === 0) {
+        return await prisma.company.findMany({});
+      }
+      return await prisma.company.findMany({
         where: {
-          id: Number(args.id),
-        },
-        include: {
-          industry: true,
+          industryId: Number(args.id),
         },
       });
+    },
+
+    getCompanyByIndustryWithPrice: async (parent, args, context) => {
+      const companies = [];
+      var data = [];
+
+      Number(args.id) !== 0
+        ? (data = await prisma.company.findMany({
+            where: {
+              industryId: Number(args.id),
+            },
+            include: {
+              companyPrice: {
+                take: 1,
+                orderBy: {
+                  date: "desc",
+                },
+              },
+            },
+          }))
+        : (data = await prisma.company.findMany({
+            orderBy: {
+              name: "asc",
+            },
+            include: {
+              companyPrice: {
+                take: 1,
+                orderBy: {
+                  date: "desc",
+                },
+              },
+            },
+          }));
+
+      data.map((company) => {
+        if (
+          !Array.isArray(company.companyPrice) ||
+          !company.companyPrice.length
+        ) {
+          companies.push({
+            id: company.id,
+            name: company.name,
+            symbol: company.symbol,
+            closingPrice: 0,
+          });
+        } else {
+          companies.push({
+            id: company.id,
+            name: company.name,
+            symbol: company.symbol,
+            closingPrice: company.companyPrice[0].closingPrice,
+          });
+        }
+      });
+
+      return companies;
     },
 
     getAllCompanies: async () => {
@@ -117,7 +195,7 @@ const resolvers = {
         where: {
           financialStatement: {
             some: {
-              financialStatementId: 1,
+              financialStatementId: Number(args.id),
             },
           },
         },
@@ -184,11 +262,11 @@ const resolvers = {
               financialStatementFact: {
                 where: {
                   quarter: args.quarter,
+                  fiscalYear: args.fiscalYear,
                 },
                 orderBy: {
                   fiscalYear: "desc",
                 },
-                take: 1,
               },
             },
           },

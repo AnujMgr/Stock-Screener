@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
 import { Table, Column, HeaderCell, Cell } from "rsuite-table";
-import "rsuite-table/dist/css/rsuite-table.css";
-
-// const dataList = [
-//   { id: 1, price: "1000" },
-//   { id: 1, roe: "1000" },
-//   { id: 2, price: "1000" },
-//   { id: 3, price: "1000" },
-// ];
+// import "rsuite-table/dist/css/rsuite-table.css";
 
 function DataTable({ dataList, statements }) {
-  const [sortColumn, setSortColumn] = useState("id");
+  const [sortColumn, setSortColumn] = useState("79");
   const [sortType, setSortType] = useState("asc");
   const [loading, setLoading] = useState(false);
 
@@ -38,14 +31,18 @@ function DataTable({ dataList, statements }) {
       height={420}
       autoHeight
     >
-      <Column width={200} sortable fixed resizable>
-        <HeaderCell>Name</HeaderCell>
+      <Column sortable resizable>
+        <HeaderCell className="select-none">Name</HeaderCell>
         <Cell dataKey="company" />
+      </Column>
+      <Column sortable resizable>
+        <HeaderCell className="select-none ">Price</HeaderCell>
+        <Cell dataKey="price" />
       </Column>
 
       {statements.map((stat) => (
-        <Column key={stat.id} width={100} sortable fixed resizable>
-          <HeaderCell>{stat.name}</HeaderCell>
+        <Column key={stat.id} width={100} sortable resizable>
+          <HeaderCell className="select-none">{stat.name}</HeaderCell>
           <Cell dataKey={stat.id} />
         </Column>
       ))}
@@ -56,8 +53,9 @@ function DataTable({ dataList, statements }) {
 const getData = (data, sortColumn, sortType) => {
   if (sortColumn && sortType) {
     return data.sort((a, b) => {
-      let x = a[sortColumn];
-      let y = b[sortColumn];
+      let x = a[sortColumn] || "z";
+      let y = b[sortColumn] || "z";
+      // console.log(x);
       if (typeof x === "string") {
         x = x.charCodeAt();
       }
@@ -71,6 +69,7 @@ const getData = (data, sortColumn, sortType) => {
       }
     });
   }
+
   return data;
 };
 

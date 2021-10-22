@@ -1,14 +1,14 @@
-import Layout from "../components/layout";
-import { ThemeProvider, useTheme } from "next-themes";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import MicroChart from "../components/charts/MicroChart";
 import SearchBar from "../components/searchbar";
+import { useAppContext } from "../lib/contexts/State";
 
 export default function Home() {
-  // company.setCurrentCompany({ anuj: "A" });
   const { theme } = useTheme();
   const bg = theme === "light" ? "#4C1D95" : "#111827";
   const [mounted, setMounted] = useState(false);
+  const { companies } = useAppContext();
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
@@ -26,14 +26,15 @@ export default function Home() {
             If the image has no dimensions or intrinsic ratio, rule 4 applies,
             and we use the background area's dimension.
           </p>
-          <div className="flex justify-center mt-6 w-100">
+          <div className="flex justify-center mt-6 w-full">
             <SearchBar
               bg={theme === "light" ? "#F3F4F6" : "#2d3748"}
               borderRad={"1.5em"}
-              width={"w-120 md:w-60 lg:w-120"}
+              width={"w-60 sm:w-96 md:w-120"}
               placeholder={"Search for a Company..."}
               color={theme === "light" ? "#000" : "#fff"}
               height="50px"
+              companies={companies.getAllCompanies}
             />
           </div>
         </div>
@@ -52,48 +53,41 @@ export default function Home() {
           Market Trend
         </h1>
 
-        <table className="table-auto w-full">
-          <thead>
-            <tr className="text-gray-500 ">
-              <th className="w-1/4 py-3 px-3 text-left">Index</th>
-              <th className="w-1/4 py-3 px-3 text-center">Points</th>
-              <th className="w-1/4 py-3 px-3 text-center">24hr Change</th>
-              <th className="w-1/2 py-3 px-3 text-right">Market</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-              <td className="py-3 px-3 text-xl">Nepse</td>
-              <td className="py-3 px-3 text-xl text-center">2,843.00</td>
-              <td className="py-3 px-3 text-xl text-center text-gray-500">
-                +0.68 %
-              </td>
-              <td className="text-xl text-right">
-                <MicroChart />
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-              <td className="py-3 px-3 text-xl">Development Bank</td>
-              <td className="py-3 px-3 text-xl text-center">1,800.00</td>
-              <td className="py-3 px-3 text-xl text-center text-gray-500">
-                +1.2 %
-              </td>
-              <td className="text-xl text-right">
-                <MicroChart />
-              </td>
-            </tr>
-            <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-              <td className="py-3 px-3 text-xl">Finance</td>
-              <td className="py-3 px-3 text-xl text-center">2,300.00</td>
-              <td className="py-3 px-3 text-xl text-center text-gray-500">
-                -2.3 %
-              </td>
-              <td className="text-xl text-right">
-                <MicroChart />
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="grid grid-rows-3 gap-1">
+          <div className="grid grid-cols-4">
+            <h6 className="text-gray-500 py-3 px-3 text-left">Index</h6>
+            <h6 className="text-gray-500 py-3 px-3 text-left">Points</h6>
+            <h6 className="text-gray-500 py-3 px-3 text-left">24hr Change</h6>
+            <h6 className="text-gray-500 py-3 px-3 text-right">Market</h6>
+          </div>
+          <div className="grid grid-cols-4 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+            <p className="py-3 px-3 text-xl">Nepse</p>
+            <p className="py-3 px-3 text-xl">2,843.00</p>
+            <p className="py-3 px-3 text-xl">+0.68 %</p>
+            <div className="text-xl text-right">
+              <MicroChart />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-4 gap-3 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+            <div className="col-span-1">
+              <p className="py-3 px-3 text-xl">Development Bank</p>
+            </div>
+            <p className="py-3 px-3 text-xl">1,800.00</p>
+            <p className="py-3 px-3 text-xl">+1.2 %</p>
+            <div className="text-xl text-right">
+              <MicroChart />
+            </div>
+          </div>
+          <div className="grid grid-cols-4 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+            <p className="py-3 px-3 text-xl">Finance</p>
+            <p className="py-3 px-3 text-xl">2,300.00</p>
+            <p className="py-3 px-3 text-xl">+4.2 %</p>
+            <div className="text-xl text-right">
+              <MicroChart />
+            </div>
+          </div>
+        </div>
       </section>
     </>
   );

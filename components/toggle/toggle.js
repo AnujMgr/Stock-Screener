@@ -3,8 +3,8 @@ import { BiSun, BiMoon } from "react-icons/bi";
 import { useTheme } from "next-themes";
 
 export const Toggle = () => {
-  const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
@@ -18,12 +18,12 @@ export const Toggle = () => {
         transition duration-500 ease-in-out "
         aria-label="Toggle Dark Mode"
         type="button"
-        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       >
-        {theme === "dark" ? (
-          <BiSun className="h-5 w-5 " />
-        ) : (
+        {theme === "light" ? (
           <BiMoon className="h-5 w-5" />
+        ) : (
+          <BiSun className="h-5 w-5 " />
         )}
       </button>
     </div>

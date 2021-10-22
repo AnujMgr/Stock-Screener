@@ -1,13 +1,10 @@
-import Layout from "../../../components/layout";
 import prisma from "../../../prisma/client";
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import FinancialsHeader from "../../../components/financialsHeader/FinancialsHeader";
 import Spinner from "../../../components/Spinner";
 import { GET_STATEMENT_WITH_FACTS } from "../../../lib/graphql/queries";
 import { useQuery } from "@apollo/client";
-import Company from "../[slug]";
 
 export async function getServerSideProps({ params }) {
   const company = await prisma.company.findFirst({

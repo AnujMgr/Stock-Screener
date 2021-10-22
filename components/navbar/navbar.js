@@ -9,8 +9,7 @@ import { useAppContext } from "../../lib/contexts/State";
 function Navbar({ showSearch }) {
   const [hidden, setHidden] = useState(true);
   const { theme } = useTheme();
-  // const { companies } = useAppContext();
-  const companies = [];
+  const { companies } = useAppContext();
   return (
     <>
       <div className="hidden md:block shadow-sm bg-white dark:bg-gray-700 border-b border-fuchsia-100 border-gray-100 dark:border-gray-600">
@@ -28,6 +27,7 @@ function Navbar({ showSearch }) {
                     borderRad={"25px"}
                     width={"md:w-60 lg:w-80"}
                     color={theme === "light" ? "#000" : "#fff"}
+                    companies={companies.getAllCompanies}
                   />
                 ) : null}
               </div>
@@ -88,7 +88,7 @@ function Navbar({ showSearch }) {
               borderRad={"6px"}
               width={"w-full sm:w-3/4 mx-auto"}
               color={theme === "light" ? "#000" : "#fff"}
-              companies={companies}
+              companies={companies.getAllCompanies}
             />
           </div>
         ) : (

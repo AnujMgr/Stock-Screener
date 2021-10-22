@@ -2,7 +2,7 @@ import Footer from "../footer/footer";
 import Navbar from "../navbar";
 import SecondaryNavbar from "../navbar/secondaryNavbar";
 
-const DashboardLayout = ({ children }) => {
+const SecondaryLayout = ({ children }) => {
   return (
     <div className="grid grid-rows-3 min-h-screen">
       <section className="row-span-full">
@@ -15,4 +15,4 @@ const DashboardLayout = ({ children }) => {
   );
 };
 
-export default DashboardLayout;
+export default SecondaryLayout;

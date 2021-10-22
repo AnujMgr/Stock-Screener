@@ -2,10 +2,11 @@ import Link from "next/link";
 import React from "react";
 import SearchBar from "../components/searchbar";
 import { useTheme } from "next-themes";
+import { useAppContext } from "../lib/contexts/State";
 
 export default function Custom404() {
   const { theme } = useTheme();
-  // const { companies } = useAppContext();
+  const { companies } = useAppContext();
 
   return (
     <section className="xl:container mx-3 xl:mx-auto mt-8 px-2 py-5 md:p-5 mb-3">
@@ -21,6 +22,7 @@ export default function Custom404() {
           borderRad={"10px"}
           width={"w-full sm:w-3/4 md:w-96 mx-auto"}
           color={theme === "light" ? "#000" : "#fff"}
+          companies={companies.getAllCompanies}
         />
       </div>
       <div className="text-center mt-8">
