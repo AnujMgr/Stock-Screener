@@ -30,7 +30,7 @@ export default function Home() {
             <SearchBar
               bg={theme === "light" ? "#F3F4F6" : "#2d3748"}
               borderRad={"1.5em"}
-              width={"w-60 sm:w-96 md:w-120"}
+              width={"w-11/12 sm:w-96 md:w-120"}
               placeholder={"Search for a Company..."}
               color={theme === "light" ? "#000" : "#fff"}
               height="50px"

@@ -32,6 +32,7 @@ module.exports = {
     extend: {
       backgroundColor: ["even", "checked"],
       ringWidth: ["hover", "active", "focus"],
+      display: ["group-hover"],
     },
   },
   plugins: [

@@ -9,12 +9,15 @@ export async function getServerSideProps({ params }) {
     where: {
       slug: params.slug,
     },
+    include: {
+      companyStatementDetails: true,
+    },
   });
   const facts = [];
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
-      financialStatementId: 5,
+      financialStatementId: 1,
     },
     include: {
       financialStatementLine: {
@@ -22,7 +25,7 @@ export async function getServerSideProps({ params }) {
           financialStatementFact: {
             where: {
               quarter: "Q4",
-              companySlug: params.slug,
+              companyId: company.id,
             },
           },
         },
@@ -46,10 +49,10 @@ export async function getServerSideProps({ params }) {
       });
   });
 
-  return { props: { facts } };
+  return { props: { facts, company } };
 }
 
-function FinancialOverview({ facts }) {
+function FinancialOverview({ facts, company }) {
   const [quarter, setQuarter] = useState(false);
   const router = useRouter();
   const { slug } = router.query;
@@ -82,8 +85,12 @@ function FinancialOverview({ facts }) {
 
   return (
     <>
-      <FinancialsHeader slug={slug} active={0} />
-      <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 md:p-5 mb-3 rounded-b-lg">
+      <FinancialsHeader
+        statements={company.companyStatementDetails}
+        slug={slug}
+        active={0}
+      />
+      <section className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 md:p-5 mb-3 rounded-b-lg">
         <div className="flex gap-3 p-2">
           <button
             className={`${

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BiSun, BiMoon } from "react-icons/bi";
 import { useTheme } from "next-themes";
+import { MoonIcon, SunIcon } from "../../lib/icons/Icons";
 
 export const Toggle = () => {
   const { theme, setTheme } = useTheme();
@@ -21,9 +22,10 @@ export const Toggle = () => {
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       >
         {theme === "light" ? (
-          <BiMoon className="h-5 w-5" />
+          <MoonIcon height="16" width="16" color="#fff" />
         ) : (
-          <BiSun className="h-5 w-5 " />
+          // <MoonIcon height="16" width="16" color="#fff" />
+          <SunIcon height="16" width="16" color="#fff" />
         )}
       </button>
     </div>

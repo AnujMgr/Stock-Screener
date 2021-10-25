@@ -4,14 +4,92 @@ import PriceCounter from "../../components/PriceCounter/PriceCounter";
 import prisma from "../../prisma/client";
 import Custom404 from "../404";
 
-export async function getServerSideProps({ params }) {
-  console.log("Holla");
+// export async function getServerSideProps({ params }) {
+//   const company = await prisma.company.findFirst({
+//     where: {
+//       slug: params.slug,
+//     },
+//     include: {
+//       industry: true,
+//       companyStatementDetails: true,
+//       stockHoldingFact: true,
+//     },
+//   });
+
+//   console.log(company);
+
+//   if (company === null) {
+//     const essentials = [];
+//     const priceHistory = [];
+//     return { props: { company, essentials, priceHistory } };
+//   }
+
+//   const priceHistory = await prisma.companyPrice.findMany({
+//     where: {
+//       companySlug: params.slug,
+//     },
+//     orderBy: {
+//       date: "desc",
+//     },
+//   });
+
+//   const data = await prisma.financialStatementLineSequence.findMany({
+//     where: {
+//       financialStatementId: company.companyStatementDetails.companyEssentialsId,
+//     },
+//     include: {
+//       financialStatementLine: {
+//         include: {
+//           financialStatementFact: {
+//             where: {
+//               // quarter: "Q4",
+//               companyId: company.id,
+//             },
+//             orderBy: [
+//               {
+//                 quarter: "desc",
+//               },
+//               {
+//                 fiscalYear: "desc",
+//               },
+//             ],
+//           },
+//         },
+//       },
+//     },
+//   });
+
+//   var essentials = [];
+//   var stockHoldingData = [];
+
+//   data.map((statement) => {
+//     if (statement.financialStatementLine.financialStatementFact.length > 0)
+//       essentials.push({
+//         // ...fact[0],
+//         sequence: statement.sequence,
+//         name: statement.financialStatementLine.name,
+//         amount:
+//           statement.financialStatementLine.financialStatementFact[0].amount,
+//         unit: statement.financialStatementLine.unit,
+//       });
+//   });
+
+//   company.stockHoldingFact.map((data) =>
+//     stockHoldingData.push({ name: data.name, value: data.amount })
+//   );
+
+//   // Pass post data to the page via props
+//   return { props: { company, essentials, priceHistory, stockHoldingData } };
+// }
+
+export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
     where: {
       slug: params.slug,
     },
     include: {
       industry: true,
+      companyStatementDetails: true,
       stockHoldingFact: true,
     },
   });
@@ -33,16 +111,24 @@ export async function getServerSideProps({ params }) {
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
-      financialStatementId: company.companyEssentialsId,
+      financialStatementId: company.companyStatementDetails.companyEssentialsId,
     },
     include: {
       financialStatementLine: {
         include: {
           financialStatementFact: {
             where: {
-              quarter: "Q4",
-              companySlug: params.slug,
+              // quarter: "Q4",
+              companyId: company.id,
             },
+            orderBy: [
+              {
+                quarter: "desc",
+              },
+              {
+                fiscalYear: "desc",
+              },
+            ],
           },
         },
       },
@@ -72,6 +158,19 @@ export async function getServerSideProps({ params }) {
   return { props: { company, essentials, priceHistory, stockHoldingData } };
 }
 
+export async function getStaticPaths() {
+  const companies = await prisma.company.findMany();
+  const slugs = [];
+
+  companies.map((company) => {
+    slugs.push({ params: { slug: company.slug } });
+  });
+  return {
+    paths: slugs,
+    fallback: false,
+  };
+}
+
 export function Company({
   company,
   essentials,
@@ -82,7 +181,6 @@ export function Company({
     return <Custom404 />;
   }
 
-  console.log(!Array.isArray(priceHistory) || !priceHistory.length);
   return (
     <>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
@@ -142,7 +240,7 @@ export function Company({
             </div>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
           <div className="pt-5 bg-white dark:bg-gray-900 rounded-md">
             <p className="text-lg">Rs. 100</p>
             <p className="text-gray-400 text-xs">Today's Low</p>

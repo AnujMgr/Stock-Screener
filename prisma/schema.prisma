@@ -44,6 +44,7 @@ model CompanyStatementDetails {
   companyRatioId        Int
   financialHighlightsId Int
   companyActionId       Int  
+  financialStatementOverview       Int  
   companies             Company[]
 }
 
@@ -60,6 +61,11 @@ model CompanyPrice {
   priceDifference  Float
   company          Company @relation(fields: [companySlug], references: [slug])
   companySlug      String // relation scalar field  (used in the `@relation` attribute above)
+}
+
+model StockHolding {
+  id        Int     @id @default(autoincrement())
+  name      String
 }
 
 model StockHoldingFact {

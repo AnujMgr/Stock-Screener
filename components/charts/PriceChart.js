@@ -101,10 +101,10 @@ const PriceChart = ({ priceHistory }) => {
             Max
           </button> */}
         </div>
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <button className="border rounded-sm py-1 px-3">PE</button>
           <button className="border rounded-sm py-1 px-3">Volume</button>
-        </div>
+        </div> */}
       </div>
       <ResponsiveContainer width="100%" height={400}>
         <AreaChart

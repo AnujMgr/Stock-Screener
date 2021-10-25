@@ -13,9 +13,9 @@ const typeDefs = gql`
     name: String!
     slug: String!
     symbol: String!
-    industry: Industry!
-    balanceSheetSlug: String!
-    profitLossSlug: String!
+    description: String
+    industryId: Int!
+    statementsId: Int!
   }
 
   type CompanyPrice {

@@ -1,10 +1,8 @@
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import Accordion from "../../../components/accordion/Accordion";
-import FinancialsHeader from "../../../components/financialsHeader/FinancialsHeader";
+import Accordion from "../../components/accordion/Accordion";
 import ReactTooltip from "react-tooltip";
-
-import prisma from "../../../prisma/client";
+import prisma from "../../prisma/client";
 
 export async function getServerSideProps({ query }) {
   const financialStatement = [];
@@ -16,6 +14,11 @@ export async function getServerSideProps({ query }) {
       companyStatementDetails: true,
     },
   });
+
+  // if (!query.hasOwnProperty("statementType")) {
+  //   const data = [];
+  //   return { props: { company, financialStatement, data } };
+  // }
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
@@ -79,6 +82,10 @@ export async function getServerSideProps({ query }) {
     },
   });
 
+  // const isParent (data) {
+  //   if(data.children)
+  // }
+
   data.map((fact) => {
     financialStatement.push({
       id: fact.financialStatementLine.id,
@@ -111,7 +118,7 @@ export async function getServerSideProps({ query }) {
 
 function FinancialStatement({ company, financialStatement, data }) {
   const router = useRouter();
-  const { slug, statementType, quarter } = router.query;
+  const { quarter } = router.query;
   const [quarterValue, setQuarterValue] = useState(
     quarter ? quarter : "qtrToqtr"
   );
@@ -125,24 +132,14 @@ function FinancialStatement({ company, financialStatement, data }) {
   ];
   return (
     <>
-      <FinancialsHeader
-        statements={company.companyStatementDetails}
-        slug={slug}
-        active={
-          statementType
-            ? statementType
-            : company.companyStatementDetails.balanceSheetId
-        }
-      />
-
-      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-b-lg">
+      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
         <div className="grid">
           <div className="w-full overflow-hidden shadow-xs">
             <div className="w-full overflow-x-auto custom-scroll">
               <table className="w-full whitespace-no-wrap">
                 <thead>
-                  <tr className="text-sm font-semibold tracking-wide text-left text-gray-900 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-white dark:bg-blue-900">
-                    <th className="px-4 py-4 sticky left-0 bg-gray-100 dark:bg-blue-900 dark:border-gray-700">
+                  <tr className="text-sm font-semibold tracking-wide text-left text-gray-900 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-50 dark:bg-blue-900">
+                    <th className="px-4 py-4 sticky left-0 bg-gray-100 dark:bg-blue-900 dark:border-gray-700 z-30">
                       Particulars
                     </th>
                     {financialStatement.length > 0
@@ -160,12 +157,12 @@ function FinancialStatement({ company, financialStatement, data }) {
                   {financialStatement.map((fact) => (
                     <tr
                       key={fact.id}
-                      className="text-gray-700 dark:text-gray-50 dark:hover:bg-gray-800 hover:bg-gray-100 group"
+                      className="text-gray-700 dark:text-gray-50"
                     >
                       {fact.children.length > 0 ? (
                         <Accordion fact={fact} />
                       ) : (
-                        <td className="px-4 py-3 sticky left-0 dark:bg-gray-900 bg-white dark:group-hover:bg-gray-800 group-hover:bg-gray-100">
+                        <td className="px-4 py-3 sticky left-0 dark:bg-gray-900 bg-white ">
                           {fact.unit == "topic" ? (
                             <h1 className="font-bold">{fact.name}</h1>
                           ) : (

@@ -2,18 +2,16 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { MiniChart } from "../../../components/charts";
 import FinancialsHeader from "../../../components/financialsHeader/FinancialsHeader";
-import Layout from "../../../components/layout";
-import Spinner from "../../../components/Spinner";
-import {
-  GET_STATEMENT_LINES,
-  GET_STATEMENT_WITH_FACTS,
-} from "../../../lib/graphql/queries";
+
 import prisma from "../../../prisma/client";
 
 export async function getServerSideProps({ params }) {
   const company = await prisma.company.findFirst({
     where: {
       slug: params.slug,
+    },
+    include: {
+      companyStatementDetails: true,
     },
   });
   const companyRatios = [];
@@ -25,7 +23,7 @@ export async function getServerSideProps({ params }) {
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
-      financialStatementId: company.companyRatioId,
+      financialStatementId: company.companyStatementDetails.companyRatioId,
     },
     include: {
       financialStatementLine: {
@@ -61,16 +59,20 @@ export async function getServerSideProps({ params }) {
   });
 
   // Pass post data to the page via props
-  return { props: { companyRatios } };
+  return { props: { company, companyRatios } };
 }
 
-function Statistics({ companyRatios }) {
+function Statistics({ company, companyRatios }) {
   const router = useRouter();
-  const { slug } = router.query;
+  const { slug, statementType } = router.query;
 
   return (
     <>
-      <FinancialsHeader slug={slug} active={5} />
+      <FinancialsHeader
+        statements={company.companyStatementDetails}
+        slug={slug}
+        active={statementType}
+      />
 
       <section className="xl:container mx-3 xl:mx-auto py-5 mb-3 rounded-b-lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

@@ -2,9 +2,6 @@ import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { useRouter } from "next/router";
-import { GET_ALL_COMPANIES } from "../../lib/graphql/queries";
-import { useQuery } from "@apollo/client";
-import Spinner from "../Spinner";
 
 function SearchBar({
   companies,
@@ -62,7 +59,7 @@ function SearchBar({
               backgroundColor: bg,
               hoverBackgroundColor: theme === "light" ? "#E5E7EB" : "#6B7280",
               color: color,
-              zIndex: 99,
+              zIndex: 999,
               boxShadow:
                 "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
               fontFamily: "Muli",

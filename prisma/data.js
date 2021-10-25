@@ -2,7 +2,25 @@ const industries = [
   {
     name: "Commercial Banks",
     slug: "commercial-banks",
-    screenerStatementId: 1,
+    screenerId: 1,
+  },
+  {
+    name: "Development Banks",
+    slug: "development-banks",
+    screenerId: 2,
+  },
+];
+
+const companyStatmentDetails = [
+  {
+    name: "For Commercial Banks",
+    balanceSheetId: 1,
+    profitLossId: 2,
+    financialHighlightsId: 3,
+    companyRatioId: 4,
+    companyEssentialsId: 5,
+    companyActionId: 8,
+    financialStatementOverview: 8,
   },
 ];
 
@@ -11,11 +29,9 @@ const companies = [
     name: "Nabil Bank",
     slug: "nabil",
     symbol: "NABIL",
-    industryId: "1",
-    balanceSheetId: "1",
-    profitLossId: "2",
-    companyEssentialId: "3",
-    companyRatioId: "4",
+    description: "",
+    industryId: 2,
+    statementsId: 1,
   },
 ];
 
@@ -26,7 +42,7 @@ const financialStatement = [
   },
   {
     name: "Profit And Loss for Commercial Banks",
-    slug: "balance-sheet-for-commercial-banks",
+    slug: "profit-loss-for-commercial-banks",
   },
   {
     name: "Financial Highlights for Commercial Banks",
@@ -40,92 +56,174 @@ const financialStatement = [
     name: "Company Essentials for Commercial Banks",
     slug: "company-essentials-for-commercial-banks",
   },
+  {
+    name: "Company Actions",
+    slug: "company-actions",
+  },
+  {
+    name: "Financial Statement overview for Commercial Banks",
+    slug: "financial-statement-overview-for-commercial-banks",
+  },
 ];
 
 const financialStatementLine = [
+  // Balance Sheet
   {
     name: "Equity And Liabilities",
-    parent: null,
     parentId: null,
     unit: "topic",
   },
   {
     name: "Share Capital",
-    parent: null,
     parentId: null,
   },
   {
     name: "Total Reserves",
-    parent: null,
     parentId: null,
   },
   {
     name: "Deposits",
-    parent: null,
     parentId: null,
   },
   {
     name: "Borrowings",
-    parent: null,
     parentId: null,
   },
   {
     name: "Other Liabilities",
-    parent: null,
     parentId: null,
   },
   {
     name: "Total Liabilities",
-    parent: null,
     parentId: null,
   },
   {
     name: "Assets",
-    parent: null,
+
     parentId: null,
     unit: "topic",
   },
   {
     name: "Balance with Nepal Rastra Bank",
-    parent: null,
     parentId: null,
   },
   {
     name: "Balance with Banks",
-    parent: null,
     parentId: null,
   },
 
   {
     name: "Investments",
-    parent: null,
     parentId: null,
   },
   {
     name: "Advances",
-    parent: null,
     parentId: null,
   },
   {
     name: "Net Block",
-    parent: null,
     parentId: null,
   },
   {
     name: "Other Assets",
-    parent: null,
     parentId: null,
   },
   {
     name: "Balance with RBI",
-    parent: null,
     parentId: null,
   },
   {
     name: "Total Assets",
-    parent: null,
     parentId: null,
+  },
+  // P&L
+  {
+    name: "Net Sales",
+    parentId: null,
+  },
+  {
+    name: "Total Expenditure",
+    parentId: null,
+  },
+  {
+    name: "Operating Profit",
+    parentId: null,
+  },
+  {
+    name: "Other Income",
+    parentId: null,
+  },
+  {
+    name: "Interest",
+    parentId: null,
+  },
+  {
+    name: "Depreciation",
+    parentId: null,
+  },
+  {
+    name: "Exceptional Items",
+    parentId: null,
+  },
+  {
+    name: "Profit Before Tax",
+    parentId: null,
+  },
+  {
+    name: "Tax",
+    parentId: null,
+  },
+  {
+    name: "Net Profit",
+    parentId: null,
+  },
+  {
+    name: "Adjusted EPS (Rs.)",
+    parentId: null,
+  },
+
+  //  Ratios
+  {
+    name: "ROE",
+    parentId: null,
+    unit: "%",
+  },
+  {
+    name: "ROA",
+    parentId: null,
+    unit: "%",
+  },
+  {
+    name: "Net NPA",
+    parentId: null,
+    unit: "%",
+  },
+  {
+    name: "NIM",
+    parentId: null,
+    unit: "%",
+  },
+  {
+    name: "CAR",
+    parentId: null,
+    unit: "%",
+  },
+  {
+    name: "Cost of Liabilities",
+    parentId: null,
+    unit: "%",
+  },
+  {
+    name: "PEG Ratio",
+    parentId: null,
+    unit: "%",
   },
 ];
 
-export { industries, companies, financialStatement, financialStatementLine };
+module.exports = {
+  industries,
+  companies,
+  financialStatement,
+  financialStatementLine,
+  companyStatmentDetails,
+};

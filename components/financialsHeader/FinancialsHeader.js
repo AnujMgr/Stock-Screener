@@ -1,100 +1,72 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
+import HeaderButton from "./HeaderButton";
 
-export default function FinancialsHeader({ company, slug, active }) {
+export default function FinancialsHeader({ statements, slug, active }) {
   const router = useRouter();
+
+  const handleClick = (id) => {
+    router.push({
+      pathname: `/company/${slug}/financial-statement`,
+      query: {
+        statementType: id,
+      },
+    });
+  };
 
   return (
     <div>
-      <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow rounded-t-lg">
-        <div className="flex border-b border-gray-200 dark:border-gray-800">
-          <Link
-            href={`/company/[slug]/financial-overview`}
-            as={`/company/${slug}/financial-overview`}
-          >
-            <button
-              className={`${
-                active == 0
-                  ? "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 text-white dark:text-white hover:text-white transition duration-500"
-                  : "bg-white dark:bg-gray-900 hover:bg-blue-800 dark:hover:bg-blue-900 text-dark dark:text-white hover:text-white transition duration-500"
-              }  font-bold py-4 px-4 rounded-tl-lg border-r border-gray-200 dark:border-gray-800`}
+      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow rounded-none md:rounded-t-lg">
+        <div className="grid">
+          <div className="overflow-x-auto flex border-b border-gray-200 dark:border-gray-800 no-scroll">
+            <Link
+              href={`/company/[slug]/financial-overview`}
+              as={`/company/${slug}/financial-overview`}
             >
-              Overview
-            </button>
-          </Link>
+              <button
+                className={`${
+                  active == 0
+                    ? "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 text-white dark:text-white hover:text-white transition duration-500"
+                    : "bg-white dark:bg-gray-900 hover:bg-blue-800 dark:hover:bg-blue-900 text-dark dark:text-white hover:text-white transition duration-500"
+                }  font-bold py-4 px-4 rounded-none md:rounded-tl-lg border-r border-gray-200 dark:border-gray-800`}
+              >
+                Overview
+              </button>
+            </Link>
 
-          <button
-            onClick={(e) => {
-              router.push({
-                pathname: `/company/${slug}/financial-statement`,
-                query: {
-                  statementType: company.profitLossSlug,
-                },
-              });
-            }}
-            className={`${
-              active == company.profitLossSlug
-                ? "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 text-white dark:text-white hover:text-white transition duration-500"
-                : "bg-white dark:bg-gray-900 hover:bg-blue-800 dark:hover:bg-blue-900 text-dark dark:text-white hover:text-white transition duration-500"
-            }  font-bold py-4 px-4 border-r border-gray-200 dark:border-gray-800 `}
-          >
-            Income Statement
-          </button>
+            <HeaderButton
+              handleClick={(e) => handleClick(statements.balanceSheetId)}
+              isActive={active == statements.balanceSheetId}
+              title="Balance Sheet"
+            />
 
-          <button
-            onClick={(e) => {
-              router.push({
-                pathname: `/company/${slug}/financial-statement`,
-                query: {
-                  statementType: company.balanceSheetSlug,
-                },
-              });
-            }}
-            className={`${
-              active == company.balanceSheetSlug
-                ? "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 text-white dark:text-white hover:text-white transition duration-500"
-                : "bg-white dark:bg-gray-900 hover:bg-blue-800 dark:hover:bg-blue-900 text-dark dark:text-white hover:text-white transition duration-500"
-            }  font-bold py-4 px-4 border-r border-gray-200 dark:border-gray-800 `}
-          >
-            Balance Sheet
-          </button>
+            <HeaderButton
+              handleClick={(e) => handleClick(statements.profitLossId)}
+              isActive={active == statements.profitLossId}
+              title="Income Statement"
+            />
 
-          <button
-            onClick={(e) => {
-              router.push({
-                pathname: `/company/${slug}/financial-statement`,
-                query: {
-                  statementType: company.balanceSheetSlug,
-                },
-              });
-            }}
-            className={`${
-              active == 4
-                ? "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 text-white dark:text-white hover:text-white transition duration-500"
-                : "bg-white dark:bg-gray-900 hover:bg-blue-800 dark:hover:bg-blue-900 text-dark dark:text-white hover:text-white transition duration-500"
-            }  font-bold py-4 px-4 border-r border-gray-200 dark:border-gray-800 `}
-          >
-            Financial Highlights
-          </button>
+            <HeaderButton
+              handleClick={(e) => handleClick(statements.financialHighlightsId)}
+              isActive={active == statements.financialHighlightsId}
+              title="Financial Highlights"
+            />
 
-          <button
-            onClick={(e) => {
-              router.push({
-                pathname: `/company/${slug}/statistics`,
-                query: {
-                  statementType: company.companyRatioSlug,
-                },
-              });
-            }}
-            className={`${
-              active == company.companyRatioSlug
-                ? "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 text-white dark:text-white hover:text-white transition duration-500"
-                : "bg-white dark:bg-gray-900 hover:bg-blue-800 dark:hover:bg-blue-900 text-dark dark:text-white hover:text-white transition duration-500"
-            }  font-bold py-4 px-4 border-r border-gray-200 dark:border-gray-800 `}
-          >
-            Ratio Charts
-          </button>
+            <HeaderButton
+              handleClick={(e) => {
+                router.push({
+                  pathname: `/company/${slug}/statistics`,
+                  query: {
+                    statementType: statements.companyRatioId,
+                    quarter: "Q4",
+                  },
+                });
+              }}
+              isActive={active == statements.companyRatioId}
+              title="Ratio Charts"
+            />
+          </div>
         </div>
       </section>
     </div>

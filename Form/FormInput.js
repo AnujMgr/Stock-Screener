@@ -15,3 +15,5 @@ function FormInput(props) {
     </div>
   );
 }
+
+export default FormInput;
