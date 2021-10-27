@@ -33,6 +33,14 @@ const companies = [
     industryId: 2,
     statementsId: 1,
   },
+  {
+    name: "Nepal Bank",
+    slug: "nepal-banl",
+    symbol: "NBL",
+    description: "",
+    industryId: 2,
+    statementsId: 1,
+  },
 ];
 
 const financialStatement = [

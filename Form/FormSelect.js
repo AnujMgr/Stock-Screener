@@ -1,16 +1,17 @@
 function FormSelect(props) {
-  const { label, name, options, handleChange, firstOption, value } = props;
+  const { label, name, options, handleChange, firstOption, value, className } =
+    props;
 
   return (
     <>
       <select
-        className="w-full dark:bg-gray-800 bg-gray-50 dark:text-white text-dark border shadow-sm p-2"
+        className={`w-full dark:bg-gray-800 bg-gray-50 dark:text-white text-dark border shadow-sm p-2 ${className}`}
         name={name}
         id={name}
         value={value}
         onChange={handleChange}
       >
-        <option>{firstOption ? firstOption : `Select ${name}`}</option>
+        <option value="">{firstOption ? firstOption : `Select ${name}`}</option>
         {options.map((option) => {
           return (
             <option key={option.id} value={option.id}>

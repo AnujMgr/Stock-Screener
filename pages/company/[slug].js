@@ -177,7 +177,7 @@ export function Company({
   priceHistory,
   stockHoldingData,
 }) {
-  if (company === null) {
+  if (!company) {
     return <Custom404 />;
   }
 

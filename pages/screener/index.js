@@ -1,77 +1,117 @@
 import React, { useState } from "react";
 import DataTable from "../../components/dataTable";
-import Spinner from "../../components/Spinner";
-import {
-  GET_COMPANY_BY_INDUSTRY,
-  GET_COMPANY_BY_INDUSTRY_WITH_PRICE,
-  GET_SCREENER_DATA,
-  GET_STATEMENT_LINES,
-} from "../../lib/graphql/queries";
-import { useQuery } from "@apollo/client";
 
 export async function getServerSideProps({ params }) {
+  const companies = [];
+  const statements = [];
+  const screenerData = [];
+
   const industries = await prisma.industry.findMany({});
+
+  const data1 = await prisma.company.findMany({
+    where: {
+      industryId: 2,
+    },
+    include: {
+      companyPrice: {
+        take: 1,
+        orderBy: {
+          date: "desc",
+        },
+      },
+    },
+  });
+
+  data1.map((company) => {
+    if (!Array.isArray(company.companyPrice) || !company.companyPrice.length) {
+      companies.push({
+        id: company.id,
+        name: company.name,
+        symbol: company.symbol,
+        closingPrice: 0,
+      });
+    } else {
+      companies.push({
+        id: company.id,
+        name: company.name,
+        symbol: company.symbol,
+        closingPrice: company.companyPrice[0].closingPrice,
+      });
+    }
+  });
+
+  const data = await prisma.financialStatementLineSequence.findMany({
+    where: {
+      financialStatementId: 8,
+    },
+    include: {
+      financialStatementLine: {
+        include: {
+          financialStatementFact: {
+            where: {
+              quarter: "Q4",
+              fiscalYear: "2020/2021",
+            },
+            orderBy: {
+              fiscalYear: "desc",
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      sequence: "asc",
+    },
+  });
+
+  data.map((statement) => {
+    statements.push({
+      id: statement.financialStatementLine.id,
+      name: statement.financialStatementLine.name,
+    });
+    if (statement.financialStatementLine.financialStatementFact.length > 0)
+      statement.financialStatementLine.financialStatementFact.map((fact) =>
+        screenerData.push({
+          statementId: statement.financialStatementLine.id,
+          name: statement.financialStatementLine.name,
+          companyId: fact.companyId,
+          amount: fact.amount,
+        })
+      );
+  });
+
+  return { props: { companies, industries, statements, screenerData } };
   // Pass post data to the page via props
-  return { props: { industries } };
+  // return { props: { industries } };
 }
 
-function Screener({ industries }) {
+function Screener({ companies, industries, statements, screenerData }) {
   const [quarter, setQuarter] = useState("Q4");
   const [fiscalYear, setFiscalYear] = useState("2021");
   const [industry, setIndustry] = useState(1);
-  // const { companies } = useAppContext();
-  const {
-    loading,
-    error,
-    data: facts,
-  } = useQuery(GET_SCREENER_DATA, {
-    variables: {
-      id: 4, // This should be screener statement id i.e stored in industry
-      quarter: quarter,
-      fiscalYear: 2021,
-    },
-  });
-
-  const {
-    loading: loading2,
-    error: error2,
-    data: companies,
-  } = useQuery(GET_COMPANY_BY_INDUSTRY_WITH_PRICE, {
-    variables: {
-      id: industry, // This should be screener statement id i.e stored in industry
-    },
-  });
-
-  if (loading || loading2) {
-    return <Spinner />;
-  }
-
-  if (error) {
-    return <h1>Error</h1>;
-  }
-  if (error2) {
-    return <h1>Error2</h1>;
-  }
 
   var dataList = [];
 
-  companies.getCompanyByIndustryWithPrice.map((company) =>
+  companies.map((company) =>
     dataList.push({
       id: company.id,
       company: company.name,
-      price: company.closingPrice,
+      price: "100",
     })
   );
 
   dataList.map((data, ind) => {
-    facts.getScreenerData.screenerFacts.map((screener) => {
-      if (data.id.toString() === screener.companyId) {
+    screenerData.map((screener) => {
+      if (data.id.toString() == screener.companyId) {
         Object.assign(dataList[ind], {
           [screener.statementId]: screener.amount,
         });
       }
     });
   });
+
+  console.log(screenerData);
+  console.log(dataList);
 
   return (
     <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow-md rounded-lg ">
@@ -127,10 +167,7 @@ function Screener({ industries }) {
         </div>
       </div>
 
-      <DataTable
-        dataList={dataList}
-        statements={facts.getScreenerData.statementLines}
-      />
+      <DataTable dataList={dataList} statements={statements} />
     </section>
   );
 }

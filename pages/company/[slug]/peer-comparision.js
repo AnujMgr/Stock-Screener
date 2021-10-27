@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import Accordion from "../../components/accordion/Accordion";
+import Accordion from "../../../components/accordion/Accordion";
 import ReactTooltip from "react-tooltip";
-import prisma from "../../prisma/client";
-import SelectWithSearch from "../../components/SelectWithSearch";
-import FormSelect from "../../Form/FormSelect";
+import prisma from "../../../prisma/client";
+import SelectWithSearch from "../../../components/SelectWithSearch";
+import FormSelect from "../../../Form/FormSelect";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
+import Custom404 from "../../404";
 
 export async function getServerSideProps({ query }) {
+  console.log(
+    "--------------------------------------------------------------------"
+  );
   const financialStatement = [];
   const company = await prisma.company.findFirst({
     where: {
@@ -18,16 +22,20 @@ export async function getServerSideProps({ query }) {
     },
   });
 
-  const companies = await prisma.company.findMany({});
-
-  if (
-    !query.hasOwnProperty("quarter") &&
-    !query.hasOwnProperty("statementType") &&
-    !query.hasOwnProperty("fiscalYear") &&
-    !query.hasOwnProperty("statementType")
-  ) {
-    return { props: { company, companies, financialStatement } };
+  if (company === null) {
+    const companies = [];
+    const data = [];
+    return { props: { company, companies, financialStatement, data } };
   }
+
+  const companyIds = [];
+  const companies = await prisma.company.findMany({
+    where: {
+      id: { in: [1, 2] },
+    },
+  });
+
+  companies.map((company) => companyIds.push(company.id));
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
@@ -47,14 +55,14 @@ export async function getServerSideProps({ query }) {
                 where: query.hasOwnProperty("quarter")
                   ? query.quarter === "qtrToqtr"
                     ? {
-                        companyId: company.id,
+                        companyId: { in: companyIds },
                       }
                     : {
-                        companyId: company.id,
+                        companyId: { in: companyIds },
                         quarter: query.quarter,
                       }
                   : {
-                      companyId: company.id,
+                      companyId: { in: companyIds },
                     },
                 take: 5,
               },
@@ -64,14 +72,14 @@ export async function getServerSideProps({ query }) {
             where: query.hasOwnProperty("quarter")
               ? query.quarter == "qtrToqtr"
                 ? {
-                    companyId: company.id,
+                    companyId: { in: companyIds },
                   }
                 : {
-                    companyId: company.id,
+                    companyId: { in: companyIds },
                     quarter: query.quarter,
                   }
               : {
-                  companyId: company.id,
+                  companyId: { in: companyIds },
                 },
             take: 5,
             orderBy: [
@@ -105,6 +113,7 @@ export async function getServerSideProps({ query }) {
           amount: data.amount,
           quarter: data.quarter,
           fiscalYear: data.fiscalYear,
+          companyId: data.companyId,
         })),
       })),
       financialStatementFact:
@@ -113,6 +122,7 @@ export async function getServerSideProps({ query }) {
           amount: data.amount,
           quarter: data.quarter,
           fiscalYear: data.fiscalYear,
+          companyId: data.companyId,
         })),
     });
   });
@@ -124,13 +134,18 @@ export async function getServerSideProps({ query }) {
 function FinancialStatement({ company, companies, financialStatement, data }) {
   const { theme } = useTheme();
   const router = useRouter();
+  const { slug, statementType, quarter } = router.query;
   const [selectedOptions, setSelectedOptions] = useState("");
-  const [quarter, setQuarter] = useState("");
+  const [quarterOption, setQuarterOption] = useState("");
   const [fiscalYear, setFiscalYear] = useState("");
-  const [statement, setStatement] = useState("");
+  const [statementTypeOption, setStatementTypeOption] = useState("");
 
   const companiesOptions = [];
   const financialStatementOptions = [];
+
+  if (!company) {
+    return <Custom404 />;
+  }
 
   const handleChange = (selectedOptions) => {
     setSelectedOptions(selectedOptions);
@@ -172,37 +187,51 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
     }
   );
 
+  const getCompanyName = (id) => {
+    var name = "";
+    companies.map((company) => {
+      if (company.id == id) {
+        name = company.name;
+      }
+    });
+
+    return name;
+  };
+
   return (
     <>
       <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
-        <div className="grid grid-cols-5 gap-3">
-          <div className="mb-2 flex-col">
+        <div className="grid grid-cols-4 md:grid-cols-5 gap-3">
+          <div className="mb-2 flex-col col-span-2 md:col-span-1">
             <SelectWithSearch
               isMulti={true}
               options={companiesOptions}
               selectedValues={selectedOptions}
               handleChange={handleChange}
+              className="rounded border "
               controlBackgroundColor={theme === "light" ? "#F3F4F6" : "#1F2937"}
               dropdownMenuBackgroundColor={
                 theme === "light" ? "#F3F4F6" : "#1F2937"
               }
               hoverMenuColor={theme === "light" ? "#fff" : "#111827"}
               menuFontColor={theme === "light" ? "#000" : "#F3F4F6"}
+              borderColor={theme === "light" ? "#6B7280" : "#374151"}
             />
             <span className="text-xs">Companies</span>
           </div>
-          <div className="mb-2">
+          <div className="mb-2 col-span-2 md:col-span-1">
             <FormSelect
               className="rounded"
               options={quarterOptions}
               control="select"
               label="Quarter"
               name="quarter"
-              value={quarter}
+              value={quarterOption}
+              className="rounded border dark:border-gray-700 border-gray-400"
               handleChange={(e) => setQuarter(e.target.value)}
             />
           </div>
-          <div className="mb-2">
+          <div className="mb-2 col-span-2 md:col-span-1">
             <FormSelect
               className="rounded"
               options={fiscalYearOptions}
@@ -210,29 +239,36 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
               label="FiscalYear"
               name="FiscalYear"
               value={fiscalYear}
+              className="rounded border  dark:border-gray-700 border-gray-400"
               handleChange={(e) => setFiscalYear(e.target.value)}
             />
           </div>
-          <div className="mb-2">
+          <div className="mb-2 col-span-2 md:col-span-1">
             <FormSelect
               className="rounded"
               options={financialStatementOptions}
               control="select"
               label="Statement"
               name="Statement"
-              value={statement}
-              handleChange={(e) => setStatement(e.target.value)}
+              value={statementTypeOption}
+              className="rounded border dark:border-gray-700 border-gray-400"
+              handleChange={(e) => setStatementType(e.target.value)}
             />
           </div>
-          <div className="mb-2">
-            <button onClick={e =>
-              router.push({
-                pathname: `/company/${slug}/financial-statement`,
-                query: {
-                  statementType: id,
-                },
-              })
-            } className="bg-blue-600 text-white h-9 px-5 rounded">
+          <div className="mb-2 text-center md:text-left col-span-4 md:col-span-1">
+            <button
+              onClick={(e) =>
+                router.push({
+                  pathname: `/company/${slug}/peer-comparision`,
+                  query: {
+                    quarter: quarterOption,
+                    fiscalYear: fiscalYear,
+                    statementType: statementTypeOption,
+                  },
+                })
+              }
+              className="bg-blue-600 text-white h-9 px-5 rounded"
+            >
               Submit
             </button>
           </div>
@@ -243,13 +279,15 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
               <table className="w-full whitespace-no-wrap">
                 <thead>
                   <tr className="text-sm font-semibold tracking-wide text-left text-gray-900 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-50 dark:bg-blue-900">
-                    <th className="px-4 py-4 sticky left-0 bg-gray-100 dark:bg-blue-900 dark:border-gray-700 z-30">
+                    <th className="px-4 py-0 sticky left-0 bg-gray-100 dark:bg-blue-900 dark:border-gray-700">
                       Particulars
                     </th>
                     {financialStatement.length > 0
                       ? financialStatement[1].financialStatementFact.map(
                           (fact) => (
                             <th key={fact.id} className="px-4 py-4">
+                              {getCompanyName(fact.companyId)}
+                              <br />
                               {fact.fiscalYear} {"  "} {fact.quarter}
                             </th>
                           )
@@ -266,7 +304,7 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
                       {fact.children.length > 0 ? (
                         <Accordion fact={fact} />
                       ) : (
-                        <td className="px-4 py-3 sticky left-0 dark:bg-gray-900 bg-white ">
+                        <td className=" px-4 py-3 sticky left-0 dark:bg-gray-900 bg-white ">
                           {fact.unit == "topic" ? (
                             <h1 className="font-bold text-md">{fact.name}</h1>
                           ) : (

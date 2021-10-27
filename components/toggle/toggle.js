@@ -22,10 +22,10 @@ export const Toggle = () => {
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       >
         {theme === "light" ? (
-          <MoonIcon height="16" width="16" color="#fff" />
+          <MoonIcon height="20" width="20" color="#fff" />
         ) : (
           // <MoonIcon height="16" width="16" color="#fff" />
-          <SunIcon height="16" width="16" color="#fff" />
+          <SunIcon height="20" width="20" color="#fff" />
         )}
       </button>
     </div>

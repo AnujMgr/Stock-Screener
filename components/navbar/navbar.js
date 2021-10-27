@@ -66,11 +66,25 @@ function Navbar({ showSearch }) {
       <div className="lg:hidden shadow-sm border-b-1 bg-white dark:bg-gray-700 border-fuchsia-100 border-b border-gray-100 dark:border-gray-600">
         <div className="xl:container mx-auto flex justify-between items-center px-4">
           <div>
-            <h1 className="lg:block hidden text-2xl dark:text-white text-gray-900 mr-6">
-              <Link className="hidden lg:block" href="/">
+            <h1 className="text-2xl dark:text-white text-gray-900 mr-6">
+              <Link className="lg:block" href="/">
                 Analytics
               </Link>
             </h1>
+          </div>
+          {/* Right Nav Items */}
+          <div className="flex items-center gap-2 my-2">
+            {hidden ? (
+              <button className="p-2 rounded" onClick={(e) => setHidden(false)}>
+                <BsSearch className="h-5 w-5" />
+              </button>
+            ) : (
+              <button className="rounded" onClick={(e) => setHidden(true)}>
+                <BsX className="h-8 w-8 text-md" />
+              </button>
+            )}
+            <Toggle />
+
             <button
               onClick={(e) => setOpen(!open)}
               className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-600 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-500
@@ -90,19 +104,6 @@ function Navbar({ showSearch }) {
                 />
               </svg>
             </button>
-          </div>
-          {/* Right Nav Items */}
-          <div className="flex items-center gap-2 my-2">
-            {hidden ? (
-              <button className="p-2 rounded" onClick={(e) => setHidden(false)}>
-                <BsSearch className="h-5 w-5" />
-              </button>
-            ) : (
-              <button className="rounded" onClick={(e) => setHidden(true)}>
-                <BsX className="h-8 w-8 text-md" />
-              </button>
-            )}
-            <Toggle />
           </div>
         </div>
         {!hidden ? (

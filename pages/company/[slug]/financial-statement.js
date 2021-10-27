@@ -5,6 +5,8 @@ import FinancialsHeader from "../../../components/financialsHeader/FinancialsHea
 import ReactTooltip from "react-tooltip";
 
 import prisma from "../../../prisma/client";
+import FormSelect from "../../../Form/FormSelect";
+import Custom404 from "../../404";
 
 export async function getServerSideProps({ query }) {
   const financialStatement = [];
@@ -16,6 +18,10 @@ export async function getServerSideProps({ query }) {
       companyStatementDetails: true,
     },
   });
+  if (!company) {
+    const company = null;
+    return { props: { company, financialStatement } };
+  }
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
@@ -113,7 +119,7 @@ function FinancialStatement({ company, financialStatement, data }) {
   const router = useRouter();
   const { slug, statementType, quarter } = router.query;
   const [quarterValue, setQuarterValue] = useState(
-    quarter ? quarter : "qtrToqtr"
+    quarter || quarter != undefined ? quarter : "qtrToqtr"
   );
 
   const quarterOptions = [
@@ -123,6 +129,9 @@ function FinancialStatement({ company, financialStatement, data }) {
     { id: "Q4", name: "Q4" },
     { id: "qtrToqtr", name: "Quarter To Quarter" },
   ];
+  if (!company) {
+    return <Custom404 />;
+  }
   return (
     <>
       <FinancialsHeader
@@ -135,25 +144,49 @@ function FinancialStatement({ company, financialStatement, data }) {
         }
       />
 
-      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-b-lg">
+      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-b-lg">
+        <div className="mb-4 md:w-36">
+          <FormSelect
+            control="select"
+            label="Quarter"
+            name="quarter"
+            className="rounded border border-gray-600"
+            value={quarterValue}
+            options={quarterOptions}
+            handleChange={(e) => {
+              setQuarterValue(e.target.value);
+              router.push({
+                pathname: `/company/${slug}/financial-statement`,
+                query: {
+                  statementType: statementType
+                    ? statementType
+                    : company.companyStatementDetails.balanceSheetId,
+                  quarter: e.target.value,
+                },
+              });
+            }}
+          />
+        </div>
         <div className="grid">
           <div className="w-full overflow-hidden shadow-xs">
             <div className="w-full overflow-x-auto custom-scroll">
               <table className="w-full whitespace-no-wrap">
                 <thead>
-                  <tr className="text-sm font-semibold tracking-wide text-left text-gray-900 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-white dark:bg-blue-900">
+                  <tr className="text-sm font-semibold tracking-wide text-left text-gray-900 uppercase border-b-2 dark:border-gray-700 bg-gray-100 dark:text-white dark:bg-blue-900">
                     <th className="px-4 py-4 sticky left-0 bg-gray-100 dark:bg-blue-900 dark:border-gray-700">
                       Particulars
                     </th>
-                    {financialStatement.length > 0
-                      ? financialStatement[1].financialStatementFact.map(
-                          (fact) => (
-                            <th key={fact.id} className="px-4 py-4">
-                              {fact.fiscalYear} {"  "} {fact.quarter}
-                            </th>
-                          )
+                    {financialStatement.length > 0 ? (
+                      financialStatement[1].financialStatementFact.map(
+                        (fact) => (
+                          <th key={fact.id} className="px-4 py-4">
+                            {fact.fiscalYear} {"  "} {fact.quarter}
+                          </th>
                         )
-                      : null}
+                      )
+                    ) : (
+                      <th className="px-4 py-4">NA</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-900">
@@ -208,7 +241,7 @@ function FinancialStatement({ company, financialStatement, data }) {
                           </td>
                         ))
                       ) : fact.unit == "topic" ? null : (
-                        <div className="flex-1 p-2 mb-1">0</div>
+                        <td className="flex-1 p-2 mb-1">NA</td>
                       )}
                     </tr>
                   ))}

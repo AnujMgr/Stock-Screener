@@ -14,6 +14,8 @@ function DataTable({ dataList, statements }) {
     setLoading(false);
   }
 
+  console.log(dataList);
+
   const [mounted, setMounted] = useState(false);
 
   // When mounted on client, now we can show the UI
@@ -43,7 +45,7 @@ function DataTable({ dataList, statements }) {
       {statements.map((stat) => (
         <Column key={stat.id} width={100} sortable resizable>
           <HeaderCell className="select-none">{stat.name}</HeaderCell>
-          <Cell dataKey={stat.id} />
+          <Cell dataKey={String(stat.id)} />
         </Column>
       ))}
     </Table>
