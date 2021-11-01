@@ -3,23 +3,31 @@ import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 
 export default function PriceCounter({ isRising, amount, rate }) {
   return (
-    <div className="flex">
+    <>
       {isRising ? (
-        <>
-          <p className="text-green-500 mr-2">
+        <div className="flex">
+          <p className="text-gray-700 dark:text-green-300 mr-2">
             + {amount} (+ {rate} %)
           </p>
-          <BsFillCaretUpFill color="#48bb78" size="20" />
-        </>
+          <BsFillCaretUpFill
+            className="animate-ping-1"
+            color="#047857"
+            size="20"
+          />
+        </div>
       ) : (
-        <>
-          <p className="text-red-600 mr-2">
+        <div className="flex">
+          <p className="text-red-800 dark:text-gray-50 mr-2">
             {" "}
             {amount} ({rate} %)
           </p>
-          <BsFillCaretDownFill color="red" size="20" />
-        </>
+          <BsFillCaretDownFill
+            className="animate-ping-1"
+            color="red"
+            size="20"
+          />
+        </div>
       )}
-    </div>
+    </>
   );
 }

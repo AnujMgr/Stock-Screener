@@ -1,3 +1,3 @@
-import FinancialsHeader from "financialsHeader";
+import FinancialsHeader from "./FinancialsHeader";
 
 export default FinancialsHeader;

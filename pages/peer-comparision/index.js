@@ -225,14 +225,17 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
             />
           </div>
           <div className="mb-2">
-            <button onClick={e =>
-              router.push({
-                pathname: `/company/${slug}/financial-statement`,
-                query: {
-                  statementType: id,
-                },
-              })
-            } className="bg-blue-600 text-white h-9 px-5 rounded">
+            <button
+              onClick={(e) =>
+                router.push({
+                  pathname: `/company/${slug}/financial-statement`,
+                  query: {
+                    statementType: id,
+                  },
+                })
+              }
+              className="bg-blue-600 text-white h-9 px-5 rounded"
+            >
               Submit
             </button>
           </div>

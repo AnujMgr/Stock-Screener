@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Table, Column, HeaderCell, Cell } from "rsuite-table";
-// import "rsuite-table/dist/css/rsuite-table.css";
+import "rsuite-table/dist/css/rsuite-table.css";
+// import "../../styles/rsuite-table.css";
 
 function DataTable({ dataList, statements }) {
   const [sortColumn, setSortColumn] = useState("79");
@@ -13,8 +14,6 @@ function DataTable({ dataList, statements }) {
     setSortType(sortType);
     setLoading(false);
   }
-
-  console.log(dataList);
 
   const [mounted, setMounted] = useState(false);
 
@@ -34,7 +33,7 @@ function DataTable({ dataList, statements }) {
       autoHeight
     >
       <Column sortable resizable>
-        <HeaderCell className="select-none">Name</HeaderCell>
+        <HeaderCell className="select-none ">Name</HeaderCell>
         <Cell dataKey="company" />
       </Column>
       <Column sortable resizable>

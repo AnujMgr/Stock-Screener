@@ -127,7 +127,7 @@ function Navbar({ showSearch }) {
         }`}
       >
         <div className="xl:container mx-auto flex justify-between items-center px-4 border-b border-gray-300 dark:border-gray-500 ">
-          <h1 className="text-2xl dark:text-white text-gray-900 mr-6">
+          <h1 className="text-2xl dark:text-white text-gray-900">
             <a href="/">Analytics</a>
           </h1>
           <div className="flex items-center gap-2 my-2">

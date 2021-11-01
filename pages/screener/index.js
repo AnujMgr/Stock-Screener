@@ -1,16 +1,39 @@
+import { useRouter } from "next/router";
 import React, { useState } from "react";
-import DataTable from "../../components/dataTable";
+import SortableTable from "../../components/SortableTable";
+import FormSelect from "../../Form/FormSelect";
+import prisma from "../../prisma/client";
 
-export async function getServerSideProps({ params }) {
-  const companies = [];
-  const statements = [];
+export async function getServerSideProps({ query }) {
   const screenerData = [];
+  const columns = [
+    {
+      Header: "Company",
+      accessor: "Company",
+    },
+    {
+      Header: "Price",
+      accessor: "Price",
+    },
+  ];
+  const dataList = [];
+  const industries = await prisma.industry.findMany();
 
-  const industries = await prisma.industry.findMany({});
-
-  const data1 = await prisma.company.findMany({
+  const currentIndustry = await prisma.industry.findFirst({
     where: {
-      industryId: 2,
+      slug: query.industryType ? query.industryType : "commercial-banks",
+    },
+  });
+
+  if (!currentIndustry) {
+    const dataList = null;
+    const columns = null;
+    return { props: { columns, dataList, industries } };
+  }
+
+  const companies = await prisma.company.findMany({
+    where: {
+      industryId: currentIndustry.id,
     },
     include: {
       companyPrice: {
@@ -22,27 +45,9 @@ export async function getServerSideProps({ params }) {
     },
   });
 
-  data1.map((company) => {
-    if (!Array.isArray(company.companyPrice) || !company.companyPrice.length) {
-      companies.push({
-        id: company.id,
-        name: company.name,
-        symbol: company.symbol,
-        closingPrice: 0,
-      });
-    } else {
-      companies.push({
-        id: company.id,
-        name: company.name,
-        symbol: company.symbol,
-        closingPrice: company.companyPrice[0].closingPrice,
-      });
-    }
-  });
-
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
-      financialStatementId: 8,
+      financialStatementId: currentIndustry.screenerId,
     },
     include: {
       financialStatementLine: {
@@ -65,111 +70,77 @@ export async function getServerSideProps({ params }) {
   });
 
   data.map((statement) => {
-    statements.push({
-      id: statement.financialStatementLine.id,
-      name: statement.financialStatementLine.name,
-    });
-    if (statement.financialStatementLine.financialStatementFact.length > 0)
+    if (statement.financialStatementLine.financialStatementFact.length > 0) {
       statement.financialStatementLine.financialStatementFact.map((fact) =>
         screenerData.push({
           statementId: statement.financialStatementLine.id,
-          name: statement.financialStatementLine.name,
           companyId: fact.companyId,
+          name: statement.financialStatementLine.name,
           amount: fact.amount,
         })
       );
+    }
+    columns.push({
+      Header: statement.financialStatementLine.name,
+      accessor: statement.financialStatementLine.name,
+    });
+    //
   });
 
-  return { props: { companies, industries, statements, screenerData } };
-  // Pass post data to the page via props
-  // return { props: { industries } };
-}
-
-function Screener({ companies, industries, statements, screenerData }) {
-  const [quarter, setQuarter] = useState("Q4");
-  const [fiscalYear, setFiscalYear] = useState("2021");
-  const [industry, setIndustry] = useState(1);
-
-  var dataList = [];
-
-  companies.map((company) =>
-    dataList.push({
-      id: company.id,
-      company: company.name,
-      price: "100",
-    })
-  );
-
-  dataList.map((data, ind) => {
+  companies.map((company, i) => {
+    var myobj = {};
     screenerData.map((screener) => {
-      if (data.id.toString() == screener.companyId) {
-        Object.assign(dataList[ind], {
-          [screener.statementId]: screener.amount,
+      if (company.id === screener.companyId) {
+        Object.assign(myobj, {
+          [screener.name]: screener.amount,
         });
       }
     });
+    // dataList.push({ ["col1"]: company.name });
+    Object.assign(myobj, { ["Company"]: company.name });
+    Object.assign(myobj, { ["Price"]: "123" });
+
+    dataList.push(myobj);
   });
 
-  console.log(screenerData);
-  console.log(dataList);
+  return { props: { columns, dataList, industries } };
+}
+
+export default function Screener({ columns, dataList, industries }) {
+  const router = useRouter();
+  const [industry, setIndustry] = useState(1);
+  const industryOptions = [];
+
+  industries.map((industry) =>
+    industryOptions.push({ id: industry.slug, name: industry.name })
+  );
+
+  if (columns == null) {
+    return <h1>Data Not Available!</h1>;
+  }
 
   return (
-    <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow-md rounded-lg ">
-      <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-white">
-        Screener
-      </h2>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="flex flex-col mr-4 text-left">
-            <select
-              name="quarters"
-              className="p-2 bg-blue-50 dark:bg-gray-800 rounded-sm border dark:border-gray-600"
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-            >
-              <option value={0}>All Sectors</option>
-              {industries.map((industry) => (
-                <option value={industry.id} key={industry.id}>
-                  {industry.name}
-                </option>
-              ))}
-            </select>
-            <span className="text-xs text-gray-400 my-1">Sectors</span>
-          </div>
-          <div className="flex flex-col mr-4">
-            <select
-              name="quarters"
-              className="p-2 bg-blue-50 dark:bg-gray-800 rounded-sm border dark:border-gray-600"
-              value={quarter}
-              onChange={(e) => setQuarter(e.target.value)}
-            >
-              <option value="Q1">Q1</option>
-              <option value="Q2">Q2</option>
-              <option value="Q3">Q3</option>
-              <option value="Q4">Q4</option>
-            </select>
-            <span className="text-xs text-gray-400 my-1">Quarter</span>
-          </div>
-          <div className="flex flex-col">
-            <select
-              name="fiscalYear"
-              className="p-2 bg-blue-50 dark:bg-gray-800 rounded-sm border dark:border-gray-600"
-              value={fiscalYear}
-              onChange={(e) => setFiscalYear(e.target.value)}
-            >
-              <option value="2021">2021</option>
-              <option value="Q2">Q2</option>
-              <option value="Q3">Q3</option>
-              <option value="Q4">Q4</option>
-            </select>
-            <span className="text-xs text-gray-400 my-1">Fiscal Year</span>
-          </div>
-        </div>
+    <section className="xl:container mt-5 mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-md">
+      <div className="mb-4 md:w-52">
+        <FormSelect
+          control="select"
+          label="Industry Type"
+          name="quarter"
+          className="rounded border border-gray-600"
+          value={industry}
+          options={industryOptions}
+          handleChange={(e) => {
+            setIndustry(e.target.value);
+            router.push({
+              pathname: `/screener`,
+              query: {
+                industryType: e.target.value,
+              },
+            });
+          }}
+        />
       </div>
-
-      <DataTable dataList={dataList} statements={statements} />
+      <SortableTable columns={columns} data={dataList} />
     </section>
   );
 }
-
-export default Screener;

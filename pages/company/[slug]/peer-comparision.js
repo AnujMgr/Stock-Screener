@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import Accordion from "../../../components/accordion/Accordion";
-import ReactTooltip from "react-tooltip";
+import React, { useEffect, useState } from "react";
 import prisma from "../../../prisma/client";
 import SelectWithSearch from "../../../components/SelectWithSearch";
 import FormSelect from "../../../Form/FormSelect";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 import Custom404 from "../../404";
+import { useAppContext } from "../../../lib/contexts/State";
+import MyTable from "../../../components/FinancialsTable/MyTable";
+import { MinusIcon, PlusIcon } from "../../../lib/icons/Icons";
+
+const initialFormData = undefined;
 
 export async function getServerSideProps({ query }) {
-  console.log(
-    "--------------------------------------------------------------------"
-  );
-  const financialStatement = [];
+  // Company is Required to get company statement details
   const company = await prisma.company.findFirst({
     where: {
       slug: query.slug,
@@ -21,7 +21,12 @@ export async function getServerSideProps({ query }) {
       companyStatementDetails: true,
     },
   });
+  const financialStatement = [];
+  const columnsData = [];
+  const dataList = [];
+  const fiscalYearList = [];
 
+  // If given company slug is wrong then return
   if (company === null) {
     const companies = [];
     const data = [];
@@ -31,10 +36,11 @@ export async function getServerSideProps({ query }) {
   const companyIds = [];
   const companies = await prisma.company.findMany({
     where: {
-      id: { in: [1, 2] },
+      slug: query.companies
+        ? { in: [query.slug, ...query.companies, query.companies] }
+        : { in: [query.slug] },
     },
   });
-
   companies.map((company) => companyIds.push(company.id));
 
   const data = await prisma.financialStatementLineSequence.findMany({
@@ -53,35 +59,31 @@ export async function getServerSideProps({ query }) {
             include: {
               financialStatementFact: {
                 where: query.hasOwnProperty("quarter")
-                  ? query.quarter === "qtrToqtr"
-                    ? {
-                        companyId: { in: companyIds },
-                      }
-                    : {
-                        companyId: { in: companyIds },
-                        quarter: query.quarter,
-                      }
+                  ? {
+                      companyId: { in: companyIds },
+                      quarter: query.quarter,
+                      fiscalYear: query.fiscalYear,
+                    }
                   : {
                       companyId: { in: companyIds },
+                      quarter: "Q4",
                     },
-                take: 5,
+                take: companies.length,
               },
             },
           },
           financialStatementFact: {
             where: query.hasOwnProperty("quarter")
-              ? query.quarter == "qtrToqtr"
-                ? {
-                    companyId: { in: companyIds },
-                  }
-                : {
-                    companyId: { in: companyIds },
-                    quarter: query.quarter,
-                  }
+              ? {
+                  companyId: { in: companyIds },
+                  quarter: query.quarter,
+                  fiscalYear: query.fiscalYear,
+                }
               : {
                   companyId: { in: companyIds },
+                  quarter: "Q4",
                 },
-            take: 5,
+            take: companies.length,
             orderBy: [
               {
                 quarter: "desc",
@@ -99,58 +101,160 @@ export async function getServerSideProps({ query }) {
     },
   });
 
-  data.map((fact) => {
-    financialStatement.push({
-      id: fact.financialStatementLine.id,
-      name: fact.financialStatementLine.name,
-      unit: fact.financialStatementLine.unit,
+  if (!data.length > 0) {
+    const dataList = null;
+    return {
+      props: { company, financialStatement, data, dataList, columnsData },
+    };
+  }
 
-      children: fact.financialStatementLine.children.map((data) => ({
-        id: data.id,
-        name: data.name,
-        financialStatementFact: data.financialStatementFact.map((data) => ({
-          id: data.id,
-          amount: data.amount,
-          quarter: data.quarter,
-          fiscalYear: data.fiscalYear,
-          companyId: data.companyId,
-        })),
-      })),
-      financialStatementFact:
-        fact.financialStatementLine.financialStatementFact.map((data) => ({
-          id: data.id,
-          amount: data.amount,
-          quarter: data.quarter,
-          fiscalYear: data.fiscalYear,
-          companyId: data.companyId,
-        })),
+  if (data[1].financialStatementLine.financialStatementFact.length <= 0) {
+    // if no. of facts is 0
+    const dataList = null;
+    return {
+      props: { company, financialStatement, data, dataList, columnsData },
+    };
+  }
+
+  const currentFiscalYearFact = await prisma.financialStatementFact.findFirst({
+    where: {
+      companyId: Number(company.id),
+    },
+    orderBy: {
+      fiscalYear: "desc",
+    },
+  });
+
+  for (let i = 0; i < 5; i++) {
+    var firstYear = parseInt(
+      parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1
+    );
+    var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
+    fiscalYearList.push(parseInt(firstYear - i) + "/" + parseInt(lastYear - i));
+  }
+
+  data[1].financialStatementLine.financialStatementFact.map((fact) => {
+    columnsData.push({
+      Header: companies.find((item) => item.id === fact.companyId).name,
+      accessor: fact.companyId + "" + fact.fiscalYear + " " + fact.quarter,
     });
   });
 
+  data.map((fact) => {
+    var child = {};
+    var myobj = {};
+
+    fact.financialStatementLine.children.map((data) => {
+      data.financialStatementFact.map((myData) => {
+        Object.assign(child, {
+          [myData.companyId + "" + myData.fiscalYear + " " + myData.quarter]:
+            myData.amount,
+          particular: data.name,
+        });
+      });
+    });
+
+    fact.financialStatementLine.financialStatementFact.length > 0
+      ? fact.financialStatementLine.financialStatementFact.map((data) => {
+          Object.assign(myobj, {
+            particular: fact.financialStatementLine.name,
+            [data.companyId + "" + data.fiscalYear + " " + data.quarter]:
+              data.amount,
+
+            subRows:
+              fact.financialStatementLine.children.length > 0 ? [child] : [],
+          });
+        })
+      : Object.assign(myobj, {
+          particular: fact.financialStatementLine.name,
+
+          subRows:
+            fact.financialStatementLine.children.length > 0 ? [child] : [],
+        });
+
+    dataList.push({ ...myobj });
+  });
+
   // Pass post data to the page via props
-  return { props: { company, companies, financialStatement, data } };
+  return { props: { company, dataList, columnsData, fiscalYearList } };
 }
 
-function FinancialStatement({ company, companies, financialStatement, data }) {
-  const { theme } = useTheme();
-  const router = useRouter();
-  const { slug, statementType, quarter } = router.query;
-  const [selectedOptions, setSelectedOptions] = useState("");
-  const [quarterOption, setQuarterOption] = useState("");
-  const [fiscalYear, setFiscalYear] = useState("");
-  const [statementTypeOption, setStatementTypeOption] = useState("");
-
-  const companiesOptions = [];
-  const financialStatementOptions = [];
-
+function FinancialStatement({
+  company,
+  fiscalYearList,
+  dataList,
+  columnsData,
+}) {
   if (!company) {
     return <Custom404 />;
   }
 
+  if (!dataList) {
+    return (
+      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
+        <h1>Data Not Available!</h1>
+      </section>
+    );
+  }
+
+  const [formData, setFormData] = useState(initialFormData);
+
+  const { theme } = useTheme();
+  const router = useRouter();
+  const { slug, statementType, quarter, fiscalYear } = router.query;
+  const [selectedCompanies, setSelectedCompanies] = useState("");
+  const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "Q4");
+  const [fiscalYearOption, setFiscalYearOption] = useState(
+    fiscalYear ? fiscalYear : "2020/2021"
+  );
+  const [statementTypeOption, setStatementTypeOption] = useState(
+    statementType ? statementType : 1
+  );
+  const [companyOption, setCompanyOption] = useState(slug ? slug : "");
+
+  const { companies } = useAppContext();
+  const companiesOptions = [];
+  const financialStatementOptions = [];
+
   const handleChange = (selectedOptions) => {
-    setSelectedOptions(selectedOptions);
+    console.log(selectedOptions);
+    const companies = [];
+    selectedOptions.map((option) => companies.push(option.value));
+    setCompanyOption(companies);
+    setSelectedCompanies(selectedOptions);
   };
   // Companies Ko id, quarter, fiscalYear, quarter
+
+  const columns = [
+    {
+      id: "expander", // Make sure it has an ID
+      Header: "SN",
+
+      Cell: ({ row }) =>
+        // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
+        // to build the toggle for expanding a row
+        row.canExpand ? (
+          <span
+            {...row.getToggleRowExpandedProps({
+              style: {
+                // We can even use the row.depth property
+                // and paddingLeft to indicate the depth
+                // of the row
+                paddingLeft: `${row.depth * 2}rem`,
+              },
+            })}
+          >
+            {row.isExpanded ? <PlusIcon /> : <MinusIcon />}
+          </span>
+        ) : null,
+    },
+    {
+      Header: "Particulars",
+      accessor: "particular",
+      className: "table-title",
+    },
+    ...columnsData,
+  ];
 
   const quarterOptions = [
     { id: "Q1", name: "Q1" },
@@ -159,13 +263,17 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
     { id: "Q4", name: "Q4" },
   ];
 
-  const fiscalYearOptions = [
-    { id: "2019/2020", name: "2019/2020" },
-    { id: "2020/2021", name: "2020/2021" },
-  ];
+  const fiscalYearOptions = fiscalYearList
+    ? fiscalYearList.map((fiscalYear) => ({
+        id: fiscalYear,
+        name: fiscalYear,
+      }))
+    : [];
 
-  companies.map((company) => {
-    companiesOptions.push({ value: company.id, label: company.name });
+  companies.getAllCompanies.map((comp) => {
+    if (!(comp.id == company.id)) {
+      companiesOptions.push({ value: comp.slug, label: comp.name });
+    }
   });
 
   financialStatementOptions.push(
@@ -187,16 +295,24 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
     }
   );
 
-  const getCompanyName = (id) => {
-    var name = "";
-    companies.map((company) => {
-      if (company.id == id) {
-        name = company.name;
-      }
-    });
+  useEffect(() => {
+    setFormData(initialFormData); // To avoid errors from initial values
+    // this is replacement for a network call that would load the data from a server
+    var noOfStatements = [];
 
-    return name;
-  };
+    setTimeout(() => {
+      setFormData({
+        statementType: statementType,
+        companies: slug,
+        fiscalYear: fiscalYearOption,
+        quarter: quarter,
+      });
+      console.log("From Outside");
+    }, 1000);
+    // console.log(formData);
+
+    // Missing dependency array here
+  }, []);
 
   return (
     <>
@@ -206,7 +322,7 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
             <SelectWithSearch
               isMulti={true}
               options={companiesOptions}
-              selectedValues={selectedOptions}
+              selectedValues={selectedCompanies}
               handleChange={handleChange}
               className="rounded border "
               controlBackgroundColor={theme === "light" ? "#F3F4F6" : "#1F2937"}
@@ -221,14 +337,14 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
           </div>
           <div className="mb-2 col-span-2 md:col-span-1">
             <FormSelect
-              className="rounded"
+              className="rounded ring-4 ring-pink-300"
               options={quarterOptions}
               control="select"
               label="Quarter"
               name="quarter"
               value={quarterOption}
               className="rounded border dark:border-gray-700 border-gray-400"
-              handleChange={(e) => setQuarter(e.target.value)}
+              handleChange={(e) => setQuarterOption(e.target.value)}
             />
           </div>
           <div className="mb-2 col-span-2 md:col-span-1">
@@ -238,9 +354,9 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
               control="select"
               label="FiscalYear"
               name="FiscalYear"
-              value={fiscalYear}
+              value={fiscalYearOption}
               className="rounded border  dark:border-gray-700 border-gray-400"
-              handleChange={(e) => setFiscalYear(e.target.value)}
+              handleChange={(e) => setFiscalYearOption(e.target.value)}
             />
           </div>
           <div className="mb-2 col-span-2 md:col-span-1">
@@ -252,7 +368,7 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
               name="Statement"
               value={statementTypeOption}
               className="rounded border dark:border-gray-700 border-gray-400"
-              handleChange={(e) => setStatementType(e.target.value)}
+              handleChange={(e) => setStatementTypeOption(e.target.value)}
             />
           </div>
           <div className="mb-2 text-center md:text-left col-span-4 md:col-span-1">
@@ -261,8 +377,9 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
                 router.push({
                   pathname: `/company/${slug}/peer-comparision`,
                   query: {
-                    quarter: quarterOption,
-                    fiscalYear: fiscalYear,
+                    companies: companyOption,
+                    quarter: [quarterOption],
+                    fiscalYear: fiscalYearOption,
                     statementType: statementTypeOption,
                   },
                 })
@@ -273,87 +390,13 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
             </button>
           </div>
         </div>
+
         <div className="grid">
           <div className="w-full overflow-hidden shadow-xs">
-            <div className="w-full overflow-x-auto custom-scroll">
-              <table className="w-full whitespace-no-wrap">
-                <thead>
-                  <tr className="text-sm font-semibold tracking-wide text-left text-gray-900 uppercase border-b dark:border-gray-700 bg-gray-100 dark:text-gray-50 dark:bg-blue-900">
-                    <th className="px-4 py-0 sticky left-0 bg-gray-100 dark:bg-blue-900 dark:border-gray-700">
-                      Particulars
-                    </th>
-                    {financialStatement.length > 0
-                      ? financialStatement[1].financialStatementFact.map(
-                          (fact) => (
-                            <th key={fact.id} className="px-4 py-4">
-                              {getCompanyName(fact.companyId)}
-                              <br />
-                              {fact.fiscalYear} {"  "} {fact.quarter}
-                            </th>
-                          )
-                        )
-                      : null}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-900">
-                  {financialStatement.map((fact) => (
-                    <tr
-                      key={fact.id}
-                      className="text-gray-700 dark:text-gray-50"
-                    >
-                      {fact.children.length > 0 ? (
-                        <Accordion fact={fact} />
-                      ) : (
-                        <td className=" px-4 py-3 sticky left-0 dark:bg-gray-900 bg-white ">
-                          {fact.unit == "topic" ? (
-                            <h1 className="font-bold text-md">{fact.name}</h1>
-                          ) : (
-                            <h1 className="inline-flex items-center">
-                              {fact.name}{" "}
-                              <span
-                                className="ml-3 relative"
-                                data-tip
-                                data-for="registerTip"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="12"
-                                  height="12"
-                                  fill="currentColor"
-                                  className="bi bi-info-circle hover:block"
-                                  viewBox="0 0 16 16"
-                                >
-                                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                                  <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                                </svg>
-                              </span>
-                              <ReactTooltip
-                                key={fact.id}
-                                id="registerTip"
-                                place="top"
-                                effect="solid"
-                              >
-                                Tooltip for the register button
-                              </ReactTooltip>
-                            </h1>
-                          )}
-                        </td>
-                      )}
-
-                      {fact.financialStatementFact.length > 0 ? (
-                        fact.financialStatementFact.map((data) => (
-                          <td key={data.id} className="px-4 py-3 text-sm">
-                            {data.amount.toLocaleString()}
-                          </td>
-                        ))
-                      ) : fact.unit == "topic" ? null : (
-                        <div className="flex-1 p-2 mb-1">0</div>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {/* {financialStatement[1].financialStatementFact.length > 0 ? ( */}
+            {/* <FinancialsTable financialStatement={financialStatement} /> */}
+            <MyTable data={dataList} columns={columns} />
+            {/* ) : null} */}
           </div>
         </div>
       </section>

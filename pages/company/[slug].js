@@ -216,9 +216,9 @@ export function Company({
                     maximumFractionDigits: 2,
                   })}
             </h1>
-            <div className="flex">
+            <>
               {!Array.isArray(priceHistory) || !priceHistory.length ? (
-                <h1>Data Not Available !!</h1>
+                <PriceCounter isRising={false} amount="321" rate="2.1" />
               ) : (
                 <PriceCounter
                   isRising={
@@ -237,7 +237,7 @@ export function Company({
                   ).toFixed(2)}
                 />
               )}
-            </div>
+            </>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
@@ -290,7 +290,7 @@ export function Company({
           Company Essentials
         </h2> */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <div className="col-span-2 gap-4 bg-white dark:bg-gray-900 shadow p-5 rounded-lg">
+          <div className="col-span-3 md:col-span-2 gap-4 bg-white dark:bg-gray-900 shadow p-5 rounded-lg">
             <div className="grid grid-cols-2 md:grid-cols-3">
               {!Array.isArray(essentials) || !essentials.length ? (
                 <h1>Data Not Available !!</h1>
@@ -338,9 +338,6 @@ export function Company({
           </div>
         </div>
       </section> */}
-      <section className="xl:container mx-3 xl:mx-auto mt-8">
-        <div className="bg-white dark:bg-gray-900 shadow p-3 rounded-lg"></div>
-      </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2  gap-4">

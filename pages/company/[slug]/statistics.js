@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React from "react";
 import { MiniChart } from "../../../components/charts";
 import FinancialsHeader from "../../../components/financialsHeader/FinancialsHeader";
 

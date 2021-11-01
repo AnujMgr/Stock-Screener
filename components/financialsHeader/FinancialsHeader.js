@@ -16,7 +16,7 @@ export default function FinancialsHeader({ statements, slug, active }) {
   };
 
   return (
-    <div className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow rounded-none md:rounded-t-md">
+    <div className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 mt-8 shadow rounded-none md:rounded-t-md">
       <div className="grid">
         <div className="overflow-x-auto flex border-b border-gray-200 dark:border-gray-800 no-scroll">
           <Link
