@@ -1,6 +1,6 @@
 import Footer from "../footer/footer";
 import Navbar from "../navbar";
-import SecondaryNavbar from "../navbar/secondaryNavbar";
+import SecondaryNavbar from "../navbar/SecondaryNavbar";
 
 const SecondaryLayout = ({ children }) => {
   return (

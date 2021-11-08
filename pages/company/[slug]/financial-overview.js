@@ -1,7 +1,7 @@
 import prisma from "../../../prisma/client";
 import { useState } from "react";
 import { useRouter } from "next/router";
-import FinancialsHeader from "../../../components/FinancialsHeader";
+import FinancialsHeader from "../../../components/FinancialsHeader/FinancialsHeader";
 import CustomBarChart from "../../../components/charts/CustomBarChart";
 
 export async function getServerSideProps({ params }) {

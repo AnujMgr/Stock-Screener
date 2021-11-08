@@ -1,8 +1,6 @@
-import { useTheme } from "next-themes";
 import React from "react";
 import ReactTooltip from "react-tooltip";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
-import MyTable from "../../components/FinancialsTable/MyTable";
 import PriceCounter from "../../components/PriceCounter/PriceCounter";
 import SortableTable from "../../components/SortableTable";
 import { InfoIcon } from "../../lib/icons/Icons";
@@ -24,7 +22,10 @@ export async function getStaticProps({ params }) {
   if (company === null) {
     const essentials = [];
     const priceHistory = [];
-    return { props: { company, essentials, priceHistory } };
+    return {
+      props: { company, essentials, priceHistory },
+      revalidate: 10, // In seconds};
+    };
   }
 
   const priceHistory = await prisma.companyPrice.findMany({
@@ -195,8 +196,6 @@ export function Company({
   dataList,
   columnsData,
 }) {
-  const { theme } = useTheme();
-
   if (!company) {
     return <Custom404 />;
   }
