@@ -280,7 +280,7 @@ function FinancialStatement({
       }))
     : [];
 
-  companies.getAllCompanies.map((comp) => {
+  companies.map((comp) => {
     if (!(comp.id == company.id)) {
       companiesOptions.push({ value: comp.slug, label: comp.name });
     }
