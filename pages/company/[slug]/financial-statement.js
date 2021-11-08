@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import FinancialsHeader from "../../../components/FinancialsHeader/FinancialsHeader";
+import FinancialsHeader from "../../../components/FinancialsHeader";
 
 import prisma from "../../../prisma/client";
 import FormSelect from "../../../Form/FormSelect";
