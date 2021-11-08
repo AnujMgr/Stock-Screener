@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import HeaderButton from "./HeaderButton";
 
-export default function FinancialsHeader({ statements, slug, active }) {
+const FinancialsHeader = ({ statements, slug, active }) => {
   const router = useRouter();
 
   const handleClick = (id) => {
@@ -70,4 +70,6 @@ export default function FinancialsHeader({ statements, slug, active }) {
       </div>
     </div>
   );
-}
+};
+
+export default FinancialsHeader;

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { BiSun, BiMoon } from "react-icons/bi";
 import { useTheme } from "next-themes";
 import { MoonIcon, SunIcon } from "../../lib/icons/Icons";
 
