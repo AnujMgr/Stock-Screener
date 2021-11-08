@@ -6,12 +6,11 @@ export default function PriceCounter({ isRising, amount, rate }) {
     <>
       {isRising ? (
         <div className="flex">
-          <p className="text-gray-700 dark:text-green-300 mr-2">
+          <p className="text-green-500  mr-2">
             + {amount} (+ {rate} %)
           </p>
           <BsFillCaretUpFill
-            className="animate-ping-1"
-            color="#047857"
+            className="animate-ping-1 fill-current text-green-500"
             size="20"
           />
         </div>

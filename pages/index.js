@@ -24,7 +24,7 @@ export default function Home() {
           </h1>
           <p className="md:max-w-3xl px-3 md:px-2 text-center text-white mx-auto mt-6">
             If the image has no dimensions or intrinsic ratio, rule 4 applies,
-            and we use the background area's dimension.
+            and we use the background area&apos;s dimension.
           </p>
           <div className="flex justify-center mt-6 w-full">
             <SearchBar
@@ -36,6 +36,21 @@ export default function Home() {
               height="50px"
               companies={companies.getAllCompanies}
             />
+          </div>
+          <div className="flex justify-center mt-6 w-full gap-3">
+            <h1 className="text-white ">Trending Stocks:</h1>
+            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Nabil Bank
+            </button>
+            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Laxmi Bank
+            </button>
+            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Uniliver Nepal Ltd.
+            </button>
+            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Bank Of Kathmandu
+            </button>
           </div>
         </div>
       </section>

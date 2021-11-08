@@ -17,6 +17,8 @@ export async function getServerSideProps({ query }) {
     },
   ];
   const dataList = [];
+  const fiscalYearList = [];
+
   const industries = await prisma.industry.findMany();
 
   const currentIndustry = await prisma.industry.findFirst({
@@ -45,6 +47,11 @@ export async function getServerSideProps({ query }) {
     },
   });
 
+  if (companies.length <= 0) {
+    const fiscalYearList = [];
+    return { props: { columns, dataList, industries, fiscalYearList } };
+  }
+
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
       financialStatementId: currentIndustry.screenerId,
@@ -54,12 +61,17 @@ export async function getServerSideProps({ query }) {
         include: {
           financialStatementFact: {
             where: {
-              quarter: "Q4",
-              fiscalYear: "2020/2021",
+              quarter: query.quarter ? query.quarter : "",
+              fiscalYear: query.fiscalYear ? query.fiscalYear : "",
             },
-            orderBy: {
-              fiscalYear: "desc",
-            },
+            orderBy: [
+              {
+                quarter: "desc",
+              },
+              {
+                fiscalYear: "desc",
+              },
+            ],
           },
         },
       },
@@ -87,6 +99,23 @@ export async function getServerSideProps({ query }) {
     //
   });
 
+  const currentFiscalYearFact = await prisma.financialStatementFact.findFirst({
+    where: {
+      companyId: companies[0].id,
+    },
+    orderBy: {
+      fiscalYear: "desc",
+    },
+  });
+
+  for (let i = 0; i < 5; i++) {
+    var firstYear = parseInt(
+      parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1
+    );
+    var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
+    fiscalYearList.push(parseInt(firstYear - i) + "/" + parseInt(lastYear - i));
+  }
+
   companies.map((company, i) => {
     var myobj = {};
     screenerData.map((screener) => {
@@ -96,19 +125,33 @@ export async function getServerSideProps({ query }) {
         });
       }
     });
-    // dataList.push({ ["col1"]: company.name });
+
     Object.assign(myobj, { ["Company"]: company.name });
     Object.assign(myobj, { ["Price"]: "123" });
 
     dataList.push(myobj);
   });
 
-  return { props: { columns, dataList, industries } };
+  return { props: { columns, dataList, industries, fiscalYearList } };
 }
 
-export default function Screener({ columns, dataList, industries }) {
+export default function Screener({
+  columns,
+  dataList,
+  industries,
+  fiscalYearList,
+}) {
   const router = useRouter();
-  const [industry, setIndustry] = useState(1);
+  const { industry, quarter } = router.query;
+
+  const [industryOption, setIndustryOption] = useState(
+    industry ? industry : "0"
+  );
+  const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "0");
+  const [fiscalYearOption, setFiscalYearOption] = useState(
+    fiscalYearOption ? fiscalYearOption : ""
+  );
+
   const industryOptions = [];
 
   industries.map((industry) =>
@@ -116,29 +159,121 @@ export default function Screener({ columns, dataList, industries }) {
   );
 
   if (columns == null) {
-    return <h1>Data Not Available!</h1>;
+    return (
+      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
+        <h1>Data Not Available!</h1>
+      </section>
+    );
   }
+
+  const quarterOptions = [
+    { id: "Q1", name: "Q1" },
+    { id: "Q2", name: "Q2" },
+    { id: "Q3", name: "Q3" },
+    { id: "Q4", name: "Q4" },
+  ];
+
+  const fiscalYearOptions = fiscalYearList
+    ? fiscalYearList.map((fiscalYear) => ({
+        id: fiscalYear,
+        name: fiscalYear,
+      }))
+    : [];
 
   return (
     <section className="xl:container mt-5 mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-md">
-      <div className="mb-4 md:w-52">
-        <FormSelect
-          control="select"
-          label="Industry Type"
-          name="quarter"
-          className="rounded border border-gray-600"
-          value={industry}
-          options={industryOptions}
-          handleChange={(e) => {
-            setIndustry(e.target.value);
-            router.push({
-              pathname: `/screener`,
-              query: {
-                industryType: e.target.value,
-              },
-            });
-          }}
-        />
+      <div className="grid grid-cols-4 md:grid-cols-5 gap-1">
+        <div className="mb-4">
+          <FormSelect
+            control="select"
+            label="Industry Type"
+            name="Industry"
+            customClassName="rounded border border-gray-600"
+            value={industryOption}
+            options={industryOptions}
+            handleChange={(e) => {
+              setIndustryOption(e.target.value);
+              router.push({
+                pathname: `/screener`,
+                query: {
+                  industryType: e.target.value,
+                  fiscalYear: fiscalYearOption,
+                  quarter: quarterOption,
+                },
+              });
+            }}
+          />
+        </div>
+        <div className="mb-2 col-span-2 md:col-span-1">
+          <FormSelect
+            options={quarterOptions}
+            control="select"
+            label="Select Quarter"
+            name="quarter"
+            value={quarterOption}
+            customClassName="rounded border dark:border-gray-700 border-gray-400"
+            handleChange={(e) => {
+              setQuarterOption(e.target.value);
+              router.push({
+                pathname: `/screener`,
+                query: {
+                  industryType: industryOption,
+                  fiscalYear: fiscalYearOption,
+                  quarter: e.target.value,
+                },
+              });
+            }}
+          />
+        </div>
+        <div className="mb-2">
+          <FormSelect
+            customClassName="rounded border dark:border-gray-700 border-gray-400"
+            options={fiscalYearOptions}
+            control="select"
+            label="FiscalYear"
+            name="FiscalYear"
+            value={fiscalYearOption}
+            handleChange={(e) => {
+              setFiscalYearOption(e.target.value);
+              router.push({
+                pathname: `/screener`,
+                query: {
+                  industryType: industryOption,
+                  fiscalYear: e.target.value,
+                  quarter: quarterOption,
+                },
+              });
+            }}
+          />
+        </div>
+        {/* <div className="mb-2">
+          {industryOption == 0 ||
+          quarterOption == 0 ||
+          fiscalYearOption == 0 ? (
+            <button
+              disabled
+              className="bg-gray-600 text-white h-9 px-5 rounded cursor-not-allowed"
+            >
+              Submit
+            </button>
+          ) : (
+            <button
+              onClick={(e) =>
+                router.push({
+                  pathname: `/screener`,
+                  query: {
+                    industryType: industryOption,
+                    quarter: quarterOption,
+                    fiscalYear: fiscalYearOption,
+                  },
+                })
+              }
+              className="bg-blue-600 text-white h-9 px-5 rounded"
+            >
+              Submit
+            </button>
+          )}
+        </div> */}
       </div>
       <SortableTable columns={columns} data={dataList} />
     </section>

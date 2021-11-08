@@ -11,6 +11,7 @@ function SearchBar({
   color,
   placeholder,
   height,
+  border,
 }) {
   const [mounted, setMounted] = useState(false);
 
@@ -49,7 +50,9 @@ function SearchBar({
         // onHover={handleOnHover}
         onSelect={handleOnSelect}
         fuseOptions={{ keys: ["name", "symbol"] }}
+        resultStringKeyName="name"
         // onFocus={handleOnFocus}
+        borderColor="red"
         placeholder={
           placeholder ? placeholder : "Type Company Name or Symbol..."
         }
@@ -57,13 +60,14 @@ function SearchBar({
         styling={{
           height: height ? height : "38px",
           backgroundColor: bg,
-          hoverBackgroundColor: theme === "light" ? "#E5E7EB" : "#6B7280",
+          hoverBackgroundColor: theme === "light" ? "#E5E7EB" : "#1F2937",
           color: color,
           zIndex: 999,
           boxShadow:
             "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
           fontFamily: "Muli",
           borderRadius: borderRad,
+          border: border ? border : "",
         }}
       />
     </div>

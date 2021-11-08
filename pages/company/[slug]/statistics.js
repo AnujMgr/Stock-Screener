@@ -76,15 +76,25 @@ function Statistics({ company, companyRatios }) {
 
       <section className="xl:container mx-3 xl:mx-auto py-5 mb-3 rounded-b-lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {companyRatios.map((fact) => (
-            <div
-              key={fact.statement.id}
-              className="shadow-md p-2 bg-white dark:bg-gray-900 rounded-lg "
-            >
-              <h1 className="p-2 text-lg">{fact.statement.name}</h1>
-              <MiniChart data={fact.facts} />
-            </div>
-          ))}
+          {companyRatios.map((fact) => {
+            return fact.facts.length > 0 ? (
+              <div
+                key={fact.statement.id}
+                className="shadow-md p-2 bg-white dark:bg-gray-900 rounded-lg "
+              >
+                <h1 className="p-2 text-lg">{fact.statement.name}</h1>
+                <MiniChart data={fact.facts} />
+              </div>
+            ) : (
+              <div
+                key={fact.statement.id}
+                className="shadow-md p-2 bg-white dark:bg-gray-900 rounded-lg "
+              >
+                <h1 className="p-2 text-lg">{fact.statement.name}</h1>
+                <h1 key={1}>Sorry Data Not Available !</h1>
+              </div>
+            );
+          })}
         </div>
       </section>
 

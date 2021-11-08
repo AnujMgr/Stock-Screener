@@ -22,6 +22,7 @@ export default function FinancialsHeader({ statements, slug, active }) {
           <Link
             href={`/company/[slug]/financial-overview`}
             as={`/company/${slug}/financial-overview`}
+            passHref
           >
             <button
               className={`${

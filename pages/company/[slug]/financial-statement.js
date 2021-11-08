@@ -146,13 +146,12 @@ export async function getServerSideProps({ query }) {
   };
 }
 
-function FinancialStatement({ company, dataList, columnsData, data }) {
+const FinancialStatement = ({ company, dataList, columnsData }) => {
   const router = useRouter();
   const { slug, statementType, quarter } = router.query;
   const [quarterValue, setQuarterValue] = useState(
     quarter || quarter != undefined ? quarter : "qtrToqtr"
   );
-  console.log(data);
 
   const quarterOptions = [
     { id: "Q1", name: "Q1" },
@@ -161,32 +160,51 @@ function FinancialStatement({ company, dataList, columnsData, data }) {
     { id: "Q4", name: "Q4" },
     { id: "qtrToqtr", name: "Quarter To Quarter" },
   ];
+
+  useEffect(
+    (quarter) => {
+      /* It will prevent => if quarter is Q1 in balance sheet when i click on profit and loss
+     the value of quarter will also be Q1 */
+      setQuarterValue(quarter || quarter != undefined ? quarter : "qtrToqtr");
+    },
+    [statementType]
+  );
+
   if (!company) {
     return <Custom404 />;
   }
-
   const columns = [
     {
       id: "expander", // Make sure it has an ID
       Header: "SN",
 
-      Cell: ({ row }) =>
+      Cell: function OrderItems({ row }) {
         // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
         // to build the toggle for expanding a row
-        row.canExpand ? (
+
+        return row.canExpand ? (
           <span
             {...row.getToggleRowExpandedProps({
               style: {
                 // We can even use the row.depth property
                 // and paddingLeft to indicate the depth
                 // of the row
+                backgroundColor: "red",
                 paddingLeft: `${row.depth * 2}rem`,
               },
             })}
           >
-            {row.isExpanded ? <PlusIcon /> : <MinusIcon />}
+            {row.isExpanded ? (
+              <PlusIcon
+                width={15}
+                customClass="fill-current dark:text-gray-400 text-gray-200"
+              />
+            ) : (
+              <MinusIcon width={15} customClass="fill-current text-gray-400" />
+            )}
           </span>
-        ) : null,
+        ) : null;
+      },
     },
     {
       Header: "Particulars",
@@ -194,14 +212,6 @@ function FinancialStatement({ company, dataList, columnsData, data }) {
     },
     ...columnsData,
   ];
-
-  useEffect(() => {
-    return () => {
-      setQuarterValue(quarter || quarter != undefined ? quarter : "qtrToqtr");
-    };
-  }, [statementType]);
-
-  console.log(columns);
 
   return (
     <>
@@ -221,7 +231,7 @@ function FinancialStatement({ company, dataList, columnsData, data }) {
             control="select"
             label="Quarter"
             name="quarter"
-            className="rounded border border-gray-600"
+            customClassName="rounded border border-gray-600"
             value={quarterValue}
             options={quarterOptions}
             handleChange={(e) => {
@@ -246,6 +256,6 @@ function FinancialStatement({ company, dataList, columnsData, data }) {
       </section>
     </>
   );
-}
+};
 
 export default FinancialStatement;

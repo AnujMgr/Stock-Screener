@@ -1,11 +1,18 @@
 function FormSelect(props) {
-  const { label, name, options, handleChange, firstOption, value, className } =
-    props;
+  const {
+    label,
+    name,
+    options,
+    handleChange,
+    firstOption,
+    value,
+    customClassName,
+  } = props;
 
   return (
     <>
       <select
-        className={`w-full dark:bg-gray-800 bg-gray-50 dark:text-white text-dark border shadow-sm p-2 ${className}`}
+        className={`w-full dark:bg-gray-800 bg-gray-50 dark:text-white text-dark border shadow-sm p-2 ${customClassName}`}
         name={name}
         id={name}
         value={value}

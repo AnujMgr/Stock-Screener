@@ -35,7 +35,7 @@ const PriceChart = ({ priceHistory }) => {
   return (
     <Fragment>
       <div className="flex justify-between px-3">
-        <div className="">
+        <div className="rounded-md">
           {lengthOfPrice > 30 && (
             <button
               className={`px-3 py-1  ${

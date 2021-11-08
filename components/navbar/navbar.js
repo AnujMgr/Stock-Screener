@@ -109,6 +109,7 @@ function Navbar({ showSearch }) {
         {!hidden ? (
           <div className="p-2">
             <SearchBar
+              border={"1px solid #fff"}
               bg={theme === "light" ? "#F3F4F6" : "#2d3748"}
               borderRad={"6px"}
               width={"w-full sm:w-3/4 mx-auto"}
@@ -128,7 +129,9 @@ function Navbar({ showSearch }) {
       >
         <div className="xl:container mx-auto flex justify-between items-center px-4 border-b border-gray-300 dark:border-gray-500 ">
           <h1 className="text-2xl dark:text-white text-gray-900">
-            <a href="/">Analytics</a>
+            <Link href={"/"} as={"/"}>
+              Analytics
+            </Link>
           </h1>
           <div className="flex items-center gap-2 my-2">
             <button
@@ -154,12 +157,14 @@ function Navbar({ showSearch }) {
         </div>
         <div className="flex flex-col ">
           <div className="p-4 dark:text-white text-gray-900  flex-grow-0 inline-flex items-center ">
-            <Link className="dark:text-white text-gray-900" href="/">
+            <Link className="dark:text-white text-gray-900" href={"/"} as={"/"}>
               Home
             </Link>
           </div>
           <div className="p-4 dark:text-white text-gray-900  flex-grow-0 inline-flex items-center ">
-            <Link href={`/screener`}>Screener</Link>
+            <Link href={`/screener`} as={`/screener`}>
+              Screener
+            </Link>
           </div>
           <div className="p-4 dark:text-white text-gray-900  flex-grow-0 inline-flex items-center ">
             <Link className="" href="/">

@@ -9,8 +9,6 @@ import { useAppContext } from "../../../lib/contexts/State";
 import MyTable from "../../../components/FinancialsTable/MyTable";
 import { MinusIcon, PlusIcon } from "../../../lib/icons/Icons";
 
-const initialFormData = undefined;
-
 export async function getServerSideProps({ query }) {
   // Company is Required to get company statement details
   const company = await prisma.company.findFirst({
@@ -185,6 +183,21 @@ function FinancialStatement({
   dataList,
   columnsData,
 }) {
+  //To Avoid React Hook "useState" is called conditionally error.
+  //React Hooks must be called in the exact same order in every component render.
+  const { theme } = useTheme();
+  const router = useRouter();
+  const [selectedCompanies, setSelectedCompanies] = useState("");
+  const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "Q4");
+  const [fiscalYearOption, setFiscalYearOption] = useState(
+    fiscalYear ? fiscalYear : "2020/2021"
+  );
+  const [statementTypeOption, setStatementTypeOption] = useState(
+    statementType ? statementType : 1
+  );
+  const [companyOption, setCompanyOption] = useState(slug ? slug : "");
+  const { companies } = useAppContext();
+
   if (!company) {
     return <Custom404 />;
   }
@@ -197,22 +210,8 @@ function FinancialStatement({
     );
   }
 
-  const [formData, setFormData] = useState(initialFormData);
-
-  const { theme } = useTheme();
-  const router = useRouter();
   const { slug, statementType, quarter, fiscalYear } = router.query;
-  const [selectedCompanies, setSelectedCompanies] = useState("");
-  const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "Q4");
-  const [fiscalYearOption, setFiscalYearOption] = useState(
-    fiscalYear ? fiscalYear : "2020/2021"
-  );
-  const [statementTypeOption, setStatementTypeOption] = useState(
-    statementType ? statementType : 1
-  );
-  const [companyOption, setCompanyOption] = useState(slug ? slug : "");
 
-  const { companies } = useAppContext();
   const companiesOptions = [];
   const financialStatementOptions = [];
 
@@ -230,10 +229,10 @@ function FinancialStatement({
       id: "expander", // Make sure it has an ID
       Header: "SN",
 
-      Cell: ({ row }) =>
+      Cell: function OrderItems({ row }) {
         // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
         // to build the toggle for expanding a row
-        row.canExpand ? (
+        return row.canExpand ? (
           <span
             {...row.getToggleRowExpandedProps({
               style: {
@@ -244,9 +243,20 @@ function FinancialStatement({
               },
             })}
           >
-            {row.isExpanded ? <PlusIcon /> : <MinusIcon />}
+            {row.isExpanded ? (
+              <PlusIcon
+                width={18}
+                customClass="fill-current dark:text-gray-400 text-gray-500"
+              />
+            ) : (
+              <MinusIcon
+                width={18}
+                customClass="fill-current dark:text-gray-400 text-gray-500"
+              />
+            )}
           </span>
-        ) : null,
+        ) : null;
+      },
     },
     {
       Header: "Particulars",
@@ -295,25 +305,6 @@ function FinancialStatement({
     }
   );
 
-  useEffect(() => {
-    setFormData(initialFormData); // To avoid errors from initial values
-    // this is replacement for a network call that would load the data from a server
-    var noOfStatements = [];
-
-    setTimeout(() => {
-      setFormData({
-        statementType: statementType,
-        companies: slug,
-        fiscalYear: fiscalYearOption,
-        quarter: quarter,
-      });
-      console.log("From Outside");
-    }, 1000);
-    // console.log(formData);
-
-    // Missing dependency array here
-  }, []);
-
   return (
     <>
       <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
@@ -337,37 +328,34 @@ function FinancialStatement({
           </div>
           <div className="mb-2 col-span-2 md:col-span-1">
             <FormSelect
-              className="rounded ring-4 ring-pink-300"
               options={quarterOptions}
               control="select"
-              label="Quarter"
+              label="Select Quarter"
               name="quarter"
               value={quarterOption}
-              className="rounded border dark:border-gray-700 border-gray-400"
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
               handleChange={(e) => setQuarterOption(e.target.value)}
             />
           </div>
           <div className="mb-2 col-span-2 md:col-span-1">
             <FormSelect
-              className="rounded"
               options={fiscalYearOptions}
               control="select"
-              label="FiscalYear"
+              label="Selec FiscalYear"
               name="FiscalYear"
               value={fiscalYearOption}
-              className="rounded border  dark:border-gray-700 border-gray-400"
+              customClassName="rounded border  dark:border-gray-700 border-gray-400"
               handleChange={(e) => setFiscalYearOption(e.target.value)}
             />
           </div>
           <div className="mb-2 col-span-2 md:col-span-1">
             <FormSelect
-              className="rounded"
               options={financialStatementOptions}
               control="select"
-              label="Statement"
+              label="Select Statement"
               name="Statement"
               value={statementTypeOption}
-              className="rounded border dark:border-gray-700 border-gray-400"
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
               handleChange={(e) => setStatementTypeOption(e.target.value)}
             />
           </div>
@@ -393,10 +381,7 @@ function FinancialStatement({
 
         <div className="grid">
           <div className="w-full overflow-hidden shadow-xs">
-            {/* {financialStatement[1].financialStatementFact.length > 0 ? ( */}
-            {/* <FinancialsTable financialStatement={financialStatement} /> */}
             <MyTable data={dataList} columns={columns} />
-            {/* ) : null} */}
           </div>
         </div>
       </section>

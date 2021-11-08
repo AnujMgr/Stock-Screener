@@ -2,6 +2,8 @@ import prisma from "../../../../../prisma/client";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import FinancialsHeader from "../../../../../components/financialsHeader/FinancialsHeader";
+import Accordion from "../../../../../components/accordion/Accordion";
+
 import FormSelect from "../../../../../Form/FormSelect";
 import ReactTooltip from "react-tooltip";
 
@@ -120,7 +122,10 @@ export async function getStaticProps({ params }) {
   });
 
   // Pass post data to the page via props
-  return { props: { company, financialStatement, data } };
+  return {
+    props: { company, financialStatement, data },
+    revalidate: 10, // In seconds};
+  };
 }
 
 export async function getStaticPaths() {
@@ -205,6 +210,7 @@ function ProfitAndLoss({ company, financialStatement, data }) {
             name="quarter"
             value={quarterValue}
             options={quarterOptions}
+            customClassName="rounded border border-gray-600"
             handleChange={(e) => {
               setQuarterValue(e.target.value);
               router.push({

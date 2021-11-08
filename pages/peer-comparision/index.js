@@ -56,7 +56,7 @@ export async function getServerSideProps({ query }) {
                   : {
                       companyId: company.id,
                     },
-                take: 5,
+                take: companies.length,
               },
             },
           },
@@ -73,7 +73,7 @@ export async function getServerSideProps({ query }) {
               : {
                   companyId: company.id,
                 },
-            take: 5,
+            take: companies.length,
             orderBy: [
               {
                 quarter: "desc",
@@ -118,10 +118,10 @@ export async function getServerSideProps({ query }) {
   });
 
   // Pass post data to the page via props
-  return { props: { company, companies, financialStatement, data } };
+  return { props: { company, companies, financialStatement } };
 }
 
-function FinancialStatement({ company, companies, financialStatement, data }) {
+function FinancialStatement({ company, companies, financialStatement }) {
   const { theme } = useTheme();
   const router = useRouter();
   const [selectedOptions, setSelectedOptions] = useState("");
@@ -193,7 +193,7 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
           </div>
           <div className="mb-2">
             <FormSelect
-              className="rounded"
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
               options={quarterOptions}
               control="select"
               label="Quarter"
@@ -204,7 +204,7 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
           </div>
           <div className="mb-2">
             <FormSelect
-              className="rounded"
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
               options={fiscalYearOptions}
               control="select"
               label="FiscalYear"
@@ -215,7 +215,7 @@ function FinancialStatement({ company, companies, financialStatement, data }) {
           </div>
           <div className="mb-2">
             <FormSelect
-              className="rounded"
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
               options={financialStatementOptions}
               control="select"
               label="Statement"

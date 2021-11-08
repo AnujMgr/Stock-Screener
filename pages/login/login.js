@@ -32,10 +32,12 @@ const Login = () => {
 
             <div className="text-center mb-8">
               <h1 className="hover:text-blue-800 my-6 transition duration-500 ease-in-out">
-                <Link href="/">Forgot Password ?</Link>
+                <Link href={"/"} as={"/"}>
+                  Forgot Password ?
+                </Link>
               </h1>
 
-              <Link href="/">
+              <Link href={"/"} as={"/"} passHref>
                 <button className="bg-blue-800 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition duration-500 ease-in-out">
                   SIGN IN{" "}
                 </button>
