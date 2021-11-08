@@ -1,7 +1,7 @@
 import prisma from "../../../../../prisma/client";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import FinancialsHeader from "../../../../../components/FinancialsHeader";
+import FinancialsHeader from "../../../../../components/HeaderMenu/FinancialsHeader";
 import Accordion from "../../../../../components/accordion/Accordion";
 
 import FormSelect from "../../../../../Form/FormSelect";

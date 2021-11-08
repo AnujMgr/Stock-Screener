@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React from "react";
 import { MiniChart } from "../../../components/charts";
-import FinancialsHeader from "../../../components/FinancialsHeader";
+import FinancialsHeader from "../../../components/HeaderMenu/FinancialsHeader";
 
 import prisma from "../../../prisma/client";
 
