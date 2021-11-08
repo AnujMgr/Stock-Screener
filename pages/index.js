@@ -9,6 +9,7 @@ export default function Home() {
   const bg = theme === "light" ? "#4C1D95" : "#111827";
   const [mounted, setMounted] = useState(false);
   const { companies } = useAppContext();
+  console.log(companies);
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
@@ -34,7 +35,7 @@ export default function Home() {
               placeholder={"Search for a Company..."}
               color={theme === "light" ? "#000" : "#fff"}
               height="50px"
-              companies={companies.getAllCompanies}
+              companies={companies}
             />
           </div>
           <div className="flex justify-center mt-6 w-full gap-3">

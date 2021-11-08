@@ -22,7 +22,7 @@ export default function Custom404() {
           borderRad={"10px"}
           width={"w-full sm:w-3/4 md:w-96 mx-auto"}
           color={theme === "light" ? "#000" : "#fff"}
-          companies={companies.getAllCompanies}
+          companies={companies}
         />
       </div>
       <div className="text-center mt-8">
