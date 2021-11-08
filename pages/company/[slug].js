@@ -24,7 +24,6 @@ export async function getStaticProps({ params }) {
     const priceHistory = [];
     return {
       props: { company, essentials, priceHistory },
-      revalidate: 10, // In seconds};
     };
   }
 
@@ -172,6 +171,7 @@ export async function getStaticProps({ params }) {
       dataList,
       columnsData,
     },
+    revalidate: 10, // In seconds};
   };
 }
 
