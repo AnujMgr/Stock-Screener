@@ -1,4 +1,3 @@
-import { Head } from "next/document";
 import React from "react";
 import ReactTooltip from "react-tooltip";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
