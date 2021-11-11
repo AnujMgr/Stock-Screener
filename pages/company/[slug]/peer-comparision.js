@@ -187,6 +187,8 @@ function FinancialStatement({
   //React Hooks must be called in the exact same order in every component render.
   const { theme } = useTheme();
   const router = useRouter();
+  const { slug, statementType, quarter, fiscalYear } = router.query;
+
   const [selectedCompanies, setSelectedCompanies] = useState("");
   const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "Q4");
   const [fiscalYearOption, setFiscalYearOption] = useState(
@@ -209,8 +211,6 @@ function FinancialStatement({
       </section>
     );
   }
-
-  const { slug, statementType, quarter, fiscalYear } = router.query;
 
   const companiesOptions = [];
   const financialStatementOptions = [];

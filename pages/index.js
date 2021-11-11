@@ -1,4 +1,5 @@
 import { useTheme } from "next-themes";
+import { Head } from "next/document";
 import { useEffect, useState } from "react";
 import MicroChart from "../components/charts/MicroChart";
 import SearchBar from "../components/searchbar";
@@ -6,10 +7,9 @@ import { useAppContext } from "../lib/contexts/State";
 
 export default function Home() {
   const { theme } = useTheme();
-  const bg = theme === "light" ? "#4C1D95" : "#111827";
+
   const [mounted, setMounted] = useState(false);
   const { companies } = useAppContext();
-  console.log(companies);
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
@@ -38,70 +38,92 @@ export default function Home() {
               companies={companies}
             />
           </div>
-          <div className="flex justify-center mt-6 w-full gap-3">
-            <h1 className="text-white ">Trending Stocks:</h1>
-            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-              Nabil Bank
-            </button>
-            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-              Laxmi Bank
-            </button>
-            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-              Uniliver Nepal Ltd.
-            </button>
-            <button className="px-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-              Bank Of Kathmandu
-            </button>
+          <div className="grid px-3 md:px-0">
+            <div className="xl:container mx-auto flex items-center overflow-x-auto custom-scroll no-scroll w-full whitespace-nowrap md:justify-center gap-3 mt-4">
+              <h1 className="text-white ">Trending Stocks:</h1>
+              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out whitespace-no-wrap">
+                Nabil Bank
+              </button>
+              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+                Laxmi Bank
+              </button>
+              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+                Uniliver Nepal Ltd.
+              </button>
+              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+                Bank Of Kathmandu
+              </button>
+              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+                Bank Of Kathmandu
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 150">
+      <svg
+        className="fill-current text-purple-900 dark:text-gray-900"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1440 150"
+      >
         <path
-          fill={bg}
           fillOpacity="12"
           d="M0,0L60,21.3C120,43,240,85,360,90.7C480,96,600,64,720,69.3C840,75,960,117,1080,128C1200,139,1320,117,1380,106.7L1440,96L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
         ></path>
       </svg>
 
-      <section className="xl:container mx-3 xl:mx-auto mt-8 p-3 rounded-lg">
+      <section className="xl:container mx-3 xl:mx-auto mt-8 rounded-lg text-gray-900 dark:text-gray-50">
         <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-10">
           Market Trend
         </h1>
 
-        <div className="grid grid-rows-3 gap-1">
-          <div className="grid grid-cols-4">
-            <h6 className="text-gray-500 py-3 px-3 text-left">Index</h6>
-            <h6 className="text-gray-500 py-3 px-3 text-left">Points</h6>
-            <h6 className="text-gray-500 py-3 px-3 text-left">24hr Change</h6>
-            <h6 className="text-gray-500 py-3 px-3 text-right">Market</h6>
-          </div>
-          <div className="grid grid-cols-4 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-            <p className="py-3 px-3 text-xl">Nepse</p>
-            <p className="py-3 px-3 text-xl">2,843.00</p>
-            <p className="py-3 px-3 text-xl">+0.68 %</p>
-            <div className="text-xl text-right">
-              <MicroChart />
-            </div>
-          </div>
+        <div className="grid">
+          <div className="w-full overflow-x-auto custom-scroll custom-scroll-light dark:custom-scroll">
+            <table className="w-full whitespace-no-wrap">
+              <thead>
+                <tr className="text-sm font-semibold tracking-wide text-left text-gray-900 uppercase  dark:text-white ">
+                  <th className="text-gray-500 py-2 px-3 text-left">Index</th>
+                  <th className="text-gray-500 py-2 px-3 text-left">Points</th>
+                  <th className="text-gray-500 py-2 px-3 text-left whitespace-nowrap">
+                    <h1>24hr Change</h1>
+                  </th>
+                  <th className="text-gray-500 py-3 px-3 text-right">Market</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y dark:divide-gray-700 ">
+                <tr className="border-0 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+                  <td className="px-4 py-3 text-xl">Nepse</td>
+                  <td className="py-2 px-3 text-xl">2,843.00</td>
+                  <td className="py-2 px-3 text-xl">+1.2 %</td>
+                  <td className="py-2 px-3 text-xl">
+                    <div className="text-xl text-right">
+                      <MicroChart />
+                    </div>
+                  </td>
+                </tr>
+                <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+                  <td className="px-4 py-3 text-xl">Development Bank</td>
+                  <td className="py-3 px-3 text-xl">2,312.00</td>
+                  <td className="py-3 px-3 text-xl">+1.2 %</td>
+                  <td className="py-3 px-3 text-xl">
+                    <div className="text-xl text-right">
+                      <MicroChart />
+                    </div>
+                  </td>
+                </tr>
 
-          <div className="grid grid-cols-4 gap-3 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-            <div className="col-span-1">
-              <p className="py-3 px-3 text-xl">Development Bank</p>
-            </div>
-            <p className="py-3 px-3 text-xl">1,800.00</p>
-            <p className="py-3 px-3 text-xl">+1.2 %</p>
-            <div className="text-xl text-right">
-              <MicroChart />
-            </div>
-          </div>
-          <div className="grid grid-cols-4 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-            <p className="py-3 px-3 text-xl">Finance</p>
-            <p className="py-3 px-3 text-xl">2,300.00</p>
-            <p className="py-3 px-3 text-xl">+4.2 %</p>
-            <div className="text-xl text-right">
-              <MicroChart />
-            </div>
+                <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
+                  <td className="px-4 py-3 text-xl">Finance</td>
+                  <td className="py-3 px-3 text-xl">2,111.00</td>
+                  <td className="py-3 px-3 text-xl">+1.2 %</td>
+                  <td className="py-3 px-3 text-xl">
+                    <div className="text-xl text-right">
+                      <MicroChart />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>

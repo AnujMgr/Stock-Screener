@@ -4,7 +4,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head></Head>
+        <Head />
         <body className="bg-blue-50 dark:bg-gray-800 ">
           <Main />
           <NextScript />

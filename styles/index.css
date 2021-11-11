@@ -119,10 +119,10 @@
       cursor: pointer;
     }
     .custom-scroll::-webkit-scrollbar-track {
-      background: #065f46;
+      background: #111827;
     }
     .custom-scroll::-webkit-scrollbar-thumb {
-      background: #1f2937;
+      background: #4b5563;
     }
 
     .custom-scroll-light::-webkit-scrollbar {
@@ -134,7 +134,7 @@
       background: #f1f1f1;
     }
     .custom-scroll-light::-webkit-scrollbar-thumb {
-      background: #888;
+      background: #93c5fd;
     }
   }
 }

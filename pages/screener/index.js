@@ -148,9 +148,7 @@ export default function Screener({
     industry ? industry : "0"
   );
   const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "0");
-  const [fiscalYearOption, setFiscalYearOption] = useState(
-    fiscalYearOption ? fiscalYearOption : ""
-  );
+  const [fiscalYearOption, setFiscalYearOption] = useState("");
 
   const industryOptions = [];
 

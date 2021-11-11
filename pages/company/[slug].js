@@ -1,3 +1,4 @@
+import { Head } from "next/document";
 import React from "react";
 import ReactTooltip from "react-tooltip";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
@@ -217,21 +218,19 @@ export function Company({
   return (
     <>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
-        <div className="grid grid-cols-1 sm:grid-cols-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 text-gray-900 dark:text-gray-50">
           <div>
-            <h1 className="text-2xl font-normal text-gray-900 dark:text-gray-200 mb-2">
-              {company.name}
-            </h1>
+            <h1 className="text-2xl font-normal mb-2">{company.name}</h1>
             <div className="flex flex-col md:flex-row">
-              <p className="mr-3 text-primary text-black dark:text-white">
+              <p className="mr-3 ">
                 NEPSE:{" "}
                 <span className="text-white bg-blue-700 px-2 py-1 font-light uppercase rounded-sm">
                   {company.symbol}
                 </span>
               </p>
-              <p className="mr-3 text-primary text-black dark:text-white mt-3 md:mt-0">
+              <p className="mr-3 mt-3 md:mt-0">
                 SECTOR:
-                <span className="px-2 py-1 font-bold text-black dark:text-white">
+                <span className="px-2 py-1 font-bold ">
                   {company.industry.name}
                 </span>
               </p>
@@ -273,7 +272,7 @@ export function Company({
             </>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 text-gray-900 dark:text-gray-50">
           <div className="pt-5 bg-white dark:bg-gray-900 rounded-lg">
             <p className="text-lg">Rs. 100</p>
             <p className="text-gray-400 text-xs">Today&apos;s Low</p>
@@ -298,7 +297,7 @@ export function Company({
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
-        <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
+        <h2 className="font-semibold text-2xl mb-4 text-gray-900 dark:text-gray-200">
           Price History
         </h2>
 
@@ -311,18 +310,16 @@ export function Company({
 
       <section className="xl:container mx-3 xl:mx-auto mt-8">
         <div className="grid grid-cols-1 ">
-          <div className=" gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0">
+          <div className=" gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0 text-gray-900 dark:text-gray-50">
             {/* <div className="col-span-3 md:col-span-3 gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0"> */}
-            <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
-              Company Essentials
-            </h2>
+            <h2 className="font-bold text-xl mb-4">Company Essentials</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {!Array.isArray(essentials) || !essentials.length ? (
                 <h1>Data Not Available !!</h1>
               ) : (
                 essentials.map((data) => (
                   <div className="flex flex-col mb-2" key={data.name}>
-                    <p className="text-md mb-2 flex items-baseline">
+                    <p className="text-xs font-normal mb-2 flex items-baseline">
                       {data.name}{" "}
                       <span
                         className="ml-2 relative"

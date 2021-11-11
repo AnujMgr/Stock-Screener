@@ -251,7 +251,9 @@ const FinancialStatement = ({ company, dataList, columnsData }) => {
         {dataList ? (
           <MyTable columns={columns} data={dataList} />
         ) : (
-          <h1>Data Not Available!</h1>
+          <h1 className="text-gray-900 dark:text-gray-50">
+            Data Not Available!
+          </h1>
         )}
       </section>
     </>

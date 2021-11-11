@@ -114,7 +114,7 @@ function Navbar({ showSearch }) {
               borderRad={"6px"}
               width={"w-full sm:w-3/4 mx-auto"}
               color={theme === "light" ? "#000" : "#fff"}
-              companies={companies.getAllCompanies}
+              companies={companies}
             />
           </div>
         ) : (
