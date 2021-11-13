@@ -37,25 +37,23 @@ export default function Home() {
               companies={companies}
             />
           </div>
-          <div className="grid px-3 md:px-0">
-            <div className="xl:container mx-auto flex items-center overflow-x-auto custom-scroll no-scroll w-full whitespace-nowrap md:justify-center gap-3 mt-4">
-              <h1 className="text-white ">Trending Stocks:</h1>
-              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out whitespace-no-wrap">
-                Nabil Bank
-              </button>
-              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-                Laxmi Bank
-              </button>
-              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-                Uniliver Nepal Ltd.
-              </button>
-              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-                Bank Of Kathmandu
-              </button>
-              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
-                Bank Of Kathmandu
-              </button>
-            </div>
+          <div className="xl:container mx-auto flex items-center flex-wrap text-center justify-center gap-3 mt-4 px-4">
+            <h1 className="text-white ">Trending Stocks:</h1>
+            <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out whitespace-no-wrap">
+              Nabil Bank
+            </button>
+            <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Laxmi Bank
+            </button>
+            <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Uniliver Nepal Ltd.
+            </button>
+            <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Bank Of Kathmandu
+            </button>
+            <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
+              Bank Of Kathmandu
+            </button>
           </div>
         </div>
       </section>
@@ -91,20 +89,22 @@ export default function Home() {
               </thead>
               <tbody className="divide-y dark:divide-gray-700 ">
                 <tr className="border-0 hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-                  <td className="px-4 py-3 text-xl">Nepse</td>
-                  <td className="py-2 px-3 text-xl">2,843.00</td>
-                  <td className="py-2 px-3 text-xl">+1.2 %</td>
-                  <td className="py-2 px-3 text-xl">
+                  <td className="px-4 py-3 text-sm md:text-xl">Nepse</td>
+                  <td className="py-2 px-3 text-sm md:text-xl">2,843.00</td>
+                  <td className="py-2 px-3 text-sm md:text-xl">+1.2 %</td>
+                  <td className="py-2 px-3 text-sm md:text-xl">
                     <div className="text-xl text-right">
                       <MicroChart />
                     </div>
                   </td>
                 </tr>
                 <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-                  <td className="px-4 py-3 text-xl">Development Bank</td>
-                  <td className="py-3 px-3 text-xl">2,312.00</td>
-                  <td className="py-3 px-3 text-xl">+1.2 %</td>
-                  <td className="py-3 px-3 text-xl">
+                  <td className="px-4 py-3 text-sm md:text-xl">
+                    Development Bank
+                  </td>
+                  <td className="py-3 px-3 text-sm md:text-xl">2,312.00</td>
+                  <td className="py-3 px-3 text-sm md:text-xl">+1.2 %</td>
+                  <td className="py-3 px-3 text-sm md:text-xl">
                     <div className="text-xl text-right">
                       <MicroChart />
                     </div>
@@ -112,9 +112,9 @@ export default function Home() {
                 </tr>
 
                 <tr className="hover:bg-gray-200 dark:hover:bg-gray-900 transition duration-500 ease-in-out">
-                  <td className="px-4 py-3 text-xl">Finance</td>
-                  <td className="py-3 px-3 text-xl">2,111.00</td>
-                  <td className="py-3 px-3 text-xl">+1.2 %</td>
+                  <td className="px-4 py-3 text-sm md:text-xl">Finance</td>
+                  <td className="py-3 px-3 text-sm md:text-xl">2,111.00</td>
+                  <td className="py-3 px-3 text-sm md:text-xl">+1.2 %</td>
                   <td className="py-3 px-3 text-xl">
                     <div className="text-xl text-right">
                       <MicroChart />

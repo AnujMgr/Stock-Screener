@@ -10,6 +10,7 @@ export async function getServerSideProps({ query }) {
     {
       Header: "Company",
       accessor: "Company",
+      className: "table-title",
     },
     {
       Header: "Price",

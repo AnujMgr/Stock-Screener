@@ -21,6 +21,8 @@ const companyStatmentDetails = [
     companyEssentialsId: 5,
     companyActionId: 8,
     financialStatementOverview: 8,
+    corporateActionId: 9,
+    stockholdingId: 10,
   },
 ];
 

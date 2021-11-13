@@ -149,7 +149,7 @@ const PriceChart = ({ priceHistory }) => {
             reversed
             tick={CustomizedAxisTick}
           />
-          <YAxis orientation="right" />
+          <YAxis orientation="right" fontSize={11} width={40} />
           <Tooltip content={<CustomTooltip />} />
           <Brush fill={theme == "light" ? "#EFF6FF" : "#111827"} />
         </AreaChart>

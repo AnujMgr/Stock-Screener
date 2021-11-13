@@ -2,12 +2,16 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  referentialIntegrity = "prisma"
+  
 }
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 model Industry {
@@ -19,33 +23,34 @@ model Industry {
 }
 
 model Company {
-  id                    Int                      @id @default(autoincrement())
-  name                  String                   @unique
-  slug                  String                   @unique
-  symbol                String                   @unique
-  description           String
-  industry              Industry                 @relation(fields: [industryId], references: [id])
-  industryId            Int // relation scalar field  (used in the `@relation` attribute above)
-  
-  companyStatementDetails CompanyStatementDetails  @relation(fields: [statementsId], references: [id])
-  statementsId     Int
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  symbol      String   @unique
+  description String
+  industry    Industry @relation(fields: [industryId], references: [id])
+  industryId  Int // relation scalar field  (used in the `@relation` attribute above)
+
+  companyStatementDetails CompanyStatementDetails @relation(fields: [statementsId], references: [id])
+  statementsId            Int
 
   // financialStatements   FinancialStatementFact[] // I dont think there is necessity of Relation between company and financial fact
-  companyPrice          CompanyPrice[]
-  stockHoldingFact      StockHoldingFact[]
+  companyPrice CompanyPrice[]
 }
 
 model CompanyStatementDetails {
-  id                    Int @id @default(autoincrement())
-  name                  String @unique
-  balanceSheetId        Int
-  profitLossId          Int
-  companyEssentialsId   Int
-  companyRatioId        Int
-  financialHighlightsId Int
-  companyActionId       Int  
-  financialStatementOverview       Int  
-  companies             Company[]
+  id                         Int       @id @default(autoincrement())
+  name                       String    @unique
+  balanceSheetId             Int
+  profitLossId               Int
+  companyEssentialsId        Int
+  companyRatioId             Int
+  financialHighlightsId      Int
+  companyActionId            Int
+  financialStatementOverview Int
+  corporateActionId          Int
+  stockholdingId             Int
+  companies                  Company[]
 }
 
 model CompanyPrice {
@@ -61,20 +66,6 @@ model CompanyPrice {
   priceDifference  Float
   company          Company @relation(fields: [companySlug], references: [slug])
   companySlug      String // relation scalar field  (used in the `@relation` attribute above)
-}
-
-model StockHolding {
-  id        Int     @id @default(autoincrement())
-  name      String
-}
-
-model StockHoldingFact {
-  id        Int     @id @default(autoincrement())
-  name      String
-  amount    Int
-  date      String
-  company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
 }
 
 //FinancialStatement is the name of the financial report. The Income Statement, Balance Sheet is an example of a FinancialStatement
@@ -104,6 +95,7 @@ model FinancialStatementLineSequence {
   financialStatementLine   FinancialStatementLine @relation(fields: [financialStatementLineId], references: [id])
   financialStatementLineId Int
   sequence                 Float
+
   @@id([financialStatementId, financialStatementLineId])
 }
 
@@ -116,4 +108,41 @@ model FinancialStatementFact {
   fiscalYear               String
   quarter                  String?
   amount                   Float
+}
+
+//FinancialStatement is the name of the financial report. The Income Statement, Balance Sheet is an example of a FinancialStatement
+model ActionStatement {
+  id                  Int                           @id @default(autoincrement())
+  name                String
+  slug                String                        @unique
+  actionStatementLine ActionStatementLineSequence[]
+}
+
+//FinancialStatementLine is a single line-item on a FinancialStatement. An example would be Cost of Goods Sold, Share capital, Cash and cash equivalent
+model ActionStatementLine {
+  id                  Int                           @id @default(autoincrement())
+  name                String                        @unique
+  actionStatementFact ActionStatementFact[]
+  actionStatement     ActionStatementLineSequence[]
+  unit                String?
+  description         String?
+}
+
+model ActionStatementLineSequence {
+  actionStatement        ActionStatement     @relation(fields: [actionStatementId], references: [id])
+  actionStatementId      Int
+  financialStatementLine ActionStatementLine @relation(fields: [actionStatementLineId], references: [id])
+  actionStatementLineId  Int
+  sequence               Float
+
+  @@id([actionStatementId, actionStatementLineId])
+}
+
+model ActionStatementFact {
+  id                     Int                 @id @default(autoincrement())
+  companyId              Int // relation scalar field  (used in the `@relation` attribute above)
+  financialStatementLine ActionStatementLine @relation(fields: [actionStatementLineId], references: [id])
+  actionStatementLineId  Int
+  bookCloseDate          String
+  amount                 Float
 }

@@ -15,7 +15,6 @@ export async function getStaticProps({ params }) {
     include: {
       industry: true,
       companyStatementDetails: true,
-      stockHoldingFact: true,
     },
   });
 
@@ -296,7 +295,7 @@ export function Company({
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
-        <h2 className="font-semibold text-2xl mb-4 text-gray-900 dark:text-gray-200">
+        <h2 className="font-semibold text-xl mb-4 text-gray-900 dark:text-gray-200">
           Price History
         </h2>
 
@@ -327,7 +326,7 @@ export function Company({
                       >
                         <InfoIcon
                           customClass={
-                            "fill-current dark:text-gray-600 text-gray-400"
+                            "fill-current dark:text-gray-700 text-blue-700"
                           }
                           height={14}
                           width={14}

@@ -209,6 +209,7 @@ const FinancialStatement = ({ company, dataList, columnsData }) => {
     {
       Header: "Particulars",
       accessor: "particular",
+      className: "table-title",
     },
     ...columnsData,
   ];
