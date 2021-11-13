@@ -1,3 +1,4 @@
+import { useRouter } from "next/router";
 import React from "react";
 import ReactTooltip from "react-tooltip";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
@@ -6,6 +7,7 @@ import SortableTable from "../../components/SortableTable";
 import { InfoIcon } from "../../lib/icons/Icons";
 import prisma from "../../prisma/client";
 import Custom404 from "../404";
+import Spinner from "../../components/Spinner";
 
 export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -183,7 +185,7 @@ export async function getStaticPaths() {
   });
   return {
     paths: slugs,
-    fallback: false,
+    fallback: true,
   };
 }
 
@@ -195,8 +197,13 @@ export function Company({
   dataList,
   columnsData,
 }) {
+  const router = useRouter();
   if (!company) {
     return <Custom404 />;
+  }
+
+  if (router.isFallback) {
+    return <Spinner />;
   }
 
   const columns = [
