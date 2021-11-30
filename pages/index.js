@@ -2,13 +2,11 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import MicroChart from "../components/charts/MicroChart";
 import SearchBar from "../components/searchbar";
-import { useAppContext } from "../lib/contexts/State";
 
 export default function Home() {
   const { theme } = useTheme();
 
   const [mounted, setMounted] = useState(false);
-  const { companies } = useAppContext();
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), []);
@@ -34,7 +32,6 @@ export default function Home() {
               placeholder={"Search for a Company..."}
               color={theme === "light" ? "#000" : "#fff"}
               height="50px"
-              companies={companies}
             />
           </div>
           <div className="xl:container mx-auto flex items-center flex-wrap text-center justify-center gap-3 mt-4 px-4">

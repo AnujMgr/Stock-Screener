@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import prisma from "../../../prisma/client";
 import SelectWithSearch from "../../../components/SelectWithSearch";
 import FormSelect from "../../../Form/FormSelect";
@@ -19,6 +19,7 @@ export async function getServerSideProps({ query }) {
       companyStatementDetails: true,
     },
   });
+
   const financialStatement = [];
   const columnsData = [];
   const dataList = [];
@@ -30,15 +31,24 @@ export async function getServerSideProps({ query }) {
     const data = [];
     return { props: { company, companies, financialStatement, data } };
   }
+  const peerCompanies = await prisma.company.findMany({
+    where: {
+      industryId: company.industryId,
+    },
+  });
 
   const companyIds = [];
+
   const companies = await prisma.company.findMany({
     where: {
       slug: query.companies
-        ? { in: [query.slug, ...query.companies, query.companies] }
+        ? typeof query.companies == "string"
+          ? { in: [query.slug, query.companies] }
+          : { in: [query.slug, ...query.companies] }
         : { in: [query.slug] },
     },
   });
+
   companies.map((company) => companyIds.push(company.id));
 
   const data = await prisma.financialStatementLineSequence.findMany({
@@ -102,7 +112,14 @@ export async function getServerSideProps({ query }) {
   if (!data.length > 0) {
     const dataList = null;
     return {
-      props: { company, financialStatement, data, dataList, columnsData },
+      props: {
+        company,
+        peerCompanies,
+        financialStatement,
+        data,
+        dataList,
+        columnsData,
+      },
     };
   }
 
@@ -110,7 +127,14 @@ export async function getServerSideProps({ query }) {
     // if no. of facts is 0
     const dataList = null;
     return {
-      props: { company, financialStatement, data, dataList, columnsData },
+      props: {
+        company,
+        peerCompanies,
+        financialStatement,
+        data,
+        dataList,
+        columnsData,
+      },
     };
   }
 
@@ -132,10 +156,16 @@ export async function getServerSideProps({ query }) {
   }
 
   data[1].financialStatementLine.financialStatementFact.map((fact) => {
-    columnsData.push({
-      Header: companies.find((item) => item.id === fact.companyId).name,
-      accessor: fact.companyId + "" + fact.fiscalYear + " " + fact.quarter,
-    });
+    fact.companyId == company.id
+      ? columnsData.unshift({
+          Header: companies.find((item) => item.id === fact.companyId).name,
+          accessor: fact.companyId + "" + fact.fiscalYear + " " + fact.quarter,
+          className: "bg-gray-100",
+        })
+      : columnsData.push({
+          Header: companies.find((item) => item.id === fact.companyId).name,
+          accessor: fact.companyId + "" + fact.fiscalYear + " " + fact.quarter,
+        });
   });
 
   data.map((fact) => {
@@ -158,14 +188,12 @@ export async function getServerSideProps({ query }) {
             particular: fact.financialStatementLine.name,
             [data.companyId + "" + data.fiscalYear + " " + data.quarter]:
               data.amount,
-
             subRows:
               fact.financialStatementLine.children.length > 0 ? [child] : [],
           });
         })
       : Object.assign(myobj, {
           particular: fact.financialStatementLine.name,
-
           subRows:
             fact.financialStatementLine.children.length > 0 ? [child] : [],
         });
@@ -174,11 +202,14 @@ export async function getServerSideProps({ query }) {
   });
 
   // Pass post data to the page via props
-  return { props: { company, dataList, columnsData, fiscalYearList } };
+  return {
+    props: { company, peerCompanies, dataList, columnsData, fiscalYearList },
+  };
 }
 
 function FinancialStatement({
   company,
+  peerCompanies,
   fiscalYearList,
   dataList,
   columnsData,
@@ -198,25 +229,15 @@ function FinancialStatement({
     statementType ? statementType : 1
   );
   const [companyOption, setCompanyOption] = useState(slug ? slug : "");
-  const { companies } = useAppContext();
 
   if (!company) {
     return <Custom404 />;
-  }
-
-  if (!dataList) {
-    return (
-      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
-        <h1>Data Not Available!</h1>
-      </section>
-    );
   }
 
   const companiesOptions = [];
   const financialStatementOptions = [];
 
   const handleChange = (selectedOptions) => {
-    console.log(selectedOptions);
     const companies = [];
     selectedOptions.map((option) => companies.push(option.value));
     setCompanyOption(companies);
@@ -280,11 +301,12 @@ function FinancialStatement({
       }))
     : [];
 
-  companies.map((comp) => {
-    if (!(comp.id == company.id)) {
-      companiesOptions.push({ value: comp.slug, label: comp.name });
-    }
-  });
+  if (peerCompanies)
+    peerCompanies.map((comp) => {
+      if (!(comp.id == company.id)) {
+        companiesOptions.push({ value: comp.slug, label: comp.name });
+      }
+    });
 
   financialStatementOptions.push(
     {
@@ -304,6 +326,84 @@ function FinancialStatement({
       name: "Company Ratios",
     }
   );
+
+  if (!dataList) {
+    return (
+      <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
+        <div className="grid grid-cols-4 md:grid-cols-5 gap-3">
+          <div className="mb-2 flex-col col-span-2 md:col-span-1">
+            <SelectWithSearch
+              isMulti={true}
+              options={companiesOptions}
+              selectedValues={selectedCompanies}
+              handleChange={handleChange}
+              className="rounded border "
+              controlBackgroundColor={theme === "light" ? "#F3F4F6" : "#1F2937"}
+              dropdownMenuBackgroundColor={
+                theme === "light" ? "#F3F4F6" : "#1F2937"
+              }
+              hoverMenuColor={theme === "light" ? "#fff" : "#111827"}
+              menuFontColor={theme === "light" ? "#000" : "#F3F4F6"}
+              borderColor={theme === "light" ? "#6B7280" : "#374151"}
+            />
+            <span className="text-xs">Companies</span>
+          </div>
+          <div className="mb-2 col-span-2 md:col-span-1">
+            <FormSelect
+              options={quarterOptions}
+              control="select"
+              label="Select Quarter"
+              name="quarter"
+              value={quarterOption}
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
+              handleChange={(e) => setQuarterOption(e.target.value)}
+            />
+          </div>
+          <div className="mb-2 col-span-2 md:col-span-1">
+            <FormSelect
+              options={fiscalYearOptions}
+              control="select"
+              label="Selec FiscalYear"
+              name="FiscalYear"
+              value={fiscalYearOption}
+              customClassName="rounded border  dark:border-gray-700 border-gray-400"
+              handleChange={(e) => setFiscalYearOption(e.target.value)}
+            />
+          </div>
+          <div className="mb-2 col-span-2 md:col-span-1">
+            <FormSelect
+              options={financialStatementOptions}
+              control="select"
+              label="Select Statement"
+              name="Statement"
+              value={statementTypeOption}
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
+              handleChange={(e) => setStatementTypeOption(e.target.value)}
+            />
+          </div>
+          <div className="mb-2 text-center md:text-left col-span-4 md:col-span-1">
+            <button
+              onClick={(e) =>
+                router.push({
+                  pathname: `/company/${slug}/peer-comparision`,
+                  query: {
+                    companies: companyOption,
+                    quarter: [quarterOption],
+                    fiscalYear: fiscalYearOption,
+                    statementType: statementTypeOption,
+                  },
+                })
+              }
+              className="bg-blue-600 text-white h-9 px-5 rounded"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+        <h1>Data Not Available!</h1>
+      </section>
+    );
+  }
 
   return (
     <>

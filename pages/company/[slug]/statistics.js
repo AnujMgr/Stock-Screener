@@ -78,13 +78,24 @@ function Statistics({ company, companyRatios }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {companyRatios.map((fact) => {
             return fact.facts.length > 0 ? (
-              <div
-                key={fact.statement.id}
-                className="shadow-md p-2 bg-white dark:bg-gray-900 rounded-lg "
-              >
-                <h1 className="p-2 text-lg">{fact.statement.name}</h1>
-                <MiniChart data={fact.facts} />
-              </div>
+              fact.facts.length == 1 ? (
+                <div
+                  key={fact.statement.id}
+                  className="shadow-md p-2 bg-white dark:bg-gray-900 rounded-lg "
+                >
+                  <h1 className="p-2 text-lg">{fact.statement.name}</h1>
+                  {/* <MiniChart data={fact.facts} /> */}
+                  <h1 className="text-4xl my-4 mx-4">{fact.facts[0].amount}</h1>
+                </div>
+              ) : (
+                <div
+                  key={fact.statement.id}
+                  className="shadow-md p-2 bg-white dark:bg-gray-900 rounded-lg "
+                >
+                  <h1 className="p-2 text-lg">{fact.statement.name}</h1>
+                  <MiniChart data={fact.facts} />
+                </div>
+              )
             ) : (
               <div
                 key={fact.statement.id}

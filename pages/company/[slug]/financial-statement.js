@@ -8,14 +8,14 @@ import Custom404 from "../../404";
 import MyTable from "../../../components/FinancialsTable/MyTable";
 import { PlusIcon, MinusIcon } from "../../../lib/icons/Icons";
 
-export async function getServerSideProps({ query }) {
+export async function getServerSideProps({ params }) {
   const financialStatement = [];
   const columnsData = [];
   const dataList = [];
 
   const company = await prisma.company.findFirst({
     where: {
-      slug: query.slug,
+      slug: params.slug,
     },
     include: {
       companyStatementDetails: true,
@@ -28,8 +28,8 @@ export async function getServerSideProps({ query }) {
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
-      financialStatementId: query.hasOwnProperty("statementType")
-        ? Number(query.statementType)
+      financialStatementId: params.hasOwnProperty("statementType")
+        ? Number(params.statementType)
         : company.companyStatementDetails.balanceSheetId,
       financialStatementLine: {
         parentId: null,
@@ -41,14 +41,14 @@ export async function getServerSideProps({ query }) {
           children: {
             include: {
               financialStatementFact: {
-                where: query.hasOwnProperty("quarter")
-                  ? query.quarter === "qtrToqtr"
+                where: params.hasOwnProperty("quarter")
+                  ? params.quarter === "qtrToqtr"
                     ? {
                         companyId: company.id,
                       }
                     : {
                         companyId: company.id,
-                        quarter: query.quarter,
+                        quarter: params.quarter,
                       }
                   : {
                       companyId: company.id,
@@ -58,14 +58,14 @@ export async function getServerSideProps({ query }) {
             },
           },
           financialStatementFact: {
-            where: query.hasOwnProperty("quarter")
-              ? query.quarter == "qtrToqtr"
+            where: params.hasOwnProperty("quarter")
+              ? params.quarter == "qtrToqtr"
                 ? {
                     companyId: company.id,
                   }
                 : {
                     companyId: company.id,
-                    quarter: query.quarter,
+                    quarter: params.quarter,
                   }
               : {
                   companyId: company.id,

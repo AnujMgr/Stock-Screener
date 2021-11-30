@@ -6,12 +6,9 @@ import HeaderButton from "./HeaderButton";
 const FinancialsHeader = ({ statements, slug, active }) => {
   const router = useRouter();
 
-  const handleClick = (id) => {
+  const handleClick = (type) => {
     router.push({
-      pathname: `/company/${slug}/financial-statement`,
-      query: {
-        statementType: id,
-      },
+      pathname: `/company/${slug}/financial-statement/${type}/qtrToqtr`,
     });
   };
 
@@ -36,20 +33,20 @@ const FinancialsHeader = ({ statements, slug, active }) => {
           </Link>
 
           <HeaderButton
-            handleClick={(e) => handleClick(statements.balanceSheetId)}
-            isActive={active == statements.balanceSheetId}
+            handleClick={(e) => handleClick("balance-sheet")}
+            isActive={active == "balance-sheet"}
             title="Balance Sheet"
           />
 
           <HeaderButton
-            handleClick={(e) => handleClick(statements.profitLossId)}
-            isActive={active == statements.profitLossId}
+            handleClick={(e) => handleClick("profit-loss")}
+            isActive={active == "profit-loss"}
             title="Income Statement"
           />
 
           <HeaderButton
-            handleClick={(e) => handleClick(statements.financialHighlightsId)}
-            isActive={active == statements.financialHighlightsId}
+            handleClick={(e) => handleClick("financial-highlights")}
+            isActive={active == "financial-highlights"}
             title="Financial Highlights"
           />
 

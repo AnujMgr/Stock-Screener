@@ -25,15 +25,13 @@ function MyApp({ Component, pageProps }) {
     Component.getLayout ||
     ((page) => (
       <ApolloProvider client={client}>
-        <AppWrapper>
-          <ThemeProvider attribute="class">
-            {router.pathname.startsWith("/company/") ? (
-              <SecondaryLayout>{page}</SecondaryLayout>
-            ) : (
-              <Layout>{page}</Layout>
-            )}
-          </ThemeProvider>
-        </AppWrapper>
+        <ThemeProvider attribute="class">
+          {router.pathname.startsWith("/company/") ? (
+            <SecondaryLayout>{page}</SecondaryLayout>
+          ) : (
+            <Layout>{page}</Layout>
+          )}
+        </ThemeProvider>
       </ApolloProvider>
     ));
 

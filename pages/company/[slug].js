@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
 import PriceCounter from "../../components/PriceCounter/PriceCounter";
@@ -8,6 +8,7 @@ import { InfoIcon } from "../../lib/icons/Icons";
 import prisma from "../../prisma/client";
 import Custom404 from "../404";
 import Spinner from "../../components/Spinner";
+import MyTable from "../../components/FinancialsTable/MyTable";
 
 export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -54,6 +55,7 @@ export async function getStaticProps({ params }) {
   });
   companies.map((company) => companyIds.push(company.id));
 
+  // Company Essentials
   const companyEssentials =
     await prisma.financialStatementLineSequence.findMany({
       where: {
@@ -82,8 +84,65 @@ export async function getStaticProps({ params }) {
       },
     });
 
+  // Stock Holding Facts
+  const stockholdingFacts = await prisma.actionStatementLineSequence.findMany({
+    where: {
+      actionStatementId: company.companyStatementDetails.stockholdingId,
+    },
+    include: {
+      actionStatementLine: {
+        include: {
+          actionStatementFact: {
+            where: {
+              // quarter: "Q4",
+              companyId: company.id,
+            },
+            orderBy: [
+              {
+                bookCloseDate: "desc",
+              },
+            ],
+            take: 1,
+          },
+        },
+      },
+    },
+  });
+
+  const companyActionFacts = await prisma.actionStatementLineSequence.findMany({
+    where: {
+      actionStatementId: company.companyStatementDetails.corporateActionId,
+    },
+    include: {
+      actionStatementLine: {
+        include: {
+          actionStatementFact: {
+            where: {
+              companyId: company.id,
+            },
+            orderBy: [
+              {
+                bookCloseDate: "desc",
+              },
+            ],
+          },
+        },
+      },
+    },
+    orderBy: {
+      sequence: "asc",
+    },
+  });
+
   var essentials = [];
   var stockHoldingData = [];
+  var actionDataList = [];
+
+  const companyActionColumnData = [];
+  const companyActionDataList = [];
+
+  const dataList = [];
+  const columnsData = [];
 
   //For Company Essentials
   companyEssentials.map((statement) => {
@@ -109,10 +168,18 @@ export async function getStaticProps({ params }) {
             financialStatementFact: {
               where: {
                 companyId: { in: companyIds },
-                quarter: params.quarter,
-                fiscalYear: params.fiscalYear,
+                // quarter: params.quarter,
+                // fiscalYear: params.fiscalYear,
               },
               take: companies.length,
+              orderBy: [
+                {
+                  fiscalYear: "desc",
+                },
+                {
+                  quarter: "desc",
+                },
+              ],
             },
           },
         },
@@ -121,9 +188,6 @@ export async function getStaticProps({ params }) {
         sequence: "asc",
       },
     });
-
-  const dataList = [];
-  const columnsData = [];
 
   peerComparisionData.map((fact) => {
     var myobj = {};
@@ -149,7 +213,7 @@ export async function getStaticProps({ params }) {
         if (comp.id == fact.companyId) {
           if (company.id == comp.id) {
             Object.assign(myObj, {
-              [peerData.financialStatementLine.name]: 1234,
+              [peerData.financialStatementLine.name]: fact.amount,
             });
           } else {
             Object.assign(myObj, {
@@ -159,7 +223,68 @@ export async function getStaticProps({ params }) {
         }
       });
     });
-    dataList.push({ ...myObj });
+
+    myObj.company == company.name
+      ? dataList.unshift({ ...myObj })
+      : dataList.push({ ...myObj });
+  });
+
+  stockholdingFacts.map((holding) => {
+    if (holding.actionStatementLine.actionStatementFact.length > 0) {
+      holding.actionStatementLine.actionStatementFact.map((data) => {
+        stockHoldingData.push({
+          name: holding.actionStatementLine.name,
+          value: Number(data.amount),
+          // closeData: data.bookCloseDate,
+        });
+      });
+    }
+  });
+
+  //Company Actions Data
+  //Columns
+  companyActionFacts.map((action) => {
+    companyActionColumnData.push({
+      Header: action.actionStatementLine.name,
+      accessor: action.actionStatementLine.name,
+    });
+  });
+  // DataList
+  companyActionFacts.map((action) => {
+    if (action.actionStatementLine.actionStatementFact.length > 0) {
+      action.actionStatementLine.actionStatementFact.map((data, i) => {
+        companyActionDataList.push({
+          name: action.actionStatementLine.name,
+          amount: data.amount,
+          closeDate: data.bookCloseDate,
+          // accessor: data.amount,
+        });
+      });
+    }
+  });
+
+  function groupByKey(array, key) {
+    return array.reduce((hash, obj) => {
+      if (obj[key] === undefined) return hash;
+      return Object.assign(hash, {
+        [obj[key]]: (hash[obj[key]] || []).concat(obj),
+      });
+    }, {});
+  }
+
+  var groupedActionData = groupByKey(companyActionDataList, "closeDate");
+  const keys = Object.keys(groupedActionData);
+  // const myDataList = [];
+
+  keys.forEach((key) => {
+    var myobj = {};
+
+    groupedActionData[key].map((data) => {
+      Object.assign(myobj, {
+        [data.name]: data.amount,
+      });
+    });
+    actionDataList.push({ date: key, ...myobj });
   });
 
   // Pass post data to the page via props
@@ -171,6 +296,9 @@ export async function getStaticProps({ params }) {
       stockHoldingData,
       dataList,
       columnsData,
+      stockholdingFacts,
+      companyActionColumnData,
+      actionDataList,
     },
     revalidate: 10, // In seconds};
   };
@@ -185,7 +313,7 @@ export async function getStaticPaths() {
   });
   return {
     paths: slugs,
-    fallback: true,
+    fallback: "blocking",
   };
 }
 
@@ -196,8 +324,11 @@ export function Company({
   stockHoldingData,
   dataList,
   columnsData,
+  companyActionColumnData,
+  actionDataList,
 }) {
   const router = useRouter();
+
   if (!company) {
     return <Custom404 />;
   }
@@ -218,6 +349,16 @@ export function Company({
     },
 
     ...columnsData,
+  ];
+
+  const actionsColumn = [
+    {
+      Header: "Date",
+      accessor: "date",
+      className: "md:w-40	font-bold",
+    },
+
+    ...companyActionColumnData,
   ];
 
   return (
@@ -309,7 +450,12 @@ export function Company({
         <div className="grid grid-cols-1">
           <PriceChart priceHistory={priceHistory} />
 
-          <h6 className="text-center mt-4">View Full Chart</h6>
+          <a
+            href="#"
+            className="text-center py-2 px-3 mt-4 w-96 border border-blue-400 dark:border-white mx-auto rounded-md shadow-sm"
+          >
+            View Full Chart
+          </a>
         </div>
       </section>
 
@@ -376,6 +522,36 @@ export function Company({
           Peer Comparision
         </h2>
         <SortableTable columns={columns} data={dataList} />
+      </section>
+      <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
+        <div className="flex justify-between">
+          <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
+            Corporate Actions
+          </h2>
+
+          {/* <div className="flex gap-2">
+            {companyActionData.map((data, i) => (
+              <button
+                key={data.id}
+                className={`px-4 ${active == i ? "border-b" : ""}`}
+                onClick={(e) => setActive(i)}
+              >
+                {data.name}
+              </button>
+            ))}
+          </div> */}
+        </div>
+        <MyTable columns={actionsColumn} data={actionDataList} />
+
+        {/* <div className="">
+          {companyActionData.map((data, i) =>
+            active == i ? (
+              <div key={data.id}>
+                <h1>{data.name}</h1>
+              </div>
+            ) : null
+          )}
+        </div> */}
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8">

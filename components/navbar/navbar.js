@@ -10,7 +10,6 @@ function Navbar({ showSearch }) {
   const [hidden, setHidden] = useState(true);
   const [isOpen, setOpen] = useState(true);
   const { theme } = useTheme();
-  const { companies } = useAppContext();
   return (
     <>
       <div className="hidden lg:block shadow-sm bg-white dark:bg-gray-700 border-b border-fuchsia-100 border-gray-100 dark:border-gray-600">
@@ -28,7 +27,6 @@ function Navbar({ showSearch }) {
                     borderRad={"0.4em"}
                     width={"w-full sm:w-3/4 mr-auto"}
                     color={theme === "light" ? "#000" : "#fff"}
-                    companies={companies}
                   />
                 ) : null}
               </div>
@@ -114,7 +112,6 @@ function Navbar({ showSearch }) {
               borderRad={"6px"}
               width={"w-full sm:w-3/4 mx-auto"}
               color={theme === "light" ? "#000" : "#fff"}
-              companies={companies}
             />
           </div>
         ) : (

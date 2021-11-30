@@ -1,10 +1,9 @@
 import { useTheme } from "next-themes";
-import React, { PureComponent } from "react";
+import React from "react";
 import { Fragment } from "react";
 import {
   BarChart,
   Bar,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -50,7 +49,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload != undefined) {
     return (
       <Fragment>
-        {payload.map(({ value, volume, payload, name }) => {
+        {payload.map(({ value, name }) => {
           return (
             <div key={name} className="bg-gray-800 p-2 text-white shadow-md">
               <p className="text-xs capitalize mb-0">

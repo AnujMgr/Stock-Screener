@@ -1,14 +1,15 @@
 import prisma from "../../../../../prisma/client";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FinancialsHeader from "../../../../../components/HeaderMenu/FinancialsHeader";
-import Accordion from "../../../../../components/accordion/Accordion";
-
 import FormSelect from "../../../../../Form/FormSelect";
-import ReactTooltip from "react-tooltip";
+import MyTable from "../../../../../components/FinancialsTable/MyTable";
 
 export async function getStaticProps({ params }) {
   const financialStatement = [];
+  const columnsData = [];
+  const dataList = [];
+
   const company = await prisma.company.findFirst({
     where: {
       slug: params.slug,
@@ -95,35 +96,54 @@ export async function getStaticProps({ params }) {
     },
   });
 
-  data.map((fact) => {
-    financialStatement.push({
-      id: fact.financialStatementLine.id,
-      name: fact.financialStatementLine.name,
-      unit: fact.financialStatementLine.unit,
+  if (!data.length > 0) {
+    const dataList = null;
+    return {
+      props: { company, financialStatement, data, dataList, columnsData },
+    };
+  }
 
-      children: fact.financialStatementLine.children.map((data) => ({
-        id: data.id,
-        name: data.name,
-        financialStatementFact: data.financialStatementFact.map((data) => ({
-          id: data.id,
-          amount: data.amount,
-          quarter: data.quarter,
-          fiscalYear: data.fiscalYear,
-        })),
-      })),
-      financialStatementFact:
-        fact.financialStatementLine.financialStatementFact.map((data) => ({
-          id: data.id,
-          amount: data.amount,
-          quarter: data.quarter,
-          fiscalYear: data.fiscalYear,
-        })),
+  data[1].financialStatementLine.financialStatementFact.map((fact) => {
+    columnsData.push({
+      Header: fact.fiscalYear + " " + fact.quarter,
+      accessor: fact.fiscalYear + " " + fact.quarter,
     });
+  });
+
+  data.map((fact) => {
+    var child = {};
+    var myobj = {};
+
+    fact.financialStatementLine.children.map((data) => {
+      data.financialStatementFact.map((myData) => {
+        Object.assign(child, {
+          [myData.fiscalYear + " " + myData.quarter]: myData.amount,
+          particular: data.name,
+        });
+      });
+    });
+
+    fact.financialStatementLine.financialStatementFact.length > 0
+      ? fact.financialStatementLine.financialStatementFact.map((data) => {
+          Object.assign(myobj, {
+            particular: fact.financialStatementLine.name,
+            [data.fiscalYear + " " + data.quarter]: data.amount,
+            subRows:
+              fact.financialStatementLine.children.length > 0 ? [child] : [],
+          });
+        })
+      : Object.assign(myobj, {
+          particular: fact.financialStatementLine.name,
+          subRows:
+            fact.financialStatementLine.children.length > 0 ? [child] : [],
+        });
+
+    dataList.push({ ...myobj });
   });
 
   // Pass post data to the page via props
   return {
-    props: { company, financialStatement, data },
+    props: { company, financialStatement, data, dataList, columnsData },
     revalidate: 10, // In seconds};
   };
 }
@@ -169,133 +189,119 @@ export async function getStaticPaths() {
     });
   });
 
-  console.log(paths);
   return {
     paths: paths,
     fallback: false,
   };
 }
 
-function ProfitAndLoss({ company, financialStatement, data }) {
+function FinancialStatement({ company, dataList, columnsData }) {
   const router = useRouter();
-  const { slug, statementType, quarter } = router.query;
+  const { slug, type, quarter } = router.query;
   const [quarterValue, setQuarterValue] = useState(
     quarter ? quarter : "qtrToqtr"
   );
 
+  console.log(quarterValue);
+
   const quarterOptions = [
-    { id: "qtrToqtr", name: "Quarter To Quarter" },
     { id: "Q1", name: "Q1" },
     { id: "Q2", name: "Q2" },
     { id: "Q3", name: "Q3" },
-    { id: "Q4", name: "Year To Year (Q4)" },
+    { id: "Q4", name: "Q4" },
+    { id: "qtrToqtr", name: "Quarter To Quarter" },
   ];
+
+  useEffect(
+    (quarter) => {
+      /* It will prevent => if quarter is Q1 in balance sheet when i click on profit and loss
+     the value of quarter will also be Q1 */
+      setQuarterValue(quarterValue ? quarterValue : "qtrToqtr");
+    },
+    [quarter]
+  );
+
+  if (!company) {
+    return <Custom404 />;
+  }
+  const columns = [
+    {
+      id: "expander", // Make sure it has an ID
+      Header: "SN",
+
+      Cell: function OrderItems({ row }) {
+        // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
+        // to build the toggle for expanding a row
+
+        return row.canExpand ? (
+          <span
+            {...row.getToggleRowExpandedProps({
+              style: {
+                // We can even use the row.depth property
+                // and paddingLeft to indicate the depth
+                // of the row
+                backgroundColor: "red",
+                paddingLeft: `${row.depth * 2}rem`,
+              },
+            })}
+          >
+            {row.isExpanded ? (
+              <PlusIcon
+                width={15}
+                customClass="fill-current dark:text-gray-400 text-gray-200"
+              />
+            ) : (
+              <MinusIcon width={15} customClass="fill-current text-gray-400" />
+            )}
+          </span>
+        ) : null;
+      },
+    },
+    {
+      Header: "Particulars",
+      accessor: "particular",
+      className: "table-title",
+    },
+    ...columnsData,
+  ];
+  console.log(dataList);
   return (
     <>
       <FinancialsHeader
         statements={company.companyStatementDetails}
         slug={slug}
-        active={
-          statementType
-            ? statementType
-            : company.companyStatementDetails.balanceSheetId
-        }
+        active={type ? type : "balance-sheet"}
       />
 
-      <section className="xl:container mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 md:p-5 mb-3 rounded-b-lg">
-        <div className="mb-4 max-w-xs">
+      <section className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-b-lg">
+        <div className="mb-4 md:w-52">
           <FormSelect
             control="select"
             label="Quarter"
             name="quarter"
+            customClassName="rounded border border-gray-600"
             value={quarterValue}
             options={quarterOptions}
-            customClassName="rounded border border-gray-600"
             handleChange={(e) => {
               setQuarterValue(e.target.value);
               router.push({
                 pathname: `/company/${slug}/financial-statement/${
-                  statementType ? statementType : "balance-sheet"
+                  type ? type : "balance-sheet"
                 }/${e.target.value}`,
               });
             }}
           />
         </div>
-        <div className="overflow-x-auto scrollable">
-          <div className="flex w-full">
-            <div className="flex-1 p-2 bg-blue-100 dark:bg-blue-900 mb-1 py-3">
-              <h1>Statments</h1>
-            </div>
-            {/* <pre>{JSON.stringify(financialStatement, undefined, 2)}</pre> */}
-            {financialStatement.length > 0
-              ? financialStatement[1].financialStatementFact.map((fact) => (
-                  <div
-                    key={fact.id}
-                    className="flex-1 p-2 bg-blue-100 dark:bg-blue-900 mb-1 py-3"
-                  >
-                    {fact.fiscalYear}
-                    {"  "} {fact.quarter}
-                  </div>
-                ))
-              : null}
-          </div>
-
-          {financialStatement.map((fact) => (
-            <div
-              key={fact.id}
-              className="flex flex-col border-b border-gray-700 dark:hover:bg-gray-800 hover:bg-gray-100"
-            >
-              {/* <pre>{JSON.stringify(fact, undefined, 2)}</pre> */}
-              {fact.children.length > 0 ? (
-                <Accordion fact={fact} />
-              ) : (
-                <div className="flex">
-                  <div className="flex-1 p-2 mb-1">
-                    {fact.unit == "topic" ? (
-                      <h1 className="font-bold">{fact.name}</h1>
-                    ) : (
-                      <h1 className="inline-flex items-center">
-                        {fact.name}{" "}
-                        <span
-                          className="ml-3 relative"
-                          data-tip
-                          data-for="registerTip"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="12"
-                            height="12"
-                            fill="currentColor"
-                            className="bi bi-info-circle hover:block"
-                            viewBox="0 0 16 16"
-                          >
-                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
-                            <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z" />
-                          </svg>
-                        </span>
-                      </h1>
-                    )}
-                    <ReactTooltip id="registerTip" place="top" effect="solid">
-                      Tooltip for the register button
-                    </ReactTooltip>
-                  </div>
-                  {fact.financialStatementFact.length > 0 ? (
-                    fact.financialStatementFact.map((data) => (
-                      <div key={data.id} className="flex-1 p-2 mb-1 font-bold">
-                        {data.amount.toLocaleString()}
-                      </div>
-                    ))
-                  ) : fact.unit == "topic" ? null : (
-                    <div className="flex-1 p-2 mb-1">0</div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {dataList ? (
+          <MyTable columns={columns} data={dataList} />
+        ) : (
+          <h1 className="text-gray-900 dark:text-gray-50">
+            Data Not Available!
+          </h1>
+        )}
       </section>
     </>
   );
 }
 
-export default ProfitAndLoss;
+export default FinancialStatement;

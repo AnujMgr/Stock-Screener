@@ -2,15 +2,15 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
+  shadowDatabaseUrl    = env("SHADOW_DATABASE_URL")
   referentialIntegrity = "prisma"
-  
+
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
 }
 
@@ -129,20 +129,20 @@ model ActionStatementLine {
 }
 
 model ActionStatementLineSequence {
-  actionStatement        ActionStatement     @relation(fields: [actionStatementId], references: [id])
-  actionStatementId      Int
-  financialStatementLine ActionStatementLine @relation(fields: [actionStatementLineId], references: [id])
-  actionStatementLineId  Int
-  sequence               Float
+  actionStatement       ActionStatement     @relation(fields: [actionStatementId], references: [id])
+  actionStatementId     Int
+  actionStatementLine   ActionStatementLine @relation(fields: [actionStatementLineId], references: [id])
+  actionStatementLineId Int
+  sequence              Float
 
   @@id([actionStatementId, actionStatementLineId])
 }
 
 model ActionStatementFact {
-  id                     Int                 @id @default(autoincrement())
-  companyId              Int // relation scalar field  (used in the `@relation` attribute above)
-  financialStatementLine ActionStatementLine @relation(fields: [actionStatementLineId], references: [id])
-  actionStatementLineId  Int
-  bookCloseDate          String
-  amount                 Float
+  id                    Int                 @id @default(autoincrement())
+  companyId             Int // relation scalar field  (used in the `@relation` attribute above)
+  actionStatementLine   ActionStatementLine @relation(fields: [actionStatementLineId], references: [id])
+  actionStatementLineId Int
+  bookCloseDate         String
+  amount                String
 }

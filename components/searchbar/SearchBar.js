@@ -4,7 +4,6 @@ import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { useRouter } from "next/router";
 
 function SearchBar({
-  companies,
   bg,
   borderRad,
   width,
@@ -14,6 +13,7 @@ function SearchBar({
   border,
 }) {
   const [mounted, setMounted] = useState(false);
+  const [companies, setCompanies] = useState([]);
 
   const { theme } = useTheme();
   const router = useRouter();
@@ -34,6 +34,17 @@ function SearchBar({
     });
   };
 
+  const handleOnSearch = async (string) => {
+    console.log(string);
+    if (string.length > 2) {
+      const res = await fetch(
+        `${process.env.url}/api/companyByString?search=${string}`
+      );
+      const data = await res.json();
+      setCompanies(data);
+    }
+  };
+
   // const handleOnSearch = (string, results) => {
   //   // onSearch will have as the first callback parameter
   //   // the string searched and for the second the results.
@@ -43,13 +54,14 @@ function SearchBar({
   return (
     // <div className="App">
     // <header className="App-header">
-    <div className={`${width}`}>
+    <div className={` ${width}`}>
       <ReactSearchAutocomplete
         items={companies}
-        // onSearch={handleOnSearch}
+        inputDebounce={500}
+        onSearch={handleOnSearch}
         // onHover={handleOnHover}
         onSelect={handleOnSelect}
-        fuseOptions={{ keys: ["name", "symbol"] }}
+        fuseOptions={{ keys: ["name", "symbol"], minMatchCharLength: 3 }}
         resultStringKeyName="name"
         // onFocus={handleOnFocus}
         borderColor="red"
@@ -71,8 +83,6 @@ function SearchBar({
         }}
       />
     </div>
-    // </header>
-    // </div>
   );
 }
 

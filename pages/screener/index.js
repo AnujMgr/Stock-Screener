@@ -146,7 +146,7 @@ export default function Screener({
   const { industry, quarter } = router.query;
 
   const [industryOption, setIndustryOption] = useState(
-    industry ? industry : "0"
+    industry ? industry : "commercial-banks"
   );
   const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "0");
   const [fiscalYearOption, setFiscalYearOption] = useState("");
