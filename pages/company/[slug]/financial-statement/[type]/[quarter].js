@@ -5,6 +5,7 @@ import FinancialsHeader from "../../../../../components/HeaderMenu/FinancialsHea
 import FormSelect from "../../../../../Form/FormSelect";
 import MyTable from "../../../../../components/FinancialsTable/MyTable";
 import { MinusIcon, PlusIcon } from "../../../../../lib/icons/Icons";
+import Custom404 from "../../../../404";
 
 export async function getStaticProps({ params }) {
   const financialStatement = [];
@@ -213,14 +214,11 @@ function FinancialStatement({ company, dataList, columnsData }) {
     { id: "qtrToqtr", name: "Quarter To Quarter" },
   ];
 
-  useEffect(
-    (quarter) => {
-      /* It will prevent => if quarter is Q1 in balance sheet when i click on profit and loss
+  useEffect(() => {
+    /* It will prevent => if quarter is Q1 in balance sheet when i click on profit and loss
      the value of quarter will also be Q1 */
-      setQuarterValue(quarterValue ? quarterValue : "qtrToqtr");
-    },
-    [quarter, quarterValue]
-  );
+    setQuarterValue(quarterValue ? quarterValue : "qtrToqtr");
+  }, [quarter, quarterValue]);
 
   if (!company) {
     return <Custom404 />;
