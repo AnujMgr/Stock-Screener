@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import FinancialsHeader from "../../../../../components/HeaderMenu/FinancialsHeader";
 import FormSelect from "../../../../../Form/FormSelect";
 import MyTable from "../../../../../components/FinancialsTable/MyTable";
+import { MinusIcon, PlusIcon } from "../../../../../lib/icons/Icons";
 
 export async function getStaticProps({ params }) {
   const financialStatement = [];
@@ -218,7 +219,7 @@ function FinancialStatement({ company, dataList, columnsData }) {
      the value of quarter will also be Q1 */
       setQuarterValue(quarterValue ? quarterValue : "qtrToqtr");
     },
-    [quarter]
+    [quarter, quarterValue]
   );
 
   if (!company) {

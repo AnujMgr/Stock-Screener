@@ -4,15 +4,17 @@ import Toggle from "../toggle";
 import SearchBar from "../searchbar";
 import { BsSearch, BsX } from "react-icons/bs";
 import { useTheme } from "next-themes";
-import { useAppContext } from "../../lib/contexts/State";
+import { useRouter } from "next/router";
 
 function Navbar({ showSearch }) {
   const [hidden, setHidden] = useState(true);
   const [isOpen, setOpen] = useState(true);
   const { theme } = useTheme();
+  const router = useRouter();
+
   return (
     <>
-      <div className="hidden lg:block shadow-sm bg-white dark:bg-gray-700 border-b border-fuchsia-100 border-gray-100 dark:border-gray-600">
+      <div className="hidden lg:block shadow-sm bg-white dark:bg-gray-700 border-fuchsia-100 border-gray-100 dark:border-gray-600">
         <div className="xl:container mx-auto flex items-center px-4">
           <h1 className="text-2xl text-primary dark:text-white lg:mr-6">
             <Link href="/">Analytics</Link>
@@ -32,20 +34,28 @@ function Navbar({ showSearch }) {
               </div>
 
               <div className="flex-1 text-right">
-                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div
+                  className={`p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center
+                  ${router.asPath === "/" ? "border-indigo-700" : ""}
+                `}
+                >
                   <Link className="" href="/">
                     Home
                   </Link>
                 </div>
-                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div
+                  className={`p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center 
+                ${router.asPath === "/screener" ? "border-indigo-700" : ""}
+                `}
+                >
                   <Link href={`/screener`}>Screener</Link>
                 </div>
-                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link className="" href="/">
                     Listing
                   </Link>
                 </div>
-                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link href="/">Market</Link>
                 </div>
               </div>
@@ -53,7 +63,7 @@ function Navbar({ showSearch }) {
           </div>
           {/* Right Nav Items */}
           <div className="flex items-center">
-            <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-50 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+            <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
               <Link href="/login">Login</Link>
             </div>
             <Toggle />
