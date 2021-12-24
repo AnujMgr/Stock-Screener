@@ -2,6 +2,7 @@ import { useTheme } from "next-themes";
 import React, { useEffect, useState } from "react";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { useRouter } from "next/router";
+import axios from "axios";
 
 function SearchBar({
   bg,
@@ -14,7 +15,6 @@ function SearchBar({
 }) {
   const [mounted, setMounted] = useState(false);
   const [companies, setCompanies] = useState([]);
-  const [searchString, setSearchString] = useState("");
 
   const { theme } = useTheme();
   const router = useRouter();
@@ -37,15 +37,16 @@ function SearchBar({
 
   const handleOnSearch = async (string) => {
     if (string.length > 2) {
-      const res = await fetch(
-        `${process.env.url}/api/companyByString?search=${string}`,
-        {
-          method: "GET",
-          headers: { "Content-type": "application/json;charset=UTF-8" },
-        }
-      );
-      const data = await res.json();
-      setCompanies(data);
+      await axios
+        .get(`/api/companyByString?search=${string}`)
+        .then(function (response) {
+          console.log(response.data);
+          setCompanies(response.data);
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error);
+        });
     }
   };
 

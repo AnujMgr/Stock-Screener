@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Link from "next/link";
-import { useTheme } from "next-themes";
 import { ToastContainer, toast } from "react-toast";
 import { useAuth } from "../../lib/contexts/AuthContext";
 import { useRouter } from "next/router";
@@ -8,7 +7,6 @@ import Cookies from "js-cookie";
 import { Field, Formik } from "formik";
 import PasswordField from "../../Form/PasswordField";
 import * as Yup from "yup";
-import UserProfile from "../../components/navbar/UserProfile";
 
 const Schema = Yup.object().shape({
   email: Yup.string().required("This field is required"),
