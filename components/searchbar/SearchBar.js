@@ -38,7 +38,11 @@ function SearchBar({
   const handleOnSearch = async (string) => {
     if (string.length > 2) {
       const res = await fetch(
-        `${process.env.url}/api/companyByString?search=${string}`
+        `${process.env.url}/api/companyByString?search=${string}`,
+        {
+          method: "GET",
+          headers: { "Content-type": "application/json;charset=UTF-8" },
+        }
       );
       const data = await res.json();
       setCompanies(data);
