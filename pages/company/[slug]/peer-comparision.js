@@ -5,9 +5,8 @@ import FormSelect from "../../../Form/FormSelect";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 import Custom404 from "../../404";
-import { useAppContext } from "../../../lib/contexts/State";
 import MyTable from "../../../components/FinancialsTable/MyTable";
-import { MinusIcon, PlusIcon } from "../../../lib/icons/Icons";
+import { MinusIcon, PlusIcon } from "../../../utils/icons";
 
 export async function getServerSideProps({ query }) {
   // Company is Required to get company statement details

@@ -2,6 +2,7 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import MicroChart from "../components/charts/MicroChart";
 import SearchBar from "../components/searchbar";
+import Link from "next/link";
 
 export default function Home() {
   const { theme } = useTheme();
@@ -24,6 +25,7 @@ export default function Home() {
             If the image has no dimensions or intrinsic ratio, rule 4 applies,
             and we use the background area&apos;s dimension.
           </p>
+
           <div className="flex justify-center mt-6 w-full">
             <SearchBar
               bg={theme === "light" ? "#F3F4F6" : "#2d3748"}
@@ -36,9 +38,11 @@ export default function Home() {
           </div>
           <div className="xl:container mx-auto flex items-center flex-wrap text-center justify-center gap-3 mt-4 px-4">
             <h1 className="text-white ">Trending Stocks:</h1>
-            <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out whitespace-no-wrap">
-              Nabil Bank
-            </button>
+            <Link className="" href="/">
+              <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out whitespace-no-wrap">
+                Nabil Bank
+              </button>
+            </Link>
             <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
               Laxmi Bank
             </button>

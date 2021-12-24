@@ -1,4 +1,3 @@
-import { ThemeProvider } from "next-themes";
 import Router from "next/router";
 import NProgress from "nprogress"; //nprogress module
 
@@ -8,10 +7,12 @@ import "../styles/rsuite-table.css";
 
 import { useApollo } from "../lib/apollo/apolloClient";
 import { ApolloProvider } from "@apollo/client";
-import { AppWrapper } from "../lib/contexts/State";
 import { useRouter } from "next/router";
 import SecondaryLayout from "../components/layout/SecondaryLayout";
 import Layout from "../components/layout";
+import RouteGuard from "../lib/RouteGuard/RouteGuard";
+import { AuthProvider } from "../lib/contexts/AuthContext";
+import { appRoutes } from "../utils/Constants";
 
 Router.events.on("routeChangeStart", () => NProgress.start());
 Router.events.on("routeChangeComplete", () => NProgress.done());
@@ -21,18 +22,31 @@ NProgress.configure({ showSpinner: false });
 function MyApp({ Component, pageProps }) {
   const client = useApollo(pageProps.initialApolloState);
   const router = useRouter();
+
+  let unprotectedRoutes = [
+    appRoutes.LOGIN_PAGE,
+    appRoutes.REGISTER_PAGE,
+    // appRoutes.HOME_PAGE,
+  ];
+  let pathIsProtected = unprotectedRoutes.indexOf(router.pathname) === -1;
+  /**
+   * @var pathIsProtected Checks if path exists in the unprotectedRoutes routes array
+   */
+
   const getLayout =
     Component.getLayout ||
     ((page) => (
-      <ApolloProvider client={client}>
-        <ThemeProvider attribute="class">
-          {router.pathname.startsWith("/company/") ? (
+      <AuthProvider>
+        <RouteGuard router={router} pathIsProtected={pathIsProtected}>
+          {!pathIsProtected ? (
+            <Layout>{page}</Layout>
+          ) : router.pathname.startsWith("/company/") ? (
             <SecondaryLayout>{page}</SecondaryLayout>
           ) : (
             <Layout>{page}</Layout>
           )}
-        </ThemeProvider>
-      </ApolloProvider>
+        </RouteGuard>
+      </AuthProvider>
     ));
 
   return getLayout(<Component {...pageProps} />);

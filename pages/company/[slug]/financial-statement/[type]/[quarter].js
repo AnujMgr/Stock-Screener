@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import FinancialsHeader from "../../../../../components/HeaderMenu/FinancialsHeader";
 import FormSelect from "../../../../../Form/FormSelect";
 import MyTable from "../../../../../components/FinancialsTable/MyTable";
-import { MinusIcon, PlusIcon } from "../../../../../lib/icons/Icons";
+import { MinusIcon, PlusIcon } from "../../../../../utils/icons";
 import Custom404 from "../../../../404";
 
 export async function getStaticProps({ params }) {

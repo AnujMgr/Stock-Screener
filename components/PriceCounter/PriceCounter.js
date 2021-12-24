@@ -1,5 +1,6 @@
 import React from "react";
-import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
+import { CaretDownIcon, CaretUpIcon } from "../../utils/icons";
+// import { BsFillCaretDownFill, BsFillCaretUpFill } from "react-icons/bs";
 
 export default function PriceCounter({ isRising, amount, rate }) {
   return (
@@ -9,10 +10,15 @@ export default function PriceCounter({ isRising, amount, rate }) {
           <p className="text-green-500  mr-2">
             + {amount} (+ {rate} %)
           </p>
-          <BsFillCaretUpFill
+          <CaretUpIcon
+            height={24}
+            width={24}
+            customClass={"animate-ping-1 fill-current text-green-500"}
+          />
+          {/* <BsFillCaretUpFill
             className="animate-ping-1 fill-current text-green-500"
             size="20"
-          />
+          /> */}
         </div>
       ) : (
         <div className="flex">
@@ -20,11 +26,17 @@ export default function PriceCounter({ isRising, amount, rate }) {
             {" "}
             {amount} ({rate} %)
           </p>
-          <BsFillCaretDownFill
+          <CaretDownIcon
+            height={24}
+            width={24}
+            customClass={"animate-ping-1 fill-current text-green-500"}
+          />
+
+          {/* <BsFillCaretDownFill
             className="animate-ping-1"
             color="red"
             size="20"
-          />
+          /> */}
         </div>
       )}
     </>

@@ -14,6 +14,7 @@ function SearchBar({
 }) {
   const [mounted, setMounted] = useState(false);
   const [companies, setCompanies] = useState([]);
+  const [searchString, setSearchString] = useState("");
 
   const { theme } = useTheme();
   const router = useRouter();
@@ -35,7 +36,6 @@ function SearchBar({
   };
 
   const handleOnSearch = async (string) => {
-    console.log(string);
     if (string.length > 2) {
       const res = await fetch(
         `${process.env.url}/api/companyByString?search=${string}`
@@ -57,7 +57,7 @@ function SearchBar({
     <div className={` ${width}`}>
       <ReactSearchAutocomplete
         items={companies}
-        inputDebounce={500}
+        inputDebounce={1000}
         onSearch={handleOnSearch}
         // onHover={handleOnHover}
         onSelect={handleOnSelect}

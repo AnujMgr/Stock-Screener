@@ -1,6 +1,6 @@
 import React from "react";
 import { useTable, useSortBy } from "react-table";
-import { SortDown, SortUp } from "../../lib/icons/Icons";
+import { SortDown, SortUp } from "../../utils/icons";
 
 function SortableTable({ data, columns, showCheck }) {
   const {

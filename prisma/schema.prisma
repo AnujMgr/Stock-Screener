@@ -146,3 +146,80 @@ model ActionStatementFact {
   bookCloseDate         String
   amount                String
 }
+
+
+model User {
+  id             Int               @id @default(autoincrement())
+  name           String            @db.VarChar(50)
+  phoneNumber    String            @unique
+  email          String            @unique
+  password       String
+  profile        Profile?          @relation(fields: [profileId], references: [id]) // references `id` of `Profile`
+  profileId      Int?              @unique
+  subscription   UserSubscription? @relation(fields: [subscriptionId], references: [id]) // references `id` of `Profile`
+  subscriptionId Int?              @unique
+  role           Role?             @relation(fields: [roleId], references: [id]) // references `id` of `Profile`
+  roleId        Int?
+}
+
+model Role {
+  id             Int               @id @default(autoincrement())
+  name           String
+  user           User?
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  avtar     String
+  FirstName String   @db.VarChar(25)
+  LastName  String   @db.VarChar(25)
+  birthDate  DateTime
+  Address    String
+  createdAt DateTime @default(now())
+  status    Boolean  @default(true)
+  user      User?
+}
+
+model UserSubscription {
+  id                 Int               @id @default(autoincrement())
+  userId             Int
+  startAt            DateTime
+  expireAt           DateTime
+  subscriptionPlan   SubscriptionPlan? @relation(fields: [subscriptionPlanId], references: [id]) // references `id` of `Profile`
+  subscriptionPlanId Int               @unique
+  user               User?
+  invoice            Invoice?
+}
+
+model SubscriptionPlan {
+  id             Int               @id @default(autoincrement())
+  slug           String            @unique
+  title          String
+  description    String
+  price          Float
+  validityInDays Int
+  isActive       Boolean
+  subscription   UserSubscription?
+}
+
+model Invoice {
+  id                  Int               @id @default(autoincrement())
+  customerInvoiceData String
+  description         String
+  amount              Float
+  invoiceCreatedAt    DateTime          @default(now())
+  subscription        UserSubscription? @relation(fields: [subscriptionId], references: [id]) // references `id` of `Profile`
+  subscriptionId      Int?              @unique
+}
+
+model Offer {
+  id                 Int      @id @default(autoincrement())
+  offerName          String
+  startAt            DateTime
+  endAt              DateTime
+  discountAmount     Float
+  discountPercentage Decimal
+  durationMonths     Int
+  durationEndDate    DateTime
+}

@@ -4,7 +4,7 @@ import ReactTooltip from "react-tooltip";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
 import PriceCounter from "../../components/PriceCounter/PriceCounter";
 import SortableTable from "../../components/SortableTable";
-import { InfoIcon } from "../../lib/icons/Icons";
+import { InfoIcon } from "../../utils/icons";
 import prisma from "../../prisma/client";
 import Custom404 from "../404";
 import Spinner from "../../components/Spinner";
@@ -452,7 +452,7 @@ export function Company({
 
           <a
             href="#"
-            className="text-center py-2 px-3 mt-4 w-96 border border-blue-400 dark:border-white mx-auto rounded-md shadow-sm"
+            className="text-center py-2 px-3 mt-4 w-96 border hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white border-indigo-800 dark:border-gray-300 mx-auto rounded-md shadow-sm transition duration-500 ease-in-out"
           >
             View Full Chart
           </a>
@@ -463,7 +463,7 @@ export function Company({
         <div className="grid grid-cols-1 ">
           <div className=" gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0 text-gray-900 dark:text-gray-50">
             {/* <div className="col-span-3 md:col-span-3 gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0"> */}
-            <h2 className="font-bold text-xl mb-4">Company Essentials</h2>
+            <h2 className="font-bold text-xl mb-4">Key Metrics</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {!Array.isArray(essentials) || !essentials.length ? (
                 <h1>Data Not Available !!</h1>

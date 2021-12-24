@@ -2,15 +2,30 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Toggle from "../toggle";
 import SearchBar from "../searchbar";
-import { BsSearch, BsX } from "react-icons/bs";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
+import { CloseIcon, HamburgerIcon, SearchIcon } from "../../utils/icons";
+import { useAuth } from "../../lib/contexts/AuthContext";
+import UserProfile from "./UserProfile";
 
 function Navbar({ showSearch }) {
   const [hidden, setHidden] = useState(true);
   const [isOpen, setOpen] = useState(true);
   const { theme } = useTheme();
   const router = useRouter();
+  const [state, dispatch] = useAuth();
+  const { user } = state;
+
+  const logOut = () => {
+    fetch("/api/signOut", {
+      method: "POST",
+      credentials: "include",
+    }).then(() => {
+      dispatch({
+        type: "removeAuthDetails",
+      });
+    });
+  };
 
   return (
     <>
@@ -35,8 +50,12 @@ function Navbar({ showSearch }) {
 
               <div className="flex-1 text-right">
                 <div
-                  className={`p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center
-                  ${router.asPath === "/" ? "border-indigo-700" : ""}
+                  className={`p-4 dark:text-white text-gray-900 dark:hover:border-gray-300 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center
+                  ${
+                    router.asPath === "/"
+                      ? "border-indigo-700 dark:border-gray-300"
+                      : ""
+                  }
                 `}
                 >
                   <Link className="" href="/">
@@ -44,28 +63,36 @@ function Navbar({ showSearch }) {
                   </Link>
                 </div>
                 <div
-                  className={`p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center 
-                ${router.asPath === "/screener" ? "border-indigo-700" : ""}
+                  className={`p-4 dark:text-white text-gray-900 dark:hover:border-gray-300 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center 
+                ${
+                  router.pathname.startsWith("/screener")
+                    ? "border-indigo-700 dark:border-gray-300"
+                    : ""
+                }
                 `}
                 >
                   <Link href={`/screener`}>Screener</Link>
                 </div>
-                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-300  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link className="" href="/">
                     Listing
                   </Link>
                 </div>
-                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
                   <Link href="/">Market</Link>
                 </div>
               </div>
             </div>
           </div>
           {/* Right Nav Items */}
-          <div className="flex items-center">
-            <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700  transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
-              <Link href="/login">Login</Link>
-            </div>
+          <div className="flex items-center gap-4">
+            {user && Object.keys(user).length !== 0 ? (
+              <UserProfile user={user} logOut={logOut} />
+            ) : (
+              <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <Link href="/login">Login</Link>
+              </div>
+            )}
             <Toggle />
           </div>
         </div>
@@ -84,33 +111,33 @@ function Navbar({ showSearch }) {
           <div className="flex items-center gap-2 my-2">
             {hidden ? (
               <button className="p-2 rounded" onClick={(e) => setHidden(false)}>
-                <BsSearch className="h-5 w-5" />
+                <SearchIcon
+                  height={20}
+                  width={20}
+                  customClass={"fill-current text-black dark:text-white"}
+                />
               </button>
             ) : (
               <button className="rounded" onClick={(e) => setHidden(true)}>
-                <BsX className="h-8 w-8 text-md" />
+                <CloseIcon
+                  height={24}
+                  width={24}
+                  customClass={"fill-current text-black dark:text-white"}
+                />
               </button>
             )}
             <Toggle />
 
             <button
               onClick={(e) => setOpen(!open)}
-              className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-600 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-500
+              className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-900
               transition duration-500 ease-in-out "
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="currentColor"
-                className="h-5 w-5 "
-                viewBox="0 0 16 16"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
-                />
-              </svg>
+              <HamburgerIcon
+                height={24}
+                width={24}
+                customClass={"fill-current text-white dark:text-white"}
+              />
             </button>
           </div>
         </div>
@@ -135,32 +162,24 @@ function Navbar({ showSearch }) {
         }`}
       >
         <div className="xl:container mx-auto flex justify-between items-center px-4 border-b border-gray-300 dark:border-gray-500 ">
-          <h1 className="text-2xl dark:text-white text-gray-900">
+          <h1 className="text-2xl dark:text-white text-gray-900 my-3">
             <Link href={"/"} as={"/"}>
               Analytics
             </Link>
           </h1>
-          <div className="flex items-center gap-2 my-2">
+          {/* <div className="flex items-center gap-2 my-2">
             <button
               onClick={(e) => setOpen(!isOpen)}
-              className="p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-600 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-500
+              className="p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-900 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-700
               transition duration-500 ease-in-out "
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="currentColor"
-                className="h-5 w-5 "
-                viewBox="0 0 16 16"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
-                />
-              </svg>
+              <HamburgerIcon
+                height={24}
+                width={24}
+                customClass={"fill-current text-white dark:text-white"}
+              />
             </button>
-          </div>
+          </div> */}
         </div>
         <div className="flex flex-col ">
           <div className="p-4 dark:text-white text-gray-900  flex-grow-0 inline-flex items-center ">

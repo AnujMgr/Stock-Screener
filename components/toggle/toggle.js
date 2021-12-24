@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { MoonIcon, SunIcon } from "../../lib/icons/Icons";
+import { MoonIcon, SunIcon } from "../../utils/icons";
 
 export const Toggle = () => {
   const { theme, setTheme } = useTheme();
@@ -14,17 +14,17 @@ export const Toggle = () => {
   return (
     <div>
       <button
-        className="p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-600 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-500
+        className="p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-900
         transition duration-500 ease-in-out "
         aria-label="Toggle Dark Mode"
         type="button"
         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
       >
         {theme === "light" ? (
-          <MoonIcon height="20" width="20" color="#fff" />
+          <MoonIcon height="24" width="24" color="#fff" />
         ) : (
           // <MoonIcon height="16" width="16" color="#fff" />
-          <SunIcon height="20" width="20" color="#fff" />
+          <SunIcon height="24" width="24" color="#fff" />
         )}
       </button>
     </div>
