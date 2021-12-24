@@ -15,8 +15,8 @@ function UserProfile({ user, logOut }) {
     return () => window.removeEventListener("click", handler);
   }, []);
 
-  const myLoader = ({ src }) => {
-    return `https://picsum.photos/200/200`;
+  const myLoader = ({ src, width, quality }) => {
+    return `https://picsum.photos/200/200?w=${width}&q=${quality || 75}`;
   };
 
   return (
