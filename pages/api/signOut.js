@@ -1,5 +1,5 @@
 import cookie from "cookie";
-export default (req, res) => {
+export default function signout(req, res) {
   if (req.method === "POST") {
     //deletes refresh token
     res.setHeader(
@@ -12,4 +12,4 @@ export default (req, res) => {
     );
     res.status(200).send();
   }
-};
+}

@@ -114,7 +114,7 @@ const Login = () => {
 
                       {touched.email && errors.email && (
                         <span className="error text-red-700 text-sm">
-                          {errors.email}{" "}
+                          {errors.email}
                         </span>
                       )}
                     </div>
@@ -131,7 +131,7 @@ const Login = () => {
                       />
                       {touched.password && errors.password && (
                         <span className="error text-red-700 text-sm">
-                          {errors.password}{" "}
+                          {errors.password}
                         </span>
                       )}
                     </div>
@@ -147,7 +147,7 @@ const Login = () => {
                           }`}
                           disabled={isSubmitting}
                         >
-                          Login{" "}
+                          Login
                         </button>
                       </div>
 
@@ -167,14 +167,14 @@ const Login = () => {
                           }`}
                           disabled={isSubmitting}
                         >
-                          Demo Login{" "}
+                          Demo Login
                         </button>
                       </div>
 
                       <div className="mt-4">
                         <div className="flex justify-center">
                           <span className="pr-2 text-gray-500">
-                            Don't Have Account?
+                            Don&apos;t Have Account?
                           </span>
                           <h1
                             className="hover:text-indigo-900 text-blue-800 font-bold transition duration-500 ease-in-out"

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LogoutIcon, ProfileIcon } from "../../utils/icons";
+import Image from "next/image";
 
 function UserProfile({ user, logOut }) {
   const [open, setOpen] = useState(false);
@@ -20,10 +21,12 @@ function UserProfile({ user, logOut }) {
         className="flex items-center cursor-pointer gap-3"
         onClick={(e) => setOpen(!open)}
       >
-        <img
+        <Image
           className="h-10 w-10 rounded-full border-2 border-gradient-to-r from-red-500 via-purple-500 to-pink-500 shadow-md"
           src="https://picsum.photos/200/200"
+          alt="Profile Picture"
         />
+        {/* <img className="h-10 w-10 rounded-full border-2 border-gradient-to-r from-red-500 via-purple-500 to-pink-500 shadow-md" /> */}
       </div>
       {open ? (
         <div className="z-50 absolute top-12 right-0 border-t border-gray-200 bg-white dark:bg-gray-800 w-60 py-2 shadow-lg">

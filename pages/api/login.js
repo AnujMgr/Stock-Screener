@@ -6,7 +6,7 @@ import {
   sendRefreshToken,
 } from "../../lib/functions/auth";
 
-export default async (req, res) => {
+export default async function login(req, res) {
   const { email, password } = req.body;
 
   const user = await prisma.user.findFirst({
@@ -87,4 +87,4 @@ export default async (req, res) => {
     }
     return resolve();
   });
-};
+}
