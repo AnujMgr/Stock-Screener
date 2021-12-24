@@ -15,6 +15,10 @@ function UserProfile({ user, logOut }) {
     return () => window.removeEventListener("click", handler);
   }, []);
 
+  const myLoader = ({ src }) => {
+    return `https://picsum.photos/200/200`;
+  };
+
   return (
     <div ref={ref} className="relative ">
       <div
@@ -22,8 +26,12 @@ function UserProfile({ user, logOut }) {
         onClick={(e) => setOpen(!open)}
       >
         <Image
-          className="h-10 w-10 rounded-full border-2 border-gradient-to-r from-red-500 via-purple-500 to-pink-500 shadow-md"
-          src="https://picsum.photos/200/200"
+          className="rounded-full border-2 border-white shadow-md"
+          // src="/200/200"
+          src={"/"}
+          loader={myLoader}
+          width={50}
+          height={50}
           alt="Profile Picture"
         />
         {/* <img className="h-10 w-10 rounded-full border-2 border-gradient-to-r from-red-500 via-purple-500 to-pink-500 shadow-md" /> */}
