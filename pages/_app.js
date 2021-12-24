@@ -12,7 +12,7 @@ import SecondaryLayout from "../components/layout/SecondaryLayout";
 import Layout from "../components/layout";
 import RouteGuard from "../lib/RouteGuard/RouteGuard";
 import { AuthProvider } from "../lib/contexts/AuthContext";
-import { appRoutes } from "../utils/Constants";
+import { appRoutes } from "../utils/constants";
 
 Router.events.on("routeChangeStart", () => NProgress.start());
 Router.events.on("routeChangeComplete", () => NProgress.done());

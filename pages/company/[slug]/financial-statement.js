@@ -6,7 +6,7 @@ import prisma from "../../../prisma/client";
 import FormSelect from "../../../Form/FormSelect";
 import Custom404 from "../../404";
 import MyTable from "../../../components/FinancialsTable/MyTable";
-import { PlusIcon, MinusIcon } from "../../../lib/icons/Icons";
+import { PlusIcon, MinusIcon } from "../../../utils/icons";
 
 export async function getServerSideProps({ params }) {
   const financialStatement = [];
