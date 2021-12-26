@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { Field, Formik } from "formik";
 import PasswordField from "../../Form/PasswordField";
 import * as Yup from "yup";
+import axios from "axios";
 
 const Schema = Yup.object().shape({
   email: Yup.string().required("This field is required"),
@@ -27,34 +28,45 @@ const Login = () => {
 
     // Call an external API endpoint to get posts.
     // You can use any data fetching library
-    const loginApi = await fetch(`/api/login`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }).catch((error) => {
-      console.log("Caught Error");
-      console.error("Error:", error);
-    });
-    let result = await loginApi.json();
-
-    if (result.user && result.accessToken) {
-      Cookies.set("token", result.accessToken);
-      dispatch({
-        type: "setAuthDetails",
-        payload: {
-          user: result.user,
-          accessToken: result.accessToken,
+    await axios
+      .post(`/api/login`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-      });
+        data,
+      })
+      .then((response) => {
+        const { user, accessToken } = response.data;
 
-      return router.push("/");
-    } else {
-      if (result.error) emailOrPasswordWrong(result.error);
-    }
+        if (user && accessToken) {
+          Cookies.set("token", accessToken);
+          dispatch({
+            type: "setAuthDetails",
+            payload: {
+              user: user,
+              accessToken: accessToken,
+            },
+          });
+
+          return router.push("/");
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          console.log(error.response);
+          emailOrPasswordWrong(error.response.data.error);
+        } else if (error.request) {
+          console.log("network error");
+          emailOrPasswordWrong("Network Error !!");
+        } else {
+          console.log("Something went wrong!!");
+        }
+      });
   }
+  // console.log(error.response));
+  // let result = await loginApi.json();
 
   const CustomInputComponent = ({ field, form, ...props }) => {
     return (

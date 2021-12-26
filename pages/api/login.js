@@ -7,7 +7,10 @@ import {
 } from "../../lib/functions/auth";
 
 export default async function login(req, res) {
-  const { email, password } = req.body;
+  const { email, password } = req.body.data;
+
+  console.log(email);
+  console.log(req);
 
   const user = await prisma.user.findFirst({
     where: {
