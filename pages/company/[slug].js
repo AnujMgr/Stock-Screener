@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactTooltip from "react-tooltip";
 import { PriceChart, StockHoldingChart } from "../../components/charts";
 import PriceCounter from "../../components/PriceCounter/PriceCounter";
@@ -9,6 +9,8 @@ import prisma from "../../prisma/client";
 import Custom404 from "../404";
 import Spinner from "../../components/Spinner";
 import MyTable from "../../components/FinancialsTable/MyTable";
+import axios from "axios";
+import { useAuth } from "../../lib/contexts/AuthContext";
 
 export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -328,6 +330,7 @@ export function Company({
   actionDataList,
 }) {
   const router = useRouter();
+  // const [state] = useAuth();
 
   if (!company) {
     return <Custom404 />;
@@ -360,6 +363,25 @@ export function Company({
 
     ...companyActionColumnData,
   ];
+
+  // useEffect(() => {
+  //   const data = {
+  //     companyId: company.id,
+  //   };
+
+  //   async function pageCounter() {
+  //     await axios
+  //       .post(`/api/pageViewCounter`, data, {
+  //         headers: {
+  //           Authorization: `Bearer ${state.accessToken}`,
+  //         },
+  //       })
+  //       .catch(function (error) {
+  //         console.log(error);
+  //       });
+  //   }
+  //   pageCounter();
+  // }, []);
 
   return (
     <>

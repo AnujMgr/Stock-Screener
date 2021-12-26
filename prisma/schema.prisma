@@ -223,3 +223,12 @@ model Offer {
   durationMonths     Int
   durationEndDate    DateTime
 }
+
+
+model TrendingStock {
+  id                 Int      @id @default(autoincrement())
+  companyId          Int @unique
+  views              Float
+  startedAt          DateTime
+  endAt              DateTime
+}

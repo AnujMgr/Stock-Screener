@@ -5,8 +5,6 @@ import "nprogress/nprogress.css"; //styles of nprogress
 import "../styles/index.css";
 import "../styles/rsuite-table.css";
 
-import { useApollo } from "../lib/apollo/apolloClient";
-import { ApolloProvider } from "@apollo/client";
 import { useRouter } from "next/router";
 import SecondaryLayout from "../components/layout/SecondaryLayout";
 import Layout from "../components/layout";
@@ -20,7 +18,6 @@ Router.events.on("routeChangeError", () => NProgress.done());
 NProgress.configure({ showSpinner: false });
 
 function MyApp({ Component, pageProps }) {
-  const client = useApollo(pageProps.initialApolloState);
   const router = useRouter();
 
   let unprotectedRoutes = [

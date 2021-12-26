@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toast";
 import { useAuth } from "../../lib/contexts/AuthContext";
@@ -31,7 +31,7 @@ const Login = () => {
       method: "POST",
       headers: {
         Accept: "application/json",
-        "Content-Type": "text/plain",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     }).catch((error) => {
@@ -67,6 +67,12 @@ const Login = () => {
   };
 
   const emailOrPasswordWrong = (text) => toast.error(text);
+
+  useEffect(() => {
+    if (state.accessToken && state.user) {
+      router.push("/");
+    }
+  }, [state]);
 
   return (
     <>
@@ -161,7 +167,7 @@ const Login = () => {
                           }
                           className={` text-white px-6 py-2 rounded-md shadow-lg transition duration-500 ease-in-out w-full ${
                             isSubmitting
-                              ? "bg-green-900 cursor-not-allowed"
+                              ? "bg-green-300 cursor-not-allowed"
                               : "bg-green-600 hover:bg-green-800"
                           }`}
                           disabled={isSubmitting}
