@@ -84,7 +84,7 @@ const Login = () => {
     if (state.accessToken && state.user) {
       router.push("/");
     }
-  }, [state]);
+  }, [state, router]);
 
   return (
     <>

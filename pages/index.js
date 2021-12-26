@@ -39,17 +39,21 @@ export default function Home() {
           <div className="xl:container mx-auto flex items-center flex-wrap text-center justify-center gap-3 mt-4 px-4">
             <h1 className="text-white ">Trending Stocks:</h1>
 
-            <Link href={`/company/nabil`} as={`/company/nabil`}>
+            <Link href={`/company/nabil`} as={`/company/nabil`} passHref>
               <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out whitespace-no-wrap">
                 Nabil Bank
               </button>
             </Link>
-            <Link href={`/company/laxmi`} as={`/company/laxmi`}>
+            <Link href={`/company/laxmi`} as={`/company/laxmi`} passHref>
               <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
                 Laxmi Bank
               </button>
             </Link>
-            <Link href={`/company/nepal-bank`} as={`/company/nepal-bank`}>
+            <Link
+              href={`/company/nepal-bank`}
+              as={`/company/nepal-bank`}
+              passHref
+            >
               <button className="p-2 bg-indigo-700 dark:bg-gray-800 rounded-sm text-white text-xs hover:bg-blue-500 dark:hover:bg-gray-600 transition duration-500 ease-in-out">
                 Nepal Bank
               </button>
