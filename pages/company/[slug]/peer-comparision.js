@@ -93,10 +93,10 @@ export async function getServerSideProps({ query }) {
             take: companies.length,
             orderBy: [
               {
-                quarter: "desc",
+                fiscalYear: "desc",
               },
               {
-                fiscalYear: "desc",
+                quarter: "desc",
               },
             ],
           },

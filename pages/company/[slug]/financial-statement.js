@@ -54,6 +54,14 @@ export async function getServerSideProps({ params }) {
                       companyId: company.id,
                     },
                 take: 5,
+                orderBy: [
+                  {
+                    fiscalYear: "desc",
+                  },
+                  {
+                    quarter: "desc",
+                  },
+                ],
               },
             },
           },
@@ -73,10 +81,10 @@ export async function getServerSideProps({ params }) {
             take: 5,
             orderBy: [
               {
-                quarter: "desc",
+                fiscalYear: "desc",
               },
               {
-                fiscalYear: "desc",
+                quarter: "desc",
               },
             ],
           },
