@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import FinancialsHeader from "../../../../../components/HeaderMenu/FinancialsHeader";
 import FormSelect from "../../../../../Form/FormSelect";
-import MyTable from "../../../../../components/FinancialsTable/MyTable";
+import FinancialTable from "../../../../../components/FinancialTable";
 import { MinusIcon, PlusIcon } from "../../../../../utils/icons";
 import Custom404 from "../../../../404";
 
@@ -300,7 +300,7 @@ function FinancialStatement({ company, dataList, columnsData }) {
           />
         </div>
         {dataList ? (
-          <MyTable columns={columns} data={dataList} />
+          <FinancialTable columns={columns} data={dataList} />
         ) : (
           <h1 className="text-gray-900 dark:text-gray-50">
             Data Not Available!

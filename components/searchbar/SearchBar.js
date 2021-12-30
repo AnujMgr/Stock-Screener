@@ -1,30 +1,41 @@
-import { useTheme } from "next-themes";
-import React, { useEffect, useState } from "react";
-import { ReactSearchAutocomplete } from "react-search-autocomplete";
-import { useRouter } from "next/router";
+import React, { useEffect, useRef, useState } from "react";
+import Downshift from "downshift";
 import axios from "axios";
+import { SearchIcon } from "../../utils/icons";
+import { useRouter } from "next/router";
+import { useDebounce, useDebouncedCallback } from "use-debounce";
 
-function SearchBar({
-  bg,
-  borderRad,
+export default function SearchBar({
+  showSymbol,
   width,
-  color,
-  placeholder,
-  height,
-  border,
+  borderRadiusTop,
+  borderRadiusBottom,
+  backgroundColor,
+  itemHoverBackground,
+  padding,
 }) {
-  const [mounted, setMounted] = useState(false);
-  const [companies, setCompanies] = useState([]);
-
-  const { theme } = useTheme();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const searchInputRef = useRef(null);
   const router = useRouter();
 
-  // const getCompaniesApi = `${process.env.url}/api/companies?search`;
-
-  // When mounted on client, now we can show the UI
-  useEffect(() => setMounted(true), []);
-
-  if (!mounted) return null;
+  const handleFetchRequest = async (string) => {
+    if (!string) return;
+    if (string.length > 3) {
+      await axios
+        .get(`/api/companyByString?search=${string}`, {
+          withCredentials: false,
+        })
+        .then((response) => {
+          setItems(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          // handle error
+          console.log(error);
+        });
+    }
+  };
 
   const handleOnSelect = (item) => {
     // the item selected
@@ -35,60 +46,143 @@ function SearchBar({
     });
   };
 
-  const handleOnSearch = async (string) => {
-    if (string.length > 2) {
-      await axios
-        .get(`/api/companyByString?search=${string}`)
-        .then(function (response) {
-          console.log(response.data);
-          setCompanies(response.data);
-        })
-        .catch(function (error) {
-          // handle error
-          console.log(error);
-        });
-    }
-  };
+  const debounced = useDebouncedCallback((value) => {
+    handleFetchRequest(value);
+  }, 1000);
 
-  // const handleOnSearch = (string, results) => {
-  //   // onSearch will have as the first callback parameter
-  //   // the string searched and for the second the results.
-  //   console.log(string, results);
-  // };
+  useEffect(() => {
+    searchInputRef.current.focus();
+  }, []);
 
   return (
-    // <div className="App">
-    // <header className="App-header">
-    <div className={` ${width}`}>
-      <ReactSearchAutocomplete
-        items={companies}
-        inputDebounce={1000}
-        onSearch={handleOnSearch}
-        // onHover={handleOnHover}
-        onSelect={handleOnSelect}
-        fuseOptions={{ keys: ["name", "symbol"], minMatchCharLength: 3 }}
-        resultStringKeyName="name"
-        // onFocus={handleOnFocus}
-        borderColor="red"
-        placeholder={
-          placeholder ? placeholder : "Type Company Name or Symbol..."
-        }
-        autoFocus
-        styling={{
-          height: height ? height : "38px",
-          backgroundColor: bg,
-          hoverBackgroundColor: theme === "light" ? "#E5E7EB" : "#1F2937",
-          color: color,
-          zIndex: 999,
-          boxShadow:
-            "0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)",
-          fontFamily: "Muli",
-          borderRadius: borderRad,
-          border: border ? border : "",
-        }}
-      />
-    </div>
+    <Downshift
+      onChange={(selection) =>
+        selection ? handleOnSelect(selection) : "Selection Cleared"
+      }
+      //   onInputValueChange={(value) => handleFetchRequest(value)}
+      itemToString={(item) => (item ? item.name : "")}
+    >
+      {({
+        getInputProps,
+        getItemProps,
+        getMenuProps,
+        isOpen,
+        inputValue,
+        getRootProps,
+      }) => (
+        <div
+          className={`relative ${width ? width : "w-11/12 sm:w-96 md:w-120"} `}
+        >
+          {/* <label {...getLabelProps()}>Enter a fruit</label> */}
+          <div
+            className={` 
+            ${borderRadiusTop ? borderRadiusTop : "rounded-t-3xl"}
+            ${borderRadiusBottom ? borderRadiusBottom : "rounded-b-3xl"}
+            ${backgroundColor ? backgroundColor : "bg-white dark:bg-gray-700"}
+            ${padding ? padding : "py-1"}
+            relative flex items-center px-5
+            `}
+            {...getRootProps({}, { suppressRefError: true })}
+          >
+            <SearchIcon
+              height={24}
+              width={24}
+              customClass={"fill-current text-gray-500"}
+            />
+            <input
+              className={`
+              ${backgroundColor ? backgroundColor : "bg-white dark:bg-gray-700"}
+                focus:outline-none py-2.5 px-2 w-full`}
+              {...getInputProps({
+                onChange: (e) => debounced(e.target.value),
+              })}
+              placeholder="Search for a Company.."
+              ref={searchInputRef}
+            />
+          </div>
+
+          {isOpen && inputValue ? ( // Avoid empty suggestion box on focus
+            inputValue.length !== 0 ? (
+              <div
+                className={`
+                ${borderRadiusBottom ? borderRadiusBottom : "rounded-b-3xl"}
+                ${
+                  backgroundColor
+                    ? backgroundColor
+                    : "bg-white dark:bg-gray-700"
+                }
+                ${showSymbol ? "pb-6" : "pb-1"}
+                  absolute top-8 w-full pt-4 z-max-1`}
+                {...getMenuProps()}
+              >
+                {inputValue.length < 4 ? (
+                  <div className="px-6 py-2 text-center">
+                    <p className="text-gray-400">
+                      Keep typing...Type some more characters.
+                    </p>
+                  </div>
+                ) : loading ? (
+                  <div className="px-6 py-2">Loading...</div>
+                ) : !loading && items.length === 0 ? (
+                  <div className="px-6 py-2">No matches for {inputValue}</div>
+                ) : (
+                  <>
+                    {showSymbol ? (
+                      <div className="px-6 flex justify-between">
+                        <h1 className="font-semibold">Stock</h1>
+                        <h1 className="font-semibold">Symbol</h1>
+                      </div>
+                    ) : null}
+                    {items
+                      .filter(
+                        (item) =>
+                          !inputValue ||
+                          item.name.toLowerCase().includes(inputValue) ||
+                          item.symbol.toLowerCase().includes(inputValue)
+                      )
+                      .map((item, index) => (
+                        <SearchItem
+                          item={item}
+                          showSymbol={showSymbol}
+                          itemHoverBackground={itemHoverBackground}
+                          getItemProps={getItemProps}
+                          index={index}
+                        />
+                      ))}
+                  </>
+                )}
+              </div>
+            ) : null
+          ) : null}
+        </div>
+      )}
+    </Downshift>
   );
 }
 
-export default SearchBar;
+function SearchItem({
+  item,
+  showSymbol,
+  itemHoverBackground,
+  getItemProps,
+  index,
+}) {
+  return (
+    <div
+      className={`${
+        itemHoverBackground
+          ? itemHoverBackground
+          : "hover:bg-gray-200 dark:hover:bg-gray-800"
+      } 
+      flex justify-between px-6 py-2 cursor-pointer transition ease-in-out delay-150`}
+      {...getItemProps({
+        key: item.id,
+        index,
+        item,
+      })}
+    >
+      <p>{item.name}</p>
+      {showSymbol ? <p>{item.symbol}</p> : null}
+    </div>
+  );
+}

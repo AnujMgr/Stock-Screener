@@ -27,14 +27,7 @@ export default function Home() {
           </p>
 
           <div className="flex justify-center mt-6 w-full">
-            <SearchBar
-              bg={theme === "light" ? "#F3F4F6" : "#2d3748"}
-              borderRad={"1.5em"}
-              width={"w-11/12 sm:w-96 md:w-120"}
-              placeholder={"Search for a Company..."}
-              color={theme === "light" ? "#000" : "#fff"}
-              height="50px"
-            />
+            <SearchBar showSymbol={true} />
           </div>
           <div className="xl:container mx-auto flex items-center flex-wrap text-center justify-center gap-3 mt-4 px-4">
             <h1 className="text-white ">Trending Stocks:</h1>

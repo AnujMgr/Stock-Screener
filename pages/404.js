@@ -16,10 +16,12 @@ export default function Custom404() {
       </h1>
       <div className="md:flex justify-center w-full">
         <SearchBar
-          bg={theme === "light" ? "#F3F4F6" : "#2d3748"}
-          borderRad={"10px"}
+          borderRadiusBottom={"rounded-b-md"}
+          borderRadiusTop={"rounded-t-md"}
+          backgroundColor={"bg-gray-300 dark:bg-gray-700"}
+          padding={"py-0"}
+          itemHoverBackground={"hover:bg-gray-300 dark:hover:bg-gray-700"}
           width={"w-full sm:w-3/4 md:w-96 mx-auto"}
-          color={theme === "light" ? "#000" : "#fff"}
         />
       </div>
       <div className="text-center mt-8">

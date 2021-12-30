@@ -8,9 +8,7 @@ import { InfoIcon } from "../../utils/icons";
 import prisma from "../../prisma/client";
 import Custom404 from "../404";
 import Spinner from "../../components/Spinner";
-import MyTable from "../../components/FinancialsTable/MyTable";
-import axios from "axios";
-import { useAuth } from "../../lib/contexts/AuthContext";
+import FinancialTable from "../../components/FinancialTable/FinancialTable";
 
 export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -364,25 +362,6 @@ export function Company({
     ...companyActionColumnData,
   ];
 
-  // useEffect(() => {
-  //   const data = {
-  //     companyId: company.id,
-  //   };
-
-  //   async function pageCounter() {
-  //     await axios
-  //       .post(`/api/pageViewCounter`, data, {
-  //         headers: {
-  //           Authorization: `Bearer ${state.accessToken}`,
-  //         },
-  //       })
-  //       .catch(function (error) {
-  //         console.log(error);
-  //       });
-  //   }
-  //   pageCounter();
-  // }, []);
-
   return (
     <>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
@@ -408,7 +387,7 @@ export function Company({
           <div className="mt-4 sm:mt-0">
             <p className="font-light text-gray-900 dark:text-gray-200">PRICE</p>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
-              Rs.{" "}
+              Rs.&nbsp;
               {!Array.isArray(priceHistory) || !priceHistory.length
                 ? "NaN"
                 : priceHistory[0].closingPrice.toLocaleString(undefined, {
@@ -425,13 +404,9 @@ export function Company({
                     priceHistory[0].closingPrice >
                     priceHistory[0].previousClosing
                   }
-                  amount={
-                    Number(priceHistory[0].closingPrice) -
-                    Number(priceHistory[0].previousClosing)
-                  }
+                  amount={Number(priceHistory[0].priceDifference)}
                   rate={(
-                    ((Number(priceHistory[0].closingPrice) -
-                      Number(priceHistory[0].previousClosing)) /
+                    (Number(priceHistory[0].priceDifference) /
                       Number(priceHistory[0].closingPrice)) *
                     100
                   ).toFixed(2)}
@@ -474,7 +449,7 @@ export function Company({
 
           <a
             href="#"
-            className="text-center py-2 px-3 mt-4 w-96 border hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white border-indigo-800 dark:border-gray-300 mx-auto rounded-md shadow-sm transition duration-500 ease-in-out"
+            className="text-center py-2 px-3 mt-4 w-full sm:w-96 border hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white border-indigo-800 dark:border-gray-300 mx-auto rounded-md shadow-sm transition duration-500 ease-in-out"
           >
             View Full Chart
           </a>
@@ -501,7 +476,7 @@ export function Company({
                       >
                         <InfoIcon
                           customClass={
-                            "fill-current dark:text-gray-700 text-blue-700"
+                            "fill-current text-blue-500 dark:text-green-500"
                           }
                           height={14}
                           width={14}
@@ -512,8 +487,8 @@ export function Company({
                       id="registerTip"
                       place="top"
                       effect="solid"
-                      backgroundColor="#374151"
-                      className="max-w-xs rounded-lg shadow-md"
+                      // backgroundColor="#374151"
+                      className="max-w-xs rounded-lg shadow-md bg-white"
                     >
                       Market capitalization is the aggregate valuation of the
                       company based on its current share price and the total
@@ -533,9 +508,6 @@ export function Company({
               )}
             </div>
           </div>
-          {/* <div className="bg-white dark:bg-gray-900 shadow p-3 rounded-lg col-span-3">
-            <PriceChart priceHistory={priceHistory} />
-          </div> */}
         </div>
       </section>
 
@@ -550,30 +522,8 @@ export function Company({
           <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
             Corporate Actions
           </h2>
-
-          {/* <div className="flex gap-2">
-            {companyActionData.map((data, i) => (
-              <button
-                key={data.id}
-                className={`px-4 ${active == i ? "border-b" : ""}`}
-                onClick={(e) => setActive(i)}
-              >
-                {data.name}
-              </button>
-            ))}
-          </div> */}
         </div>
-        <MyTable columns={actionsColumn} data={actionDataList} />
-
-        {/* <div className="">
-          {companyActionData.map((data, i) =>
-            active == i ? (
-              <div key={data.id}>
-                <h1>{data.name}</h1>
-              </div>
-            ) : null
-          )}
-        </div> */}
+        <FinancialTable columns={actionsColumn} data={actionDataList} />
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8">

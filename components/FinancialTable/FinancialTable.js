@@ -1,7 +1,7 @@
 import React from "react";
 import { useTable, useExpanded } from "react-table";
 
-function MyTable({ columns: userColumns, data }) {
+function FinancialTable({ columns: userColumns, data }) {
   const {
     getTableProps,
     getTableBodyProps,
@@ -59,6 +59,7 @@ function MyTable({ columns: userColumns, data }) {
                 >
                   {row.cells.map((cell) => {
                     const { key } = cell.getCellProps();
+                    console.log(row);
                     return (
                       <td
                         key={key}
@@ -82,4 +83,4 @@ function MyTable({ columns: userColumns, data }) {
   );
 }
 
-export default MyTable;
+export default FinancialTable;

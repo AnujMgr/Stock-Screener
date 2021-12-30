@@ -5,7 +5,7 @@ import FormSelect from "../../../Form/FormSelect";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/router";
 import Custom404 from "../../404";
-import MyTable from "../../../components/FinancialsTable/MyTable";
+import FinancialTable from "../../../components/FinancialTable";
 import { MinusIcon, PlusIcon } from "../../../utils/icons";
 
 export async function getServerSideProps({ query }) {
@@ -480,7 +480,7 @@ function FinancialStatement({
 
         <div className="grid">
           <div className="w-full overflow-hidden shadow-xs">
-            <MyTable data={dataList} columns={columns} />
+            <FinancialTable data={dataList} columns={columns} />
           </div>
         </div>
       </section>

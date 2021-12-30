@@ -7,7 +7,7 @@ export default function PriceCounter({ isRising, amount, rate }) {
     <>
       {isRising ? (
         <div className="flex">
-          <p className="text-green-500  mr-2">
+          <p className="text-green-500 mr-2">
             + {amount} (+ {rate} %)
           </p>
           <CaretUpIcon

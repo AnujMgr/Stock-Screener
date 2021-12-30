@@ -3,7 +3,6 @@ import NProgress from "nprogress"; //nprogress module
 
 import "nprogress/nprogress.css"; //styles of nprogress
 import "../styles/index.css";
-import "../styles/rsuite-table.css";
 
 import { useRouter } from "next/router";
 import SecondaryLayout from "../components/layout/SecondaryLayout";
