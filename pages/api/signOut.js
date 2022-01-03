@@ -1,14 +1,14 @@
-import cookie from "cookie";
+import cookie from 'cookie';
 export default function signout(req, res) {
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     //deletes refresh token
     res.setHeader(
-      "Set-Cookie",
-      cookie.serialize("refreshToken", "", {
+      'Set-Cookie',
+      cookie.serialize('refreshToken', '', {
         httpOnly: true,
         maxAge: 0,
-        path: "/",
-      })
+        path: '/',
+      }),
     );
     res.status(200).send();
   }

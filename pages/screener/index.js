@@ -1,20 +1,20 @@
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import SortableTable from "../../components/SortableTable";
-import FormSelect from "../../Form/FormSelect";
-import prisma from "../../prisma/client";
+import { useRouter } from 'next/router';
+import React, { useState } from 'react';
+import SortableTable from '../../components/SortableTable';
+import FormSelect from '../../Form/FormSelect';
+import prisma from '../../prisma/client';
 
 export async function getServerSideProps({ query }) {
   const screenerData = [];
   const columns = [
     {
-      Header: "Company",
-      accessor: "Company",
-      className: "table-title",
+      Header: 'Company',
+      accessor: 'Company',
+      className: 'table-title',
     },
     {
-      Header: "Price",
-      accessor: "Price",
+      Header: 'Price',
+      accessor: 'Price',
     },
   ];
   const dataList = [];
@@ -24,7 +24,7 @@ export async function getServerSideProps({ query }) {
 
   const currentIndustry = await prisma.industry.findFirst({
     where: {
-      slug: query.industryType ? query.industryType : "commercial-banks",
+      slug: query.industryType ? query.industryType : 'commercial-banks',
     },
   });
 
@@ -42,7 +42,7 @@ export async function getServerSideProps({ query }) {
       companyPrice: {
         take: 1,
         orderBy: {
-          date: "desc",
+          date: 'desc',
         },
       },
     },
@@ -62,15 +62,15 @@ export async function getServerSideProps({ query }) {
         include: {
           financialStatementFact: {
             where: {
-              quarter: query.quarter ? query.quarter : "",
-              fiscalYear: query.fiscalYear ? query.fiscalYear : "",
+              quarter: query.quarter ? query.quarter : '',
+              fiscalYear: query.fiscalYear ? query.fiscalYear : '',
             },
             orderBy: [
               {
-                quarter: "desc",
+                quarter: 'desc',
               },
               {
-                fiscalYear: "desc",
+                fiscalYear: 'desc',
               },
             ],
           },
@@ -78,7 +78,7 @@ export async function getServerSideProps({ query }) {
       },
     },
     orderBy: {
-      sequence: "asc",
+      sequence: 'asc',
     },
   });
 
@@ -90,7 +90,7 @@ export async function getServerSideProps({ query }) {
           companyId: fact.companyId,
           name: statement.financialStatementLine.name,
           amount: fact.amount,
-        })
+        }),
       );
     }
     columns.push({
@@ -105,16 +105,14 @@ export async function getServerSideProps({ query }) {
       companyId: companies[0].id,
     },
     orderBy: {
-      fiscalYear: "desc",
+      fiscalYear: 'desc',
     },
   });
 
   for (let i = 0; i < 5; i++) {
-    var firstYear = parseInt(
-      parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1
-    );
+    var firstYear = parseInt(parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1);
     var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
-    fiscalYearList.push(parseInt(firstYear - i) + "/" + parseInt(lastYear - i));
+    fiscalYearList.push(parseInt(firstYear - i) + '/' + parseInt(lastYear - i));
   }
 
   companies.map((company, i) => {
@@ -127,8 +125,8 @@ export async function getServerSideProps({ query }) {
       }
     });
 
-    Object.assign(myobj, { ["Company"]: company.name });
-    Object.assign(myobj, { ["Price"]: "123" });
+    Object.assign(myobj, { ['Company']: company.name });
+    Object.assign(myobj, { ['Price']: '123' });
 
     dataList.push(myobj);
   });
@@ -136,26 +134,17 @@ export async function getServerSideProps({ query }) {
   return { props: { columns, dataList, industries, fiscalYearList } };
 }
 
-export default function Screener({
-  columns,
-  dataList,
-  industries,
-  fiscalYearList,
-}) {
+export default function Screener({ columns, dataList, industries, fiscalYearList }) {
   const router = useRouter();
   const { industry, quarter } = router.query;
 
-  const [industryOption, setIndustryOption] = useState(
-    industry ? industry : "commercial-banks"
-  );
-  const [quarterOption, setQuarterOption] = useState(quarter ? quarter : "0");
-  const [fiscalYearOption, setFiscalYearOption] = useState("");
+  const [industryOption, setIndustryOption] = useState(industry ? industry : 'commercial-banks');
+  const [quarterOption, setQuarterOption] = useState(quarter ? quarter : '0');
+  const [fiscalYearOption, setFiscalYearOption] = useState('');
 
   const industryOptions = [];
 
-  industries.map((industry) =>
-    industryOptions.push({ id: industry.slug, name: industry.name })
-  );
+  industries.map((industry) => industryOptions.push({ id: industry.slug, name: industry.name }));
 
   if (columns == null) {
     return (
@@ -166,10 +155,10 @@ export default function Screener({
   }
 
   const quarterOptions = [
-    { id: "Q1", name: "Q1" },
-    { id: "Q2", name: "Q2" },
-    { id: "Q3", name: "Q3" },
-    { id: "Q4", name: "Q4" },
+    { id: 'q1', name: 'Q1' },
+    { id: 'q2', name: 'Q2' },
+    { id: 'q3', name: 'Q3' },
+    { id: 'q4', name: 'Q4' },
   ];
 
   const fiscalYearOptions = fiscalYearList

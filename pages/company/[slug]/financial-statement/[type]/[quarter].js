@@ -1,14 +1,27 @@
-import prisma from "../../../../../prisma/client";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import FinancialsHeader from "../../../../../components/HeaderMenu/FinancialsHeader";
-import FormSelect from "../../../../../Form/FormSelect";
-import FinancialTable from "../../../../../components/FinancialTable";
-import { MinusIcon, PlusIcon } from "../../../../../utils/icons";
-import Custom404 from "../../../../404";
+import prisma from '../../../../../prisma/client';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import FinancialsHeader from '../../../../../components/HeaderMenu/FinancialsHeader';
+import FormSelect from '../../../../../Form/FormSelect';
+import FinancialTable from '../../../../../components/FinancialTable';
+import { MinusIcon, PlusIcon } from '../../../../../utils/icons';
+import Custom404 from '../../../../404';
+import ToggleBox from '../../../../../components/ToggleBox';
+
+function checkStatementHasFact(data) {
+  return data.some(function (statementline) {
+    // topic don't have financialStatementFact so ignore
+    // if data dont have any financialStatementFact the return empty array, no need to go further
+    if (statementline.financialStatementLine.unit !== 'topic')
+      if (statementline.financialStatementLine.financialStatementFact.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+  });
+}
 
 export async function getStaticProps({ params }) {
-  const financialStatement = [];
   const columnsData = [];
   const dataList = [];
 
@@ -22,15 +35,15 @@ export async function getStaticProps({ params }) {
   });
   var statmentType = 0;
 
-  if (params.hasOwnProperty("type"))
+  if (params.hasOwnProperty('type'))
     switch (params.type) {
-      case "balance-sheet":
+      case 'balance-sheet':
         statmentType = company.companyStatementDetails.balanceSheetId;
         break;
-      case "profit-loss":
+      case 'profit-loss':
         statmentType = company.companyStatementDetails.profitLossId;
         break;
-      case "financial-highlights":
+      case 'financial-highlights':
         statmentType = company.companyStatementDetails.financialHighlightsId;
         break;
 
@@ -51,8 +64,8 @@ export async function getStaticProps({ params }) {
           children: {
             include: {
               financialStatementFact: {
-                where: params.hasOwnProperty("quarter")
-                  ? params.quarter === "qtrToqtr"
+                where: params.hasOwnProperty('quarter')
+                  ? params.quarter === 'qtr-to-qtr'
                     ? {
                         companyId: company.id,
                       }
@@ -66,18 +79,18 @@ export async function getStaticProps({ params }) {
                 take: 5,
                 orderBy: [
                   {
-                    fiscalYear: "desc",
+                    fiscalYear: 'desc',
                   },
                   {
-                    quarter: "desc",
+                    quarter: 'desc',
                   },
                 ],
               },
             },
           },
           financialStatementFact: {
-            where: params.hasOwnProperty("quarter")
-              ? params.quarter == "qtrToqtr"
+            where: params.hasOwnProperty('quarter')
+              ? params.quarter == 'qtr-to-qtr'
                 ? {
                     companyId: company.id,
                   }
@@ -91,10 +104,10 @@ export async function getStaticProps({ params }) {
             take: 5,
             orderBy: [
               {
-                fiscalYear: "desc",
+                fiscalYear: 'desc',
               },
               {
-                quarter: "desc",
+                quarter: 'desc',
               },
             ],
           },
@@ -102,22 +115,38 @@ export async function getStaticProps({ params }) {
       },
     },
     orderBy: {
-      sequence: "asc",
+      sequence: 'asc',
     },
   });
 
-  if (!data.length > 0) {
+  if (data.length == 0) {
     const dataList = null;
+    const columnsData = [];
+
     return {
-      props: { company, financialStatement, data, dataList, columnsData },
+      props: { company, dataList, columnsData },
     };
   }
 
-  data[1].financialStatementLine.financialStatementFact.map((fact) => {
-    columnsData.push({
-      Header: fact.fiscalYear + " " + fact.quarter,
-      accessor: fact.fiscalYear + " " + fact.quarter,
-    });
+  if (!checkStatementHasFact(data)) {
+    const dataList = null;
+    const columnsData = [];
+    return {
+      props: { company, dataList, columnsData },
+    };
+  }
+
+  //This will skip topic and take first statement fact and push to columns
+  data.some(function (statementline) {
+    const facts = statementline.financialStatementLine.financialStatementFact;
+    if (statementline.financialStatementLine.unit !== 'topic') {
+      return facts.map((fact) => {
+        columnsData.push({
+          Header: fact.fiscalYear + ' ' + fact.quarter,
+          accessor: fact.fiscalYear + ' ' + fact.quarter,
+        });
+      });
+    }
   });
 
   data.map((fact) => {
@@ -127,8 +156,9 @@ export async function getStaticProps({ params }) {
     fact.financialStatementLine.children.map((data) => {
       data.financialStatementFact.map((myData) => {
         Object.assign(child, {
-          [myData.fiscalYear + " " + myData.quarter]: myData.amount,
+          [myData.fiscalYear + ' ' + myData.quarter]: myData.amount.toLocaleString(),
           particular: data.name,
+          topic: data.unit,
         });
       });
     });
@@ -136,16 +166,16 @@ export async function getStaticProps({ params }) {
     fact.financialStatementLine.financialStatementFact.length > 0
       ? fact.financialStatementLine.financialStatementFact.map((data) => {
           Object.assign(myobj, {
+            topic: fact.financialStatementLine.unit,
             particular: fact.financialStatementLine.name,
-            [data.fiscalYear + " " + data.quarter]: data.amount,
-            subRows:
-              fact.financialStatementLine.children.length > 0 ? [child] : [],
+            [data.fiscalYear + ' ' + data.quarter]: data.amount.toLocaleString(),
+            subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
           });
         })
       : Object.assign(myobj, {
+          topic: fact.financialStatementLine.unit,
           particular: fact.financialStatementLine.name,
-          subRows:
-            fact.financialStatementLine.children.length > 0 ? [child] : [],
+          subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
         });
 
     dataList.push({ ...myobj });
@@ -153,7 +183,7 @@ export async function getStaticProps({ params }) {
 
   // Pass post data to the page via props
   return {
-    props: { company, financialStatement, data, dataList, columnsData },
+    props: { company, dataList, columnsData },
     revalidate: 10, // In seconds};
   };
 }
@@ -166,11 +196,11 @@ export async function getStaticPaths() {
   });
   const paths = [];
   const quarterOptions = [
-    { id: "Q1", name: "Q1" },
-    { id: "Q2", name: "Q2" },
-    { id: "Q3", name: "Q3" },
-    { id: "Q4", name: "Q4" },
-    { id: "qtrToqtr", name: "QTR To QTR" },
+    { id: 'q1', name: 'Q1' },
+    { id: 'q2', name: 'Q2' },
+    { id: 'q3', name: 'Q3' },
+    { id: 'q4', name: 'Q4' },
+    { id: 'qtr-to-qtr', name: 'QTR To QTR' },
   ];
 
   companies.map((company) => {
@@ -178,21 +208,21 @@ export async function getStaticPaths() {
       paths.push({
         params: {
           slug: company.slug,
-          type: "balance-sheet",
+          type: 'balance-sheet',
           quarter: quarter.id,
         },
       });
       paths.push({
         params: {
           slug: company.slug,
-          type: "profit-loss",
+          type: 'profit-loss',
           quarter: quarter.id,
         },
       });
       paths.push({
         params: {
           slug: company.slug,
-          type: "financial-highlights",
+          type: 'financial-highlights',
           quarter: quarter.id,
         },
       });
@@ -208,24 +238,21 @@ export async function getStaticPaths() {
 function FinancialStatement({ company, dataList, columnsData }) {
   const router = useRouter();
   const { slug, type, quarter } = router.query;
-  const [quarterValue, setQuarterValue] = useState(
-    quarter ? quarter : "qtrToqtr"
-  );
-
-  console.log(quarterValue);
+  const [quarterValue, setQuarterValue] = useState(quarter ? quarter : 'qtr-to-qtr');
+  const [showGraph, setShowGraph] = useState(false);
 
   const quarterOptions = [
-    { id: "Q1", name: "Q1" },
-    { id: "Q2", name: "Q2" },
-    { id: "Q3", name: "Q3" },
-    { id: "Q4", name: "Q4" },
-    { id: "qtrToqtr", name: "Quarter To Quarter" },
+    { id: 'q1', name: 'Q1' },
+    { id: 'q2', name: 'Q2' },
+    { id: 'q3', name: 'Q3' },
+    { id: 'q4', name: 'Q4' },
+    { id: 'qtr-to-qtr', name: 'Quarter To Quarter' },
   ];
 
   useEffect(() => {
     /* It will prevent => if quarter is Q1 in balance sheet when i click on profit and loss
      the value of quarter will also be Q1 */
-    setQuarterValue(quarterValue ? quarterValue : "qtrToqtr");
+    setQuarterValue(quarterValue ? quarterValue : 'qtr-to-qtr');
   }, [quarter, quarterValue]);
 
   if (!company) {
@@ -233,8 +260,8 @@ function FinancialStatement({ company, dataList, columnsData }) {
   }
   const columns = [
     {
-      id: "expander", // Make sure it has an ID
-      Header: "SN",
+      id: 'expander', // Make sure it has an ID
+      Header: 'SN',
 
       Cell: function OrderItems({ row }) {
         // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
@@ -247,16 +274,13 @@ function FinancialStatement({ company, dataList, columnsData }) {
                 // We can even use the row.depth property
                 // and paddingLeft to indicate the depth
                 // of the row
-                backgroundColor: "red",
+                backgroundColor: 'red',
                 paddingLeft: `${row.depth * 2}rem`,
               },
             })}
           >
             {row.isExpanded ? (
-              <PlusIcon
-                width={15}
-                customClass="fill-current dark:text-gray-400 text-gray-200"
-              />
+              <PlusIcon width={15} customClass="fill-current dark:text-gray-400 text-gray-200" />
             ) : (
               <MinusIcon width={15} customClass="fill-current text-gray-400" />
             )}
@@ -265,46 +289,57 @@ function FinancialStatement({ company, dataList, columnsData }) {
       },
     },
     {
-      Header: "Particulars",
-      accessor: "particular",
-      className: "table-title",
+      Header: 'Particulars',
+      accessor: 'particular',
+      className: 'table-title',
     },
     ...columnsData,
   ];
-  console.log(dataList);
   return (
     <>
       <FinancialsHeader
         statements={company.companyStatementDetails}
         slug={slug}
-        active={type ? type : "balance-sheet"}
+        active={type ? type : 'balance-sheet'}
       />
 
       <section className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-b-lg">
-        <div className="mb-4 md:w-52">
-          <FormSelect
-            control="select"
-            label="Quarter"
-            name="quarter"
-            customClassName="rounded border border-gray-600"
-            value={quarterValue}
-            options={quarterOptions}
-            handleChange={(e) => {
-              setQuarterValue(e.target.value);
-              router.push({
-                pathname: `/company/${slug}/financial-statement/${
-                  type ? type : "balance-sheet"
-                }/${e.target.value}`,
-              });
-            }}
+        <div className="flex justify-between w-full">
+          <div className="flex flex-col mb-4 md:w-52">
+            <FormSelect
+              control="select"
+              label="Quarter"
+              name="quarter"
+              customClassName="rounded border border-gray-600"
+              value={quarterValue}
+              options={quarterOptions}
+              handleChange={(e) => {
+                setQuarterValue(e.target.value);
+                router.push({
+                  pathname: `/company/${slug}/financial-statement/${type ? type : 'balance-sheet'}/${e.target.value}`,
+                });
+              }}
+            />
+          </div>
+
+          <ToggleBox
+            labelOnShow={'Hide Graph'}
+            labelOnHide={'Show Graph'}
+            handleChange={(e) => setShowGraph(!showGraph)}
+            showGraph={showGraph}
           />
         </div>
+
         {dataList ? (
-          <FinancialTable columns={columns} data={dataList} />
+          <FinancialTable
+            columns={columns}
+            data={dataList}
+            highlightTopic={true}
+            minDataLength={2}
+            showGraph={showGraph}
+          />
         ) : (
-          <h1 className="text-gray-900 dark:text-gray-50">
-            Data Not Available!
-          </h1>
+          <h1 className="text-2xl text-center mt-5 text-gray-700 dark:text-gray-100">Sorry, Data Not available !!</h1>
         )}
       </section>
     </>

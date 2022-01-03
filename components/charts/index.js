@@ -1,5 +1,5 @@
 import MiniChart from "./MiniChart";
 import StockHoldingChart from "./StockHoldingChart";
-import PriceChart from "./PriceChart";
+import CustomAreaChart from "./CustomAreaChart";
 
-export { MiniChart, StockHoldingChart, PriceChart };
+export { MiniChart, StockHoldingChart, CustomAreaChart };

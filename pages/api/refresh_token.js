@@ -1,20 +1,16 @@
-import { verify } from "jsonwebtoken";
-import {
-  createAccessToken,
-  sendRefreshToken,
-  createRefreshToken,
-} from "../../lib/functions/auth";
+import { verify } from 'jsonwebtoken';
+import { createAccessToken, sendRefreshToken, createRefreshToken } from '../../lib/functions/auth';
 
-import cookie from "cookie";
-import prisma from "../../prisma/client";
+import cookie from 'cookie';
+import prisma from '../../prisma/client';
 
 export default async function refresh_token(req, res) {
-  if (req.method === "POST") {
-    if (!req.headers.cookie) return res.send({ ok: false, accessToken: "" });
+  if (req.method === 'POST') {
+    if (!req.headers.cookie) return res.send({ ok: false, accessToken: '' });
     const getToken = cookie.parse(req.headers.cookie);
     const token = getToken.refreshToken;
 
-    if (!token) return res.send({ ok: false, accessToken: "" });
+    if (!token) return res.send({ ok: false, accessToken: '' });
     let payload = null;
 
     try {
@@ -31,7 +27,7 @@ export default async function refresh_token(req, res) {
         },
       });
 
-      if (!user) return res.send({ ok: false, accessToken: "" });
+      if (!user) return res.send({ ok: false, accessToken: '' });
 
       sendRefreshToken(res, createRefreshToken(user));
       const accessToken = createAccessToken(user);
@@ -39,7 +35,7 @@ export default async function refresh_token(req, res) {
       return res.send({ ok: true, accessToken, user });
     } catch (e) {
       console.log(e);
-      return res.send({ ok: false, accessToken: "" });
+      return res.send({ ok: false, accessToken: '' });
     }
   } else {
     res.status(500).send();
