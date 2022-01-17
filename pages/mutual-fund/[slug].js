@@ -1,14 +1,16 @@
-import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import ReactTooltip from "react-tooltip";
-import { PriceChart, StockHoldingChart } from "../../components/charts";
-import PriceCounter from "../../components/PriceCounter/PriceCounter";
-import SortableTable from "../../components/SortableTable";
-import { InfoIcon } from "../../utils/icons";
-import prisma from "../../prisma/client";
-import Custom404 from "../404";
-import Spinner from "../../components/Spinner";
-import FinancialTable from "../../components/FinancialTable/FinancialTable";
+import { useRouter } from 'next/router';
+import React from 'react';
+import ReactTooltip from 'react-tooltip';
+import { CustomAreaChart, StockHoldingChart } from '../../components/charts';
+import PriceCounter from '../../components/PriceCounter/PriceCounter';
+import SortableTable from '../../components/SortableTable';
+import { InfoIcon } from '../../utils/icons';
+import prisma from '../../prisma/client';
+import Custom404 from '../404';
+import Spinner from '../../components/Spinner';
+import FinancialTable from '../../components/FinancialTable/FinancialTable';
+import StockLayout from '../../components/layout/StockLayout';
+import Layout from '../../components/layout';
 
 export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -34,7 +36,7 @@ export async function getStaticProps({ params }) {
       companySlug: params.slug,
     },
     orderBy: {
-      date: "desc",
+      date: 'desc',
     },
   });
   const companyIds = [];
@@ -48,7 +50,7 @@ export async function getStaticProps({ params }) {
       companyPrice: {
         take: 1,
         orderBy: {
-          date: "desc",
+          date: 'desc',
         },
       },
     },
@@ -56,33 +58,31 @@ export async function getStaticProps({ params }) {
   companies.map((company) => companyIds.push(company.id));
 
   // Company Essentials
-  const companyEssentials =
-    await prisma.financialStatementLineSequence.findMany({
-      where: {
-        financialStatementId:
-          company.companyStatementDetails.companyEssentialsId,
-      },
-      include: {
-        financialStatementLine: {
-          include: {
-            financialStatementFact: {
-              where: {
-                // quarter: "Q4",
-                companyId: company.id,
-              },
-              orderBy: [
-                {
-                  quarter: "desc",
-                },
-                {
-                  fiscalYear: "desc",
-                },
-              ],
+  const companyEssentials = await prisma.financialStatementLineSequence.findMany({
+    where: {
+      financialStatementId: company.companyStatementDetails.companyEssentialsId,
+    },
+    include: {
+      financialStatementLine: {
+        include: {
+          financialStatementFact: {
+            where: {
+              // quarter: "Q4",
+              companyId: company.id,
             },
+            orderBy: [
+              {
+                quarter: 'desc',
+              },
+              {
+                fiscalYear: 'desc',
+              },
+            ],
           },
         },
       },
-    });
+    },
+  });
 
   // Stock Holding Facts
   const stockholdingFacts = await prisma.actionStatementLineSequence.findMany({
@@ -99,7 +99,7 @@ export async function getStaticProps({ params }) {
             },
             orderBy: [
               {
-                bookCloseDate: "desc",
+                bookCloseDate: 'desc',
               },
             ],
             take: 1,
@@ -122,7 +122,7 @@ export async function getStaticProps({ params }) {
             },
             orderBy: [
               {
-                bookCloseDate: "desc",
+                bookCloseDate: 'desc',
               },
             ],
           },
@@ -130,7 +130,7 @@ export async function getStaticProps({ params }) {
       },
     },
     orderBy: {
-      sequence: "asc",
+      sequence: 'asc',
     },
   });
 
@@ -151,43 +151,41 @@ export async function getStaticProps({ params }) {
         // ...fact[0],
         sequence: statement.sequence,
         name: statement.financialStatementLine.name,
-        amount:
-          statement.financialStatementLine.financialStatementFact[0].amount,
+        amount: statement.financialStatementLine.financialStatementFact[0].amount,
         unit: statement.financialStatementLine.unit,
       });
   });
   // For Peer Comparisions
-  const peerComparisionData =
-    await prisma.financialStatementLineSequence.findMany({
-      where: {
-        financialStatementId: company.companyStatementDetails.companyRatioId,
-      },
-      include: {
-        financialStatementLine: {
-          include: {
-            financialStatementFact: {
-              where: {
-                companyId: { in: companyIds },
-                // quarter: params.quarter,
-                // fiscalYear: params.fiscalYear,
-              },
-              take: companies.length,
-              orderBy: [
-                {
-                  fiscalYear: "desc",
-                },
-                {
-                  quarter: "desc",
-                },
-              ],
+  const peerComparisionData = await prisma.financialStatementLineSequence.findMany({
+    where: {
+      financialStatementId: company.companyStatementDetails.companyRatioId,
+    },
+    include: {
+      financialStatementLine: {
+        include: {
+          financialStatementFact: {
+            where: {
+              companyId: { in: companyIds },
+              // quarter: params.quarter,
+              // fiscalYear: params.fiscalYear,
             },
+            take: companies.length,
+            orderBy: [
+              {
+                fiscalYear: 'desc',
+              },
+              {
+                quarter: 'desc',
+              },
+            ],
           },
         },
       },
-      orderBy: {
-        sequence: "asc",
-      },
-    });
+    },
+    orderBy: {
+      sequence: 'asc',
+    },
+  });
 
   peerComparisionData.map((fact) => {
     var myobj = {};
@@ -202,10 +200,7 @@ export async function getStaticProps({ params }) {
     var myObj = {};
     Object.assign(myObj, {
       company: comp.name,
-      price:
-        comp.companyPrice.length > 0
-          ? comp.companyPrice[0].closingPrice
-          : "NaN",
+      price: comp.companyPrice.length > 0 ? comp.companyPrice[0].closingPrice : 'NaN',
     });
 
     peerComparisionData.map((peerData) => {
@@ -214,7 +209,7 @@ export async function getStaticProps({ params }) {
           if (company.id == comp.id) {
             Object.assign(myObj, {
               [peerData.financialStatementLine.name]: fact.amount,
-              topic: "topic",
+              topic: 'topic', //This will highlight background color for current company
             });
           } else {
             Object.assign(myObj, {
@@ -226,9 +221,7 @@ export async function getStaticProps({ params }) {
       });
     });
 
-    myObj.company == company.name
-      ? dataList.unshift({ ...myObj })
-      : dataList.push({ ...myObj });
+    myObj.company == company.name ? dataList.unshift({ ...myObj }) : dataList.push({ ...myObj });
   });
 
   stockholdingFacts.map((holding) => {
@@ -274,7 +267,7 @@ export async function getStaticProps({ params }) {
     }, {});
   }
 
-  var groupedActionData = groupByKey(companyActionDataList, "closeDate");
+  var groupedActionData = groupByKey(companyActionDataList, 'closeDate');
   const keys = Object.keys(groupedActionData);
   // const myDataList = [];
 
@@ -315,11 +308,11 @@ export async function getStaticPaths() {
   });
   return {
     paths: slugs,
-    fallback: "blocking",
+    fallback: 'blocking',
   };
 }
 
-export function MutualFund({
+export function Company({
   company,
   essentials,
   priceHistory,
@@ -342,13 +335,13 @@ export function MutualFund({
 
   const columns = [
     {
-      Header: "Company",
-      accessor: "company",
-      className: "md:w-40	font-bold",
+      Header: 'Company',
+      accessor: 'company',
+      className: 'md:w-40	font-bold table-title bg-white dark:bg-gray-900 px-4 py-4 sticky left-0 ',
     },
     {
-      Header: "Price",
-      accessor: "price",
+      Header: 'Price',
+      accessor: 'price',
     },
 
     ...columnsData,
@@ -356,32 +349,30 @@ export function MutualFund({
 
   const actionsColumn = [
     {
-      Header: "Date",
-      accessor: "date",
-      className: "md:w-40	font-bold",
+      Header: 'Date',
+      accessor: 'date',
+      className: 'md:w-40	font-bold table-title bg-white dark:bg-gray-900 px-4 py-4 sticky left-0 ',
     },
 
     ...companyActionColumnData,
   ];
 
   return (
-    <>
+    <Layout title={company.name} showSearch={true} showSymbol={true}>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 text-gray-900 dark:text-gray-50">
           <div>
             <h1 className="text-2xl font-normal mb-2">{company.name}</h1>
             <div className="flex flex-col md:flex-row">
               <p className="mr-3 ">
-                NEPSE:{" "}
+                NEPSE:{' '}
                 <span className="text-white bg-blue-700 px-2 py-1 font-light uppercase rounded-sm">
                   {company.symbol}
                 </span>
               </p>
               <p className="mr-3 mt-3 md:mt-0">
                 SECTOR:
-                <span className="px-2 py-1 font-bold ">
-                  {company.industry.name}
-                </span>
+                <span className="px-2 py-1 font-bold ">{company.industry.name}</span>
               </p>
             </div>
           </div>
@@ -391,7 +382,7 @@ export function MutualFund({
             <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
               Rs.&nbsp;
               {!Array.isArray(priceHistory) || !priceHistory.length
-                ? "NaN"
+                ? 'NaN'
                 : priceHistory[0].closingPrice.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -402,14 +393,10 @@ export function MutualFund({
                 <PriceCounter isRising={false} amount="321" rate="2.1" />
               ) : (
                 <PriceCounter
-                  isRising={
-                    priceHistory[0].closingPrice >
-                    priceHistory[0].previousClosing
-                  }
+                  isRising={priceHistory[0].closingPrice > priceHistory[0].previousClosing}
                   amount={Number(priceHistory[0].priceDifference)}
                   rate={(
-                    (Number(priceHistory[0].priceDifference) /
-                      Number(priceHistory[0].closingPrice)) *
+                    (Number(priceHistory[0].priceDifference) / Number(priceHistory[0].closingPrice)) *
                     100
                   ).toFixed(2)}
                 />
@@ -442,16 +429,15 @@ export function MutualFund({
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
-        <h2 className="font-semibold text-xl mb-4 text-gray-900 dark:text-gray-200">
-          Price History
-        </h2>
+        <h2 className="font-semibold text-xl mb-4 text-gray-900 dark:text-gray-200">Price History</h2>
 
         <div className="grid grid-cols-1">
-          <PriceChart priceHistory={priceHistory} />
+          <CustomAreaChart data={priceHistory} dataKeyForArea={'closingPrice'} showPeriodSelector={true} />
 
           <a
             href="#"
-            className="text-center py-2 px-3 mt-4 w-full sm:w-96 border hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white border-indigo-800 dark:border-gray-300 mx-auto rounded-md shadow-sm transition duration-500 ease-in-out"
+            className="text-center py-2 px-3 mt-4 w-full sm:w-96 border hover:bg-indigo-800 dark:hover:bg-gray-800 hover:text-white 
+            border-indigo-800 dark:border-gray-300 mx-auto rounded-md shadow-sm transition duration-500 ease-in-out"
           >
             View Full Chart
           </a>
@@ -470,16 +456,10 @@ export function MutualFund({
                 essentials.map((data) => (
                   <div className="flex flex-col mb-2" key={data.name}>
                     <p className="text-xs font-normal mb-2 flex items-baseline">
-                      {data.name}{" "}
-                      <span
-                        className="ml-2 relative"
-                        data-tip
-                        data-for="registerTip"
-                      >
+                      {data.name}{' '}
+                      <span className="ml-2 relative" data-tip data-for="registerTip">
                         <InfoIcon
-                          customClass={
-                            "fill-current text-blue-600 dark:text-green-500"
-                          }
+                          customClass={'fill-current text-blue-600 dark:text-green-500'}
                           height={14}
                           width={14}
                         />
@@ -492,18 +472,12 @@ export function MutualFund({
                       // backgroundColor="#374151"
                       className="max-w-xs rounded-lg shadow-md bg-white"
                     >
-                      Market capitalization is the aggregate valuation of the
-                      company based on its current share price and the total
-                      number of outstanding shares.
+                      Market capitalization is the aggregate valuation of the company based on its current share price
+                      and the total number of outstanding shares.
                     </ReactTooltip>
                     <h4 className="m-0 font-bold text-md mb-3 text-gray-800 dark:text-gray-300">
-                      {data.unit === '""' || data.unit !== "Rs"
-                        ? ""
-                        : data.unit}{" "}
-                      {data.amount.toLocaleString()}{" "}
-                      {data.unit === '""' || data.unit === "Rs"
-                        ? ""
-                        : data.unit}
+                      {data.unit === '""' || data.unit !== 'Rs' ? '' : data.unit} {data.amount.toLocaleString()}{' '}
+                      {data.unit === '""' || data.unit === 'Rs' ? '' : data.unit}
                     </h4>
                   </div>
                 ))
@@ -514,20 +488,13 @@ export function MutualFund({
       </section>
 
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
-        <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
-          Peer Comparision
-        </h2>
-        <SortableTable
-          columns={columns}
-          data={dataList}
-          highlightTopic={true}
-        />
+        <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Peer Comparision</h2>
+        <SortableTable columns={columns} data={dataList} highlightTopic={true} showCheck={false} />
       </section>
+
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
         <div className="flex justify-between">
-          <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
-            Corporate Actions
-          </h2>
+          <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Corporate Actions</h2>
         </div>
         <FinancialTable columns={actionsColumn} data={actionDataList} />
       </section>
@@ -535,45 +502,26 @@ export function MutualFund({
       <section className="xl:container mx-3 xl:mx-auto mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white dark:bg-gray-900 shadow p-3 rounded-lg">
-            <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
-              Stock Holding Pattern
-            </h2>
+            <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Stock Holding Pattern</h2>
             <StockHoldingChart data={stockHoldingData} />
           </div>
           <div className="bg-white dark:bg-gray-900 shadow p-3 rounded-lg">
-            <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">
-              Corporate Action
-            </h2>
+            <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Corporate Action</h2>
 
             <div className="p-3">
               <ul className="">
-                <li className="pb-3">
-                  The bank has a very low ROA track record. Average ROA of 3
-                  years is -1.98%
-                </li>
-                <li className="pb-3">
-                  The bank has a very low ROA track record. Average ROA of 3
-                  years is -1.98%
-                </li>
-                <li className="pb-3">
-                  The bank has a very low ROA track record. Average ROA of 3
-                  years is -1.98%
-                </li>
-                <li className="pb-3">
-                  The bank has a very low ROA track record. Average ROA of 3
-                  years is -1.98%
-                </li>
-                <li className="pb-3">
-                  The bank has a very low ROA track record. Average ROA of 3
-                  years is -1.98%
-                </li>
+                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
+                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
+                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
+                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
+                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
               </ul>
             </div>
           </div>
         </div>
       </section>
-    </>
+    </Layout>
   );
 }
 
-export default MutualFund;
+export default Company;

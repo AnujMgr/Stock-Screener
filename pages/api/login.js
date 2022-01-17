@@ -5,9 +5,6 @@ import { createAccessToken, createRefreshToken, sendRefreshToken } from '../../l
 export default async function login(req, res) {
   const { email, password } = req.body.data;
 
-  console.log(email);
-  console.log(req);
-
   const user = await prisma.user.findFirst({
     where: {
       email: email,
@@ -52,7 +49,8 @@ export default async function login(req, res) {
                   name: user.name,
                 };
                 /* Create JWT Payload */
-                sendRefreshToken(res, createRefreshToken(user));
+                const token = createRefreshToken(user);
+                sendRefreshToken(res, token);
                 const accessToken = createAccessToken(user);
 
                 return res.status(200).json({ success: true, accessToken, user: payload });

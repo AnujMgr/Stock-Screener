@@ -8,7 +8,7 @@ import { useAuth } from '../../lib/contexts/AuthContext';
 import UserProfile from './UserProfile';
 import { useMediaQuery } from 'react-responsive';
 
-function Navbar({ showSearch }) {
+function Navbar({ showSearch, showSymbol }) {
   const [hidden, setHidden] = useState(true);
   const [isOpen, setOpen] = useState(true);
   const router = useRouter();
@@ -23,6 +23,7 @@ function Navbar({ showSearch }) {
       dispatch({
         type: 'removeAuthDetails',
       });
+      return router.push('/login');
     });
   };
 
@@ -48,24 +49,25 @@ function Navbar({ showSearch }) {
                       backgroundColor={'bg-gray-200 dark:bg-gray-800'}
                       padding={'py-0'}
                       itemHoverBackground={'hover:bg-gray-300 dark:hover:bg-gray-700'}
+                      showSymbol={showSymbol}
                     />
                   ) : null}
                 </div>
 
                 <div className="flex-1 text-right">
-                  <NavbarLink
-                    name="Home"
-                    isActive={router.asPath === '/'}
-                    path={'/'}
-                    pathAs={'/'}
-                  />
+                  <NavbarLink name="Home" isActive={router.asPath === '/'} path={'/'} pathAs={'/'} />
                   <NavbarLink
                     name="Screener"
                     isActive={router.pathname.startsWith('/screener')}
                     path={'/screener'}
                     pathAs={'/screener'}
                   />
-                  <NavbarLink name="Listing" isActive={false} path={'/'} pathAs={'/'} />
+                  <NavbarLink
+                    name="Listing"
+                    isActive={false}
+                    path={'/listings/commercial-banks'}
+                    pathAs={'/listings/commercial-banks'}
+                  />
                   <NavbarLink name="Market" isActive={false} path={'/'} pathAs={'/'} />
                 </div>
               </div>
@@ -101,19 +103,11 @@ function Navbar({ showSearch }) {
               <div className="flex items-center gap-2 my-2">
                 {hidden ? (
                   <button className="p-2 rounded" onClick={(e) => setHidden(false)}>
-                    <SearchIcon
-                      height={24}
-                      width={24}
-                      customClass={'fill-current text-black dark:text-white'}
-                    />
+                    <SearchIcon height={24} width={24} customClass={'fill-current text-black dark:text-white'} />
                   </button>
                 ) : (
                   <button className="rounded" onClick={(e) => setHidden(true)}>
-                    <CloseIcon
-                      height={24}
-                      width={24}
-                      customClass={'fill-current text-black dark:text-white'}
-                    />
+                    <CloseIcon height={24} width={24} customClass={'fill-current text-black dark:text-white'} />
                   </button>
                 )}
                 <ToggleTheme />
@@ -123,11 +117,7 @@ function Navbar({ showSearch }) {
                   className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600 
                   hover:text-white dark:hover:bg-gray-900 transition duration-500 ease-in-out "
                 >
-                  <HamburgerIcon
-                    height={24}
-                    width={24}
-                    customClass={'fill-current text-white dark:text-white'}
-                  />
+                  <HamburgerIcon height={24} width={24} customClass={'fill-current text-white dark:text-white'} />
                 </button>
               </div>
             </div>
@@ -178,11 +168,7 @@ function SideBar({ isOpen, setOpen }) {
           className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600
            hover:text-white dark:hover:bg-gray-900 transition duration-500 ease-in-out"
         >
-          <HamburgerIcon
-            height={24}
-            width={24}
-            customClass={'fill-current text-white dark:text-white'}
-          />
+          <HamburgerIcon height={24} width={24} customClass={'fill-current text-white dark:text-white'} />
         </button>
       </div>
       <div className="flex flex-col ">

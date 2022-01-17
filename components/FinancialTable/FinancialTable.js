@@ -46,7 +46,7 @@ function FinancialTable({ columns: userColumns, data, minDataLength, highlightTo
                 return (
                   <tr
                     className="my-react-table text-sm font-semibold tracking-wide text-left text-gray-200 uppercase 
-                    border-b border-gray-100 dark:border-blue-800 bg-blue-900 dark:text-white dark:bg-blue-900 mb-2"
+                    border-b border-gray-100 dark:border-blue-800 dark:text-white  mb-2"
                     key={key}
                     {...headerGroup.getHeaderGroupProps()}
                   >
@@ -55,9 +55,13 @@ function FinancialTable({ columns: userColumns, data, minDataLength, highlightTo
                       return (
                         <th
                           key={key}
-                          className="px-4 py-4 whitespace-nowrap sticky left-0 dark:border-gray-700"
+                          className=""
                           // {...restColumn}
-                          {...column.getHeaderProps()}
+                          {...column.getHeaderProps([
+                            {
+                              className: `dark:border-gray-700 bg-blue-900 dark:bg-blue-900 whitespace-nowrap px-4 py-4  ${column.className}`,
+                            },
+                          ])}
                         >
                           <h1 className="whitespace-nowrap inline-flex select-none items-end">
                             {column.render('Header')}
@@ -80,17 +84,11 @@ function FinancialTable({ columns: userColumns, data, minDataLength, highlightTo
                   <tr
                     key={key}
                     {...restRowProps}
-                    className={`${
+                    className={`group ${
                       row.original.topic === 'topic'
                         ? 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-semibold'
-                        : `
-                        ${
-                          row.id === activeRow && showGraph
-                            ? `bg-green-600 dark:bg-green-700 font-medium text-white 
-                            ${showGraph ? 'cursor-pointer' : null}`
-                            : `dark:hover:bg-gray-800 hover:bg-gray-100 font-normal text-gray-900 bg-white dark:bg-gray-900 dark:text-gray-50 
-                            ${showGraph ? 'cursor-pointer' : null}`
-                        }`
+                        : null
+                    }
                     }`}
                     onClick={(e) =>
                       row.original.topic !== 'topic' && row.cells.length > minDataLength + 2 && showGraph
@@ -105,7 +103,21 @@ function FinancialTable({ columns: userColumns, data, minDataLength, highlightTo
                           key={key}
                           {...cell.getCellProps([
                             {
-                              className: `px-4 py-3 whitespace-nowrap sticky left-0 ${cell.column.className}`,
+                              className: `px-4 py-3 whitespace-nowrap sticky left-0 group-hover:bg-gray-100 dark:group-hover:bg-gray-800
+                              ${
+                                row.id === activeRow && showGraph
+                                  ? `active-graph-particular-light dark:bg-green-700 font-medium text-white 
+                                  ${showGraph ? 'cursor-pointer' : ''}`
+                                  : `dark:hover:bg-gray-800 hover:bg-gray-100 font-normal text-gray-900 dark:text-gray-50 
+                                  ${showGraph ? 'cursor-pointer' : ''}`
+                              } 
+                              ${cell.column.className}
+                              ${
+                                row.original.topic === 'topic'
+                                  ? 'table-particular-topic-light dark:table-particular-topic-dark bg-white dark:bg-gray-800'
+                                  : null
+                              } 
+                              `,
                             },
                           ])}
                         >

@@ -6,10 +6,16 @@ import * as Yup from 'yup';
 import PasswordField from '../../Form/PasswordField';
 import { toast, ToastContainer } from 'react-toast';
 import { useRouter } from 'next/router';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import { useAuth } from '../../lib/contexts/AuthContext';
+import Layout from '../../components/layout';
 
 const Register = () => {
   //For Form
+  const [state, dispatch] = useAuth();
   const router = useRouter();
+  console.log(dispatch);
 
   const Schema = Yup.object().shape({
     name: Yup.string().required('This field is required'),
@@ -41,30 +47,68 @@ const Register = () => {
   };
 
   async function onSubmitHandler(data) {
-    const signUpApi = await fetch(`/api/register`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }).catch((error) => {
-      console.log('Caught Error');
-      console.error('Error:', error);
-    });
-    let result = await signUpApi.json();
+    await axios
+      .post(`/api/register`, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        data,
+      })
+      .then((response) => {
+        const { user, accessToken } = response.data;
 
-    if (result.success) {
-      router.push('/login');
-    } else {
-      if (result.error) toastError(result.message);
-    }
+        if (user && accessToken) {
+          Cookies.set('token', accessToken);
+          dispatch({
+            type: 'setAuthDetails',
+            payload: {
+              user: user,
+              accessToken: accessToken,
+            },
+          });
+          return router.push('/');
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response) {
+          toastError(error.response.data.message);
+        } else if (error.request) {
+          // console.log('network error');
+          toastError('Network Error !!');
+        } else {
+          toastError('Something went wrong!!');
+          console.log('Something went wrong!!');
+        }
+      });
   }
+
+  //   await fetch(`/api/register`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Accept: 'application/json',
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify(data),
+  //   }).catch((error) => {
+  //     console.log('Caught Error');
+  //     console.error('Error:', error);
+  //   });
+  //   let result = await signUpApi.json();
+
+  //   if (result.success) {
+  //     router.push('/login');
+  //   } else {
+  //     if (result.error) toastError(result.message);
+  //   }
+  // }
 
   const toastError = (text) => toast.error(text);
 
   return (
-    <>
+    <Layout showSearch={true} showSymbol={true} title={'Register'}>
       <section className="xl:container mx-auto">
         <div className="max-w-4xl mx-auto shadow-sm my-8 rounded-md overflow-hidden">
           <div className="p-3 bg-white dark:bg-gray-900">
@@ -196,7 +240,7 @@ const Register = () => {
         </div>
         <ToastContainer delay={7000} position="bottom-right" />
       </section>
-    </>
+    </Layout>
   );
 };
 

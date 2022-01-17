@@ -37,8 +37,13 @@ function SortableTable({ data, columns, showCheck, highlightTopic }) {
                     return (
                       <th
                         key={key}
-                        className="px-4 py-4 whitespace-nowrap sticky left-0 dark:border-gray-700"
-                        {...column.getHeaderProps(column.getSortByToggleProps())}
+                        // className="px-4 py-4 whitespace-nowrap sticky left-0 dark:border-gray-700"
+                        {...column.getHeaderProps([
+                          column.getSortByToggleProps(),
+                          {
+                            className: `dark:border-gray-700 bg-blue-900 dark:bg-blue-900 whitespace-nowrap px-4 py-4  ${column.className}`,
+                          },
+                        ])}
                       >
                         <h1 className="whitespace-nowrap inline-flex select-none items-end">
                           {column.render('Header')}
@@ -62,10 +67,7 @@ function SortableTable({ data, columns, showCheck, highlightTopic }) {
               );
             })}
           </thead>
-          <tbody
-            className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-900 my-table"
-            {...getTableBodyProps()}
-          >
+          <tbody className="bg-white divide-y dark:divide-gray-700 dark:bg-gray-900 my-table" {...getTableBodyProps()}>
             {rows.map((row) => {
               prepareRow(row);
               const { key } = row.getRowProps();
@@ -73,7 +75,7 @@ function SortableTable({ data, columns, showCheck, highlightTopic }) {
                 <tr
                   key={key}
                   {...row.getRowProps()}
-                  className={`${
+                  className={`group ${
                     highlightTopic && row.original.topic === 'topic'
                       ? 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-semibold'
                       : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 dark:hover:bg-gray-800 hover:bg-gray-100 font-medium'
@@ -87,7 +89,14 @@ function SortableTable({ data, columns, showCheck, highlightTopic }) {
                         key={key}
                         {...cell.getCellProps([
                           {
-                            className: `px-4 py-3 whitespace-nowrap sticky left-0 ${cell.column.className}`,
+                            className: `px-4 py-3 whitespace-nowrap sticky left-0 group-hover:bg-gray-100 dark:group-hover:bg-gray-800 
+                            ${cell.column.className}
+                            ${
+                              row.original.topic === 'topic'
+                                ? 'table-particular-topic-light dark:table-particular-topic-dark bg-white dark:bg-gray-800'
+                                : null
+                            } 
+                            `,
                           },
                         ])}
                       >

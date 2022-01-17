@@ -3,19 +3,20 @@ import { useEffect, useState } from 'react';
 import MicroChart from '../components/charts/MicroChart';
 import SearchBar from '../components/searchbar';
 import Link from 'next/link';
+import Layout from '../components/layout';
 
 export default function Home() {
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
 
-  const [mounted, setMounted] = useState(false);
+  // const [mounted, setMounted] = useState(false);
 
-  // When mounted on client, now we can show the UI
-  useEffect(() => setMounted(true), []);
+  // // When mounted on client, now we can show the UI
+  // useEffect(() => setMounted(true), []);
 
-  if (!mounted) return null;
+  // if (!mounted) return null;
 
   return (
-    <>
+    <Layout title={'Data Analytics'}>
       <section className="bg-purple-900 dark:bg-gray-900 py-10 banner">
         <div className="xl:container mx-auto">
           <h1 className="md:max-w-4xl text-white text-4xl md:text-7xl px-3 md:px-2 text-center font-bold mx-auto mt-9">
@@ -121,6 +122,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-    </>
+    </Layout>
   );
 }

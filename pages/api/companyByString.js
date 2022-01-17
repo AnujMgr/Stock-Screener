@@ -20,6 +20,10 @@ export default async function handler(req, res) {
           },
         ],
       },
+      include: {
+        industry: true,
+      },
+      take: 6,
     });
     res.json(companies);
   } else {

@@ -7,6 +7,7 @@ import FinancialTable from '../../../../../components/FinancialTable';
 import { MinusIcon, PlusIcon } from '../../../../../utils/icons';
 import Custom404 from '../../../../404';
 import ToggleBox from '../../../../../components/ToggleBox';
+import StockLayout from '../../../../../components/layout/StockLayout';
 
 function checkStatementHasFact(data) {
   return data.some(function (statementline) {
@@ -266,7 +267,6 @@ function FinancialStatement({ company, dataList, columnsData }) {
       Cell: function OrderItems({ row }) {
         // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
         // to build the toggle for expanding a row
-
         return row.canExpand ? (
           <span
             {...row.getToggleRowExpandedProps({
@@ -291,12 +291,14 @@ function FinancialStatement({ company, dataList, columnsData }) {
     {
       Header: 'Particulars',
       accessor: 'particular',
-      className: 'table-title',
+      className: 'table-title bg-white dark:bg-gray-900 px-4 py-4 sticky left-0 ',
     },
     ...columnsData,
   ];
+
+  console.log(dataList);
   return (
-    <>
+    <StockLayout>
       <FinancialsHeader
         statements={company.companyStatementDetails}
         slug={slug}
@@ -342,7 +344,7 @@ function FinancialStatement({ company, dataList, columnsData }) {
           <h1 className="text-2xl text-center mt-5 text-gray-700 dark:text-gray-100">Sorry, Data Not available !!</h1>
         )}
       </section>
-    </>
+    </StockLayout>
   );
 }
 
