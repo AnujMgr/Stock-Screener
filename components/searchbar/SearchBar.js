@@ -142,6 +142,7 @@ export default function SearchBar({
                       )
                       .map((item, index) => (
                         <SearchItem
+                          key={item.id}
                           item={item}
                           showSymbol={showSymbol}
                           itemHoverBackground={itemHoverBackground}
