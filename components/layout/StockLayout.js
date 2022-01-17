@@ -1,8 +1,9 @@
 import Footer from '../footer/footer';
 import Navbar from '../navbar';
+import StockNavbar from '../navbar/StockNavbar';
 import Head from 'next/head';
 
-const Layout = ({ children, title, showSearch, showSymbol }) => {
+const StockLayout = ({ children, title }) => {
   return (
     <>
       <Head>
@@ -14,7 +15,8 @@ const Layout = ({ children, title, showSearch, showSymbol }) => {
       </Head>
       <div className="grid grid-rows-3 min-h-screen">
         <section className="row-span-full">
-          <Navbar showSearch={showSearch} showSymbol={showSymbol} />
+          <Navbar showSearch={true} showSymbol={true} />
+          <StockNavbar />
           <main className="row-end-auto">{children}</main>
         </section>
         <Footer />
@@ -23,4 +25,4 @@ const Layout = ({ children, title, showSearch, showSymbol }) => {
   );
 };
 
-export default Layout;
+export default StockLayout;

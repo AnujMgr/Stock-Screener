@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+
 import prisma from '../../../prisma/client';
 import { useRouter } from 'next/router';
 import Custom404 from '../../404';
@@ -7,6 +8,7 @@ import FinancialTable from '../../../components/FinancialTable';
 import { MinusIcon, PlusIcon } from '../../../utils/icons';
 import { Field, Formik } from 'formik';
 import CustomSelectField from '../../../components/SelectWithSearch/CustomSelectField';
+import MultipleLineGraph from '../../../components/charts/MultipleLineGraph';
 import StockLayout from '../../../components/layout/StockLayout';
 
 function checkStatementHasFact(data) {
@@ -33,12 +35,6 @@ export async function getServerSideProps({ query }) {
     },
   });
 
-  const fiscalYearList = await prisma.fiscalYears.findMany({
-    orderBy: {
-      fiscalYear: 'desc',
-    },
-  });
-
   const financialStatement = [];
   const columnsData = [];
   const dataList = [];
@@ -47,7 +43,7 @@ export async function getServerSideProps({ query }) {
   if (company === null) {
     const companies = [];
     const data = [];
-    return { props: { company, companies, financialStatement, data, fiscalYearList } };
+    return { props: { company, companies, financialStatement, data } };
   }
 
   const peerCompanies = await prisma.company.findMany({
@@ -68,49 +64,55 @@ export async function getServerSideProps({ query }) {
     },
   });
 
+  console.log(companies);
+
   companies.map((company) => companyIds.push(company.id));
+  var lengthOfFacts = 0;
+
+  // It is needed to make sure that no. of annual/quarterly data of all companies are equal not exceding 5
+  async function getLengthOfData() {
+    return Promise.all(
+      companyIds.map(async (id) => {
+        const dataLength = await prisma.financialStatementFact.count({
+          where: {
+            financialStatementLineId: 2,
+            quarter: query.hasOwnProperty('quarter') ? query.quarter : 'q4',
+            companyId: id,
+          },
+        });
+        if (dataLength >= 5) {
+          lengthOfFacts += 5;
+        }
+        lengthOfFacts += dataLength;
+      }),
+    );
+  }
+
+  await getLengthOfData();
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
       financialStatementId: query.hasOwnProperty('statementType')
         ? Number(query.statementType)
         : company.companyStatementDetails.balanceSheetId,
-      financialStatementLine: {
-        parentId: null,
-      },
+      // financialStatementLine: {
+      //   parentId: null,
+      // },
     },
     include: {
       financialStatementLine: {
         include: {
-          children: {
-            include: {
-              financialStatementFact: {
-                where: query.hasOwnProperty('quarter')
-                  ? {
-                      companyId: { in: companyIds },
-                      quarter: query.quarter,
-                      fiscalYear: query.fiscalYear,
-                    }
-                  : {
-                      companyId: { in: companyIds },
-                      quarter: 'q4',
-                    },
-                take: companies.length,
-              },
-            },
-          },
           financialStatementFact: {
             where: query.hasOwnProperty('quarter')
               ? {
                   companyId: { in: companyIds },
                   quarter: query.quarter,
-                  fiscalYear: query.fiscalYear,
                 }
               : {
                   companyId: { in: companyIds },
                   quarter: 'Q4',
                 },
-            take: companies.length,
+            take: lengthOfFacts,
             orderBy: [
               {
                 fiscalYear: 'desc',
@@ -133,6 +135,7 @@ export async function getServerSideProps({ query }) {
     return {
       props: {
         company,
+        companies,
         peerCompanies,
         financialStatement,
         data,
@@ -148,77 +151,98 @@ export async function getServerSideProps({ query }) {
     return {
       props: {
         company,
+        companies,
         peerCompanies,
         financialStatement,
         data,
         dataList,
         columnsData,
-        fiscalYearList,
       },
     };
   }
 
-  //This will skip topic and take first statement fact and push to columns
-  data.some(function (statementline) {
-    const facts = statementline.financialStatementLine.financialStatementFact;
-    if (statementline.financialStatementLine.unit !== 'topic') {
-      return facts.map((fact) => {
-        fact.companyId == company.id
-          ? columnsData.unshift({
-              Header: companies.find((item) => item.id === fact.companyId).name,
-              accessor: fact.companyId + '' + fact.fiscalYear + ' ' + fact.quarter,
-              className: 'bg-gray-200 dark:bg-gray-800 border-b dark:border-gray-700 border-white',
-            })
-          : columnsData.push({
-              Header: companies.find((item) => item.id === fact.companyId).name,
-              accessor: fact.companyId + '' + fact.fiscalYear + ' ' + fact.quarter,
-            });
-      });
-    }
-  });
+  const comparisionData = [];
 
   data.map((fact) => {
-    var child = {};
-    var myobj = {};
+    const facts = [];
 
-    fact.financialStatementLine.children.map((data) => {
-      data.financialStatementFact.map((myData) => {
-        Object.assign(child, {
-          [myData.companyId + '' + myData.fiscalYear + ' ' + myData.quarter]: myData.amount,
-          particular: data.name,
-          topic: data.unit,
-        });
+    fact.financialStatementLine.financialStatementFact.map((data) => {
+      facts.push({
+        companyName: companies.find((item) => item.id === data.companyId).name,
+        fiscalYear: data.fiscalYear + ' ' + data.quarter,
+        amount: data.amount,
       });
     });
-
-    fact.financialStatementLine.financialStatementFact.length > 0
-      ? fact.financialStatementLine.financialStatementFact.map((data) => {
-          Object.assign(myobj, {
-            particular: fact.financialStatementLine.name,
-            [data.companyId + '' + data.fiscalYear + ' ' + data.quarter]: data.amount,
-            subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
-          });
-        })
-      : Object.assign(myobj, {
-          particular: fact.financialStatementLine.name,
-          subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
-        });
-
-    dataList.push({ ...myobj, topic: fact.financialStatementLine.unit });
+    if (fact.financialStatementLine.unit !== 'topic')
+      comparisionData.push({
+        name: fact.financialStatementLine.name,
+        facts: facts,
+      });
   });
+
+  //This will skip topic and take first statement fact and push to columns
+  // data.some(function (statementline) {
+  //   const facts = statementline.financialStatementLine.financialStatementFact;
+  //   if (statementline.financialStatementLine.unit !== 'topic') {
+  //     return facts.map((fact) => {
+  //       fact.companyId == company.id
+  //         ? columnsData.unshift({
+  //             Header: companies.find((item) => item.id === fact.companyId).name,
+  //             accessor: fact.companyId + '' + fact.fiscalYear + ' ' + fact.quarter,
+  //             className: 'bg-gray-200 dark:bg-gray-800 border-b dark:border-gray-700 border-white',
+  //           })
+  //         : columnsData.push({
+  //             Header: companies.find((item) => item.id === fact.companyId).name,
+  //             accessor: fact.companyId + '' + fact.fiscalYear + ' ' + fact.quarter,
+  //           });
+  //     });
+  //   }
+  // });
+
+  // data.map((fact, i) => {
+  //   var child = {};
+  //   var myobj = {};
+  //   console.log(fact);
+
+  //   fact.financialStatementLine.children.map((data) => {
+  //     data.financialStatementFact.map((myData) => {
+  //       Object.assign(child, {
+  //         [myData.companyId + '' + myData.fiscalYear + ' ' + myData.quarter]: myData.amount,
+  //         name: data.name,
+  //         topic: data.unit,
+  //       });
+  //     });
+  //   });
+
+  //   fact.financialStatementLine.financialStatementFact.length > 0
+  //     ? fact.financialStatementLine.financialStatementFact.map((data) => {
+  //         Object.assign(myobj, {
+  //           particular: fact.financialStatementLine.name,
+  //           [data.companyId + '' + data.fiscalYear + ' ' + data.quarter]: data.amount,
+  //           subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
+  //         });
+  //       })
+  //     : Object.assign(myobj, {
+  //         particular: fact.financialStatementLine.name,
+  //         subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
+  //       });
+
+  //   dataList.push({ id: i, ...myobj, topic: fact.financialStatementLine.unit });
+  // });
 
   // Pass post data to the page via props
   return {
-    props: { company, peerCompanies, dataList, columnsData, fiscalYearList },
+    props: { company, peerCompanies, comparisionData, companies },
   };
 }
 
-function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, columnsData }) {
+function GraphComparision({ company, peerCompanies, comparisionData, companies }) {
   //To Avoid React Hook "useState" is called conditionally error.
   //React Hooks must be called in the exact same order in every component render.
-
   const router = useRouter();
-  const { slug, statementType, quarter, fiscalYear } = router.query;
+  const { slug, statementType, quarter } = router.query;
+
+  const [graphData, setGraphData] = useState([]);
 
   if (!company) {
     return <Custom404 />;
@@ -229,55 +253,12 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
 
   // Companies Ko id, quarter, fiscalYear, quarter
 
-  const columns = [
-    {
-      id: 'expander', // Make sure it has an ID
-      Header: 'SN',
-
-      Cell: function OrderItems({ row }) {
-        // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
-        // to build the toggle for expanding a row
-        return row.canExpand ? (
-          <span
-            {...row.getToggleRowExpandedProps({
-              style: {
-                // We can even use the row.depth property
-                // and paddingLeft to indicate the depth
-                // of the row
-                paddingLeft: `${row.depth * 2}rem`,
-              },
-            })}
-          >
-            {row.isExpanded ? (
-              <MinusIcon width={18} customClass="fill-current dark:text-gray-400 text-gray-500" />
-            ) : (
-              <PlusIcon width={18} customClass="fill-current dark:text-gray-400 text-gray-500" />
-            )}
-          </span>
-        ) : null;
-      },
-    },
-    {
-      Header: 'Particulars',
-      accessor: 'particular',
-      className: 'table-title',
-    },
-    ...columnsData,
-  ];
-
   const quarterOptions = [
     { value: 'q1', label: 'Q1' },
     { value: 'q2', label: 'Q2' },
     { value: 'q3', label: 'Q3' },
     { value: 'q4', label: 'Q4' },
   ];
-
-  const fiscalYearOptions = fiscalYearList
-    ? fiscalYearList.map((data) => ({
-        value: data.fiscalYear,
-        label: data.fiscalYear,
-      }))
-    : [];
 
   if (peerCompanies)
     peerCompanies.map((comp) => {
@@ -306,17 +287,49 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
   );
 
   const handleSubmission = (values) => {
-    const { quarter, companies, fiscalYear, statement } = values;
+    const { quarter, companies, statement } = values;
     router.push({
-      pathname: `/company/${slug}/peer-comparision`,
+      pathname: `/company/${slug}/graph-comparision`,
       query: {
         companies: companies,
         quarter: quarter,
-        fiscalYear: fiscalYear,
         statementType: statement,
       },
     });
   };
+
+  // function handleChange(quarter) {
+  //   router.push({
+  //     pathname: `/company/${slug}/peer-comparision`,
+  //     query: {
+  //       companies: companies,
+  //       quarter: quarter,
+  //       statementType: statement,
+  //     },
+  //   });
+  // }
+
+  const handleSelection = (selectedData) => {
+    // if (graphData.length === 0) {
+    const data = [];
+    const groupedData = groupByKey(selectedData.facts, 'fiscalYear');
+    const keys = Object.keys(groupedData);
+
+    keys.forEach((key, index) => {
+      const obj = {};
+      groupedData[key].map((data) => {
+        Object.assign(obj, {
+          name: selectedData.name,
+          [data.companyName]: data.amount,
+          fiscalYear: data.fiscalYear,
+        });
+      });
+      data.push(obj);
+    });
+    setGraphData(data);
+  };
+
+  console.log(companies);
 
   return (
     <StockLayout title={company.name}>
@@ -325,7 +338,6 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
           initialValues={{
             companies: [],
             quarter: quarter ? quarter : 'q4',
-            fiscalYear: fiscalYear ? fiscalYear : '',
             statement: statementType ? statementType : '1',
           }}
           onSubmit={(values, actions) => {
@@ -368,19 +380,6 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
 
                   <div className="mb-2 col-span-5 md:col-span-2">
                     <Field
-                      id="fiscalYear"
-                      name="fiscalYear"
-                      component={CustomSelectField}
-                      options={fiscalYearOptions}
-                      isMultiSelect={false}
-                    />
-                    <label htmlFor="fiscalYear" className="text-xs text-gray-800 dark:text-white">
-                      Fiscal Year
-                    </label>
-                  </div>
-
-                  <div className="mb-2 col-span-5 md:col-span-2">
-                    <Field
                       id={'statement'}
                       name="statement"
                       component={CustomSelectField}
@@ -410,30 +409,70 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
         </Formik>
 
         <div className="flex gap-3 p-2">
-          <Link href={'/company/[slug]/peer-comparision'} as={`/company/${slug}/peer-comparision`}>
-            <button className="bg-blue-900 hover:bg-blue-800 dark:hover:bg-blue-800 text-white px-4 py-1 rounded">
-              Figures
-            </button>
-          </Link>
-          <Link href={'/company/[slug]/graph-comparision'} as={`/company/${slug}/graph-comparision`}>
-            <button className="border border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-900 dark:text-white px-4 py-1 rounded ">
-              Graph
-            </button>
-          </Link>
+          <div className="flex gap-3 p-2">
+            <Link href={'/company/[slug]/peer-comparision'} as={`/company/${slug}/peer-comparision`}>
+              <button className="border border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-900 dark:text-white px-4 py-1 rounded ">
+                Figures
+              </button>
+            </Link>
+            <Link href={'/company/[slug]/graph-comparision'} as={`/company/${slug}/graph-comparision`}>
+              <button className="bg-blue-900 hover:bg-blue-800 dark:hover:bg-blue-800 text-white px-4 py-1 rounded">
+                Graph
+              </button>
+            </Link>
+          </div>
         </div>
 
-        {dataList ? (
-          <div className="grid">
-            <div className="w-full overflow-hidden shadow-xs">
-              <FinancialTable data={dataList} columns={columns} highlightTopic={true} />
-            </div>
+        {graphData.length > 0 && companies.length > 0 ? (
+          <MultipleLineGraph companies={companies} chartData={graphData} />
+        ) : null}
+
+        <h1 className="text-center text-xl mt-5 mb-5">Filters</h1>
+
+        {comparisionData ? (
+          <div className="flex flex-wrap gap-2">
+            {comparisionData.map((data) => (
+              <CustomFilter
+                key={data.name}
+                data={data}
+                handleClick={handleSelection}
+                active={graphData.length !== 0 ? data.name === graphData[0].name : false}
+              />
+            ))}
           </div>
         ) : (
-          <h1 className="text-2xl text-center mt-5 text-gray-700 dark:text-gray-100">Sorry, Data Not available !!</h1>
+          <h1 className="text-lg text-center">Sorry !! Data not Available</h1>
         )}
       </section>
     </StockLayout>
   );
 }
 
-export default FinancialStatement;
+function groupByKey(array, key) {
+  return array.reduce((hash, obj) => {
+    if (obj[key] === undefined) return hash;
+    return Object.assign(hash, { [obj[key]]: (hash[obj[key]] || []).concat(obj) });
+  }, {});
+}
+
+function CustomFilter({ data, handleClick, active }) {
+  // const [isActive, setActive] = useState(false);
+  return (
+    <div
+      className={`py-2 px-4 rounded-full flex-auto max-w-xs text-center cursor-pointer select-none 
+      ${
+        active
+          ? 'bg-blue-700 text-white'
+          : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-50 hover:bg-gray-300 transition duration-500 ease-in-out'
+      }`}
+      onClick={(e) => {
+        // selectedData[0].name === data.name ? setActive(true) : setActive(false);
+        handleClick(data);
+      }}
+    >
+      <h1 className="text-xs">{data.name}</h1>
+    </div>
+  );
+}
+
+export default GraphComparision;

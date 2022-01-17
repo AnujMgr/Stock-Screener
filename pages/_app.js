@@ -1,19 +1,16 @@
-import Router from "next/router";
-import NProgress from "nprogress"; //nprogress module
+import Router from 'next/router';
+import NProgress from 'nprogress'; //nprogress module
 
-import "nprogress/nprogress.css"; //styles of nprogress
-import "../styles/index.css";
+import 'nprogress/nprogress.css'; //styles of nprogress
+import '../styles/index.css';
 
-import { useRouter } from "next/router";
-import SecondaryLayout from "../components/layout/SecondaryLayout";
-import Layout from "../components/layout";
-import RouteGuard from "../lib/RouteGuard/RouteGuard";
-import { AuthProvider } from "../lib/contexts/AuthContext";
-import { appRoutes } from "../utils/constants";
+import { useRouter } from 'next/router';
+import { AuthProvider } from '../lib/contexts/AuthContext';
+import { appRoutes } from '../utils/constants';
 
-Router.events.on("routeChangeStart", () => NProgress.start());
-Router.events.on("routeChangeComplete", () => NProgress.done());
-Router.events.on("routeChangeError", () => NProgress.done());
+Router.events.on('routeChangeStart', () => NProgress.start());
+Router.events.on('routeChangeComplete', () => NProgress.done());
+Router.events.on('routeChangeError', () => NProgress.done());
 NProgress.configure({ showSpinner: false });
 
 function MyApp({ Component, pageProps }) {
@@ -33,15 +30,18 @@ function MyApp({ Component, pageProps }) {
     Component.getLayout ||
     ((page) => (
       <AuthProvider>
-        <RouteGuard router={router} pathIsProtected={pathIsProtected}>
-          {!pathIsProtected ? (
+        {/* <RouteGuard router={router} pathIsProtected={pathIsProtected}> */}
+        {page}
+        {/* {!pathIsProtected ? (
             <Layout>{page}</Layout>
-          ) : router.pathname.startsWith("/company/") ? (
-            <SecondaryLayout>{page}</SecondaryLayout>
+          ) : router.pathname.startsWith('/company/') ? (
+            <StockLayout>{page}</StockLayout>
+          ) : router.pathname.startsWith('/mutual-fund/') ? (
+            <StockLayout>{page}</StockLayout>
           ) : (
             <Layout>{page}</Layout>
-          )}
-        </RouteGuard>
+          )} */}
+        {/* </RouteGuard> */}
       </AuthProvider>
     ));
 

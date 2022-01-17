@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import Toggle from "../toggle";
-import SearchBar from "../searchbar";
-import { useRouter } from "next/router";
-import { CloseIcon, HamburgerIcon, SearchIcon } from "../../utils/icons";
-import { useAuth } from "../../lib/contexts/AuthContext";
-import UserProfile from "./UserProfile";
-import { useMediaQuery } from "react-responsive";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import ToggleTheme from '../ToggleTheme';
+import SearchBar from '../searchbar';
+import { useRouter } from 'next/router';
+import { CloseIcon, HamburgerIcon, SearchIcon } from '../../utils/icons';
+import { useAuth } from '../../lib/contexts/AuthContext';
+import UserProfile from './UserProfile';
+import { useMediaQuery } from 'react-responsive';
 
-function Navbar({ showSearch }) {
+function Navbar({ showSearch, showSymbol }) {
   const [hidden, setHidden] = useState(true);
   const [isOpen, setOpen] = useState(true);
   const router = useRouter();
@@ -16,17 +16,18 @@ function Navbar({ showSearch }) {
   const { user } = state;
 
   const logOut = () => {
-    fetch("/api/signOut", {
-      method: "POST",
-      credentials: "include",
+    fetch('/api/signOut', {
+      method: 'POST',
+      credentials: 'include',
     }).then(() => {
       dispatch({
-        type: "removeAuthDetails",
+        type: 'removeAuthDetails',
       });
+      return router.push('/login');
     });
   };
 
-  const isTabletOrMobile = useMediaQuery({ query: "(max-width: 992px)" });
+  const isTabletOrMobile = useMediaQuery({ query: '(max-width: 992px)' });
 
   return (
     <>
@@ -42,43 +43,32 @@ function Navbar({ showSearch }) {
                 <div className="pt-2 flex-1">
                   {showSearch ? (
                     <SearchBar
-                      borderRadiusBottom={"rounded-b-md"}
-                      borderRadiusTop={"rounded-t-md"}
-                      width={"w-full md:w-full sm:w-3/4 mr-auto"}
-                      backgroundColor={"bg-gray-200 dark:bg-gray-800"}
-                      padding={"py-0"}
-                      itemHoverBackground={
-                        "hover:bg-gray-300 dark:hover:bg-gray-700"
-                      }
+                      borderRadiusBottom={'rounded-b-md'}
+                      borderRadiusTop={'rounded-t-md'}
+                      width={'w-full md:w-full sm:w-3/4 mr-auto'}
+                      backgroundColor={'bg-gray-200 dark:bg-gray-800'}
+                      padding={'py-0'}
+                      itemHoverBackground={'hover:bg-gray-300 dark:hover:bg-gray-700'}
+                      showSymbol={showSymbol}
                     />
                   ) : null}
                 </div>
 
                 <div className="flex-1 text-right">
-                  <NavbarLink
-                    name="Home"
-                    isActive={router.asPath === "/"}
-                    path={"/"}
-                    pathAs={"/"}
-                  />
+                  <NavbarLink name="Home" isActive={router.asPath === '/'} path={'/'} pathAs={'/'} />
                   <NavbarLink
                     name="Screener"
-                    isActive={router.pathname.startsWith("/screener")}
-                    path={"/screener"}
-                    pathAs={"/screener"}
+                    isActive={router.pathname.startsWith('/screener')}
+                    path={'/screener'}
+                    pathAs={'/screener'}
                   />
                   <NavbarLink
                     name="Listing"
                     isActive={false}
-                    path={"/"}
-                    pathAs={"/"}
+                    path={'/listings/commercial-banks'}
+                    pathAs={'/listings/commercial-banks'}
                   />
-                  <NavbarLink
-                    name="Market"
-                    isActive={false}
-                    path={"/"}
-                    pathAs={"/"}
-                  />
+                  <NavbarLink name="Market" isActive={false} path={'/'} pathAs={'/'} />
                 </div>
               </div>
             </div>
@@ -87,11 +77,14 @@ function Navbar({ showSearch }) {
               {user && Object.keys(user).length !== 0 ? (
                 <UserProfile user={user} logOut={logOut} />
               ) : (
-                <div className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center ">
+                <div
+                  className="p-4 dark:text-white text-gray-900 hover:border-indigo-700 dark:hover:border-gray-300 
+                transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center"
+                >
                   <Link href="/login">Login</Link>
                 </div>
               )}
-              <Toggle />
+              <ToggleTheme />
             </div>
           </div>
         </div>
@@ -109,51 +102,34 @@ function Navbar({ showSearch }) {
               {/* Right Nav Items */}
               <div className="flex items-center gap-2 my-2">
                 {hidden ? (
-                  <button
-                    className="p-2 rounded"
-                    onClick={(e) => setHidden(false)}
-                  >
-                    <SearchIcon
-                      height={24}
-                      width={24}
-                      customClass={"fill-current text-black dark:text-white"}
-                    />
+                  <button className="p-2 rounded" onClick={(e) => setHidden(false)}>
+                    <SearchIcon height={24} width={24} customClass={'fill-current text-black dark:text-white'} />
                   </button>
                 ) : (
                   <button className="rounded" onClick={(e) => setHidden(true)}>
-                    <CloseIcon
-                      height={24}
-                      width={24}
-                      customClass={"fill-current text-black dark:text-white"}
-                    />
+                    <CloseIcon height={24} width={24} customClass={'fill-current text-black dark:text-white'} />
                   </button>
                 )}
-                <Toggle />
+                <ToggleTheme />
 
                 <button
                   onClick={(e) => setOpen(!open)}
-                  className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-900
-              transition duration-500 ease-in-out "
+                  className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600 
+                  hover:text-white dark:hover:bg-gray-900 transition duration-500 ease-in-out "
                 >
-                  <HamburgerIcon
-                    height={24}
-                    width={24}
-                    customClass={"fill-current text-white dark:text-white"}
-                  />
+                  <HamburgerIcon height={24} width={24} customClass={'fill-current text-white dark:text-white'} />
                 </button>
               </div>
             </div>
             {!hidden ? (
               <div className="p-2">
                 <SearchBar
-                  borderRadiusBottom={"rounded-b-md"}
-                  borderRadiusTop={"rounded-t-md"}
-                  backgroundColor={"bg-gray-200 dark:bg-gray-800"}
-                  padding={"py-0"}
-                  itemHoverBackground={
-                    "hover:bg-gray-300 dark:hover:bg-gray-700"
-                  }
-                  width={"w-full sm:w-3/4 mx-auto"}
+                  borderRadiusBottom={'rounded-b-md'}
+                  borderRadiusTop={'rounded-t-md'}
+                  backgroundColor={'bg-gray-200 dark:bg-gray-800'}
+                  padding={'py-0'}
+                  itemHoverBackground={'hover:bg-gray-300 dark:hover:bg-gray-700'}
+                  width={'w-full sm:w-3/4 mx-auto'}
                 />
               </div>
             ) : null}
@@ -176,37 +152,30 @@ function Navbar({ showSearch }) {
 function SideBar({ isOpen, setOpen }) {
   return (
     <div
-      className={`bg-gray-50 dark:bg-gray-800 dark:border-gray-600 lg:hidden h-screen w-full max-w-md fixed top-0 bottom-0 z-max-2 shadow-md transition-all duration-500 ease-in-out ${
-        isOpen ? "-left-full" : "left-0"
+      className={`bg-gray-50 dark:bg-gray-800 dark:border-gray-600 lg:hidden h-screen 
+      w-full max-w-md fixed top-0 bottom-0 z-max-2 shadow-md transition-all duration-500 ease-in-out ${
+        isOpen ? '-left-full' : 'left-0'
       }`}
     >
-      <div className="xl:container mx-auto flex justify-between items-center px-4 border-b border-gray-300 dark:border-gray-500 ">
+      <div className="xl:container mx-auto flex justify-between items-center px-4 border-b border-gray-300 dark:border-gray-500">
         <h1 className="text-2xl dark:text-white text-gray-900 my-3">
-          <Link href={"/"} as={"/"}>
+          <Link href={'/'} as={'/'}>
             Analytics
           </Link>
         </h1>
         <button
           onClick={(e) => setOpen(true)}
-          className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-900
-              transition duration-500 ease-in-out "
+          className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600
+           hover:text-white dark:hover:bg-gray-900 transition duration-500 ease-in-out"
         >
-          <HamburgerIcon
-            height={24}
-            width={24}
-            customClass={"fill-current text-white dark:text-white"}
-          />
+          <HamburgerIcon height={24} width={24} customClass={'fill-current text-white dark:text-white'} />
         </button>
       </div>
       <div className="flex flex-col ">
-        <SideBarNavLinks name={"Home"} path={"/"} pathAs={"/"} />
-        <SideBarNavLinks
-          name={"Screener"}
-          path={"/screener"}
-          pathAs={"/screener"}
-        />
-        <SideBarNavLinks name={"Listing"} path={"/"} pathAs={"/"} />
-        <SideBarNavLinks name={"Market"} path={"/"} pathAs={"/"} />
+        <SideBarNavLinks name={'Home'} path={'/'} pathAs={'/'} />
+        <SideBarNavLinks name={'Screener'} path={'/screener'} pathAs={'/screener'} />
+        <SideBarNavLinks name={'Listing'} path={'/'} pathAs={'/'} />
+        <SideBarNavLinks name={'Market'} path={'/'} pathAs={'/'} />
       </div>
     </div>
   );
@@ -224,17 +193,17 @@ function SideBarNavLinks({ name, path, pathAs }) {
 
 function NavbarLink({ name, isActive, path, pathAs }) {
   return (
-    <div
-      className={`
-      ${isActive ? "border-indigo-700 dark:border-gray-300" : ""}
-      p-4 dark:text-white text-gray-900 dark:hover:border-gray-300 hover:border-indigo-700  
-      transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center
-      `}
-    >
-      <Link className="" href={path} as={pathAs}>
+    <Link href={path} as={pathAs}>
+      <div
+        className={`
+          cursor-pointer p-4 dark:text-white text-gray-900 dark:hover:border-gray-300 hover:border-indigo-700  
+          transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center
+          ${isActive ? 'border-indigo-700 dark:border-gray-300' : ''}
+        `}
+      >
         {name}
-      </Link>
-    </div>
+      </div>
+    </Link>
   );
 }
 

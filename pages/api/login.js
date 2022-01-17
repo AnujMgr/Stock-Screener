@@ -1,16 +1,9 @@
-import bcrypt from "bcryptjs";
-import prisma from "../../prisma/client";
-import {
-  createAccessToken,
-  createRefreshToken,
-  sendRefreshToken,
-} from "../../lib/functions/auth";
+import bcrypt from 'bcryptjs';
+import prisma from '../../prisma/client';
+import { createAccessToken, createRefreshToken, sendRefreshToken } from '../../lib/functions/auth';
 
 export default async function login(req, res) {
   const { email, password } = req.body.data;
-
-  console.log(email);
-  console.log(req);
 
   const user = await prisma.user.findFirst({
     where: {
@@ -21,13 +14,13 @@ export default async function login(req, res) {
     const { method } = req;
     try {
       switch (method) {
-        case "POST":
+        case 'POST':
           /* Get Post Data */
           /* Any how email or password is blank */
           if (!email || !password) {
             return res.status(400).json({
-              status: "error",
-              error: "Request missing username or password",
+              status: 'error',
+              error: 'Request missing username or password',
             });
           }
           /* Check user email in database */
@@ -38,8 +31,8 @@ export default async function login(req, res) {
           if (!user) {
             /* Send error with message */
             res.status(400).json({
-              status: "error",
-              error: "Incorrect username or password",
+              status: 'error',
+              error: 'Incorrect username or password',
             });
           }
           /* Variables checking */
@@ -56,31 +49,30 @@ export default async function login(req, res) {
                   name: user.name,
                 };
                 /* Create JWT Payload */
-                sendRefreshToken(res, createRefreshToken(user));
+                const token = createRefreshToken(user);
+                sendRefreshToken(res, token);
                 const accessToken = createAccessToken(user);
 
-                return res
-                  .status(200)
-                  .json({ success: true, accessToken, user: payload });
+                return res.status(200).json({ success: true, accessToken, user: payload });
               } else {
                 /* Send error with message */
                 res.status(400).json({
-                  status: "error",
-                  error: "UserName Or Password incorrect",
-                  accessToken: "",
+                  status: 'error',
+                  error: 'UserName Or Password incorrect',
+                  accessToken: '',
                 });
               }
             });
           } else {
             res.status(400).json({
-              status: "error",
-              error: "Incorrect username or password",
+              status: 'error',
+              error: 'Incorrect username or password',
             });
           }
           break;
-        case "PUT":
+        case 'PUT':
           break;
-        case "PATCH":
+        case 'PATCH':
           break;
         default:
           break;

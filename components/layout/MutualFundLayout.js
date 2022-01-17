@@ -1,15 +1,14 @@
-import { Head } from "next/document";
-import Footer from "../footer/footer";
 import Navbar from "../navbar";
-import SecondaryNavbar from "../navbar/SecondaryNavbar";
+import StockNavbar from "../navbar/StockNavbar";
+import Footer from "../footer/footer";
 
-const SecondaryLayout = ({ children }) => {
+const MutualFundLayout = ({ children }) => {
   return (
     <>
       <div className="grid grid-rows-3 min-h-screen">
         <section className="row-span-full">
           <Navbar showSearch={true} />
-          <SecondaryNavbar />
+          <StockNavbar />
           <main className="row-end-auto">{children}</main>
         </section>
         <Footer />
@@ -18,4 +17,4 @@ const SecondaryLayout = ({ children }) => {
   );
 };
 
-export default SecondaryLayout;
+export default MutualFundLayout;

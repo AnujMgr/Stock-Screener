@@ -2,7 +2,9 @@ import { useTheme } from 'next-themes';
 import React from 'react';
 import Select from 'react-select';
 
-const SelectWithSearch = ({ name, options, id, handleChange, label, isMulti, selectedValue, placeholder }) => {
+// Source :https://gist.github.com/hubgit/e394e9be07d95cd5e774989178139ae8
+
+const CustomSelectField = ({ options, field, form, isMultiSelect }) => {
   const { theme } = useTheme();
   const isLight = theme == 'light';
 
@@ -40,27 +42,34 @@ const SelectWithSearch = ({ name, options, id, handleChange, label, isMulti, sel
     },
   });
 
+  const onChange = (option) => {
+    form.setFieldValue(field.name, isMultiSelect ? option.map((item) => item.value) : option.value);
+  };
+
+  const getValue = () => {
+    if (options) {
+      return isMultiSelect
+        ? options.filter((option) => field.value.indexOf(option.value) >= 0)
+        : options.find((option) => option.value === field.value);
+    } else {
+      return isMultiSelect ? [] : '';
+    }
+  };
   return (
     <>
       <Select
-        value={selectedValue}
         options={options}
+        name={field.name}
+        // value={options ? options.find((option) => option.value === field.value) : ''}
+        value={getValue()}
+        onChange={onChange}
+        onBlur={field.onBlur}
+        isMulti={isMultiSelect}
         styles={customStyles}
         theme={customTheme}
-        id={id}
-        onChange={handleChange}
-        name={name}
-        isMulti={isMulti}
-        isOptionDisabled={(option) => (isMulti ? selectedValues.length >= 2 : false)}
-        placeholder={placeholder}
       />
-      {label ? (
-        <label className="text-xs text-gray-900 dark:text-white" htmlFor={id}>
-          {label}
-        </label>
-      ) : null}
     </>
   );
 };
 
-export default SelectWithSearch;
+export default CustomSelectField;

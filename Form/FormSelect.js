@@ -27,7 +27,7 @@ function FormSelect(props) {
           );
         })}
       </select>
-      <label className="text-xs dark:text-white text-dark" htmlFor={name}>
+      <label className="text-xs dark:text-white text-dark mt-1" htmlFor={name}>
         {label}
       </label>
     </>

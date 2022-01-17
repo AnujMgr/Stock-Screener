@@ -1,10 +1,10 @@
-@import url("https://use.typekit.net/yne7bjc.css");
+@import url('https://use.typekit.net/yne7bjc.css');
 
 :root {
   /* Your default theme */
   --color-bg-primary: #fdfeff;
   --color-bg-secondary: #edf2f7;
-  --color-bg-ordinary: theme("colors.gray.100");
+  --color-bg-ordinary: theme('colors.gray.100');
 
   --color-text-primary: #2d3748;
   --color-text-secondary: #4a5568;
@@ -13,10 +13,10 @@
   /* Buttons */
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --color-bg-primary: #2d3748;
   --color-bg-secondary: #283141;
-  --color-bg-ordinary: theme("colors.gray.600");
+  --color-bg-ordinary: theme('colors.gray.600');
 
   --color-text-primary: #f7fafc;
   --color-text-secondary: #e2e8f0;
@@ -84,7 +84,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 6rem;
+      max-width: 10rem;
     }
   }
 
@@ -92,12 +92,11 @@
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
-    transition: background-color 50000s ease-in-out 0s,
-      color 5000s ease-in-out 0s;
+    transition: background-color 50000s ease-in-out 0s, color 5000s ease-in-out 0s;
   }
 
   .rs-table-row-header {
-    background: "blue";
+    background: 'blue';
   }
 
   @variants dark {
@@ -112,9 +111,7 @@
       @apply: bg-red-900;
       background-color: red;
     }
-    .rs-table-row-header {
-      background: "blue";
-    }
+
     .custom-scroll::-webkit-scrollbar {
       width: 1px;
       height: 0.4em;
@@ -138,9 +135,43 @@
     .custom-scroll-light::-webkit-scrollbar-thumb {
       background: #d1d5db;
     }
+
+    .table-comparision-company-light {
+      background-color: #e5e7eb;
+    }
+
+    .table-comparision-company-dark {
+      background-color: #1f2937;
+    }
+
+    .table-particular-topic-light {
+      background-color: #d1d5db !important;
+    }
+
+    .table-particular-topic-dark {
+      background-color: #1f2937 !important;
+    }
+    .active-graph-particular-light {
+      background-color: #059669 !important;
+    }
+    .active-graph-particular-dark {
+      background-color: #1f2937 !important;
+    }
+
+    .table-particular-light {
+      background-color: #f9fafb;
+    }
+    .table-particular-dark {
+      background-color: #111827;
+    }
   }
 }
 
 .background-svg {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' version='1.1' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns:svgjs='http://svgjs.com/svgjs' width='1440' height='560' preserveAspectRatio='none' viewBox='0 0 1440 560'%3e%3cg mask='url(%26quot%3b%23SvgjsMask1006%26quot%3b)' fill='none'%3e%3crect width='1440' height='560' x='0' y='0' fill='rgba(76%2c 29%2c 149%2c 1)'%3e%3c/rect%3e%3cpath d='M0%2c353.788C79.697%2c365.715%2c171.656%2c415.832%2c236.434%2c367.899C302.152%2c319.271%2c281.755%2c215.582%2c295.651%2c135.019C306.039%2c74.795%2c310.75%2c16.813%2c307.518%2c-44.214C303.967%2c-111.268%2c318.544%2c-187.198%2c275.843%2c-239.019C233.046%2c-290.956%2c152.254%2c-281.318%2c90.363%2c-307.748C17.513%2c-338.859%2c-41.948%2c-422.642%2c-119.793%2c-407.976C-196.687%2c-393.489%2c-222.371%2c-296.162%2c-275.591%2c-238.801C-331.201%2c-178.864%2c-422.365%2c-143.124%2c-439.664%2c-63.214C-457.048%2c17.092%2c-408.813%2c97.528%2c-363.191%2c165.864C-322.147%2c227.343%2c-260.599%2c269.373%2c-194.946%2c303.343C-134.099%2c334.827%2c-67.755%2c343.648%2c0%2c353.788' fill='%233d1777'%3e%3c/path%3e%3cpath d='M1440 921.932C1509.535 932.8430000000001 1577.203 902.5419999999999 1640.923 872.643 1712.549 839.0350000000001 1810.283 814.903 1830.896 738.516 1852.202 659.56 1752.033 597.676 1736.807 517.326 1722.662 442.678 1783.835 360.523 1746.709 294.235 1709.292 227.42700000000002 1626.758 188.62 1550.306 184.33100000000002 1477.706 180.25799999999998 1425.187 251.45800000000003 1355.521 272.291 1286.383 292.967 1205.614 264.587 1145.992 305.24 1081.087 349.495 1039.245 423.28 1021.756 499.866 1003.502 579.803 995.377 675.707 1046.812 739.563 1098.309 803.495 1201.416 780.822 1275.888 815.364 1336.282 843.376 1374.231 911.6120000000001 1440 921.932' fill='%235b23b3'%3e%3c/path%3e%3c/g%3e%3cdefs%3e%3cmask id='SvgjsMask1006'%3e%3crect width='1440' height='560' fill='white'%3e%3c/rect%3e%3c/mask%3e%3c/defs%3e%3c/svg%3e");
+}
+
+input:checked ~ .dot {
+  transform: translateX(100%);
+  background-color: #48bb78;
 }

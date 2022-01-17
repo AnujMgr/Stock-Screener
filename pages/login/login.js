@@ -1,17 +1,18 @@
-import React, { useEffect } from "react";
-import Link from "next/link";
-import { ToastContainer, toast } from "react-toast";
-import { useAuth } from "../../lib/contexts/AuthContext";
-import { useRouter } from "next/router";
-import Cookies from "js-cookie";
-import { Field, Formik } from "formik";
-import PasswordField from "../../Form/PasswordField";
-import * as Yup from "yup";
-import axios from "axios";
+import React, { useEffect } from 'react';
+import Link from 'next/link';
+import { ToastContainer, toast } from 'react-toast';
+import { useAuth } from '../../lib/contexts/AuthContext';
+import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
+import { Field, Formik } from 'formik';
+import PasswordField from '../../Form/PasswordField';
+import * as Yup from 'yup';
+import axios from 'axios';
+import Layout from '../../components/layout';
 
 const Schema = Yup.object().shape({
-  email: Yup.string().required("This field is required"),
-  password: Yup.string().required("This field is required"),
+  email: Yup.string().required('This field is required'),
+  password: Yup.string().required('This field is required'),
 });
 
 const Login = () => {
@@ -30,10 +31,10 @@ const Login = () => {
     // You can use any data fetching library
     await axios
       .post(`/api/login`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
         },
         data,
       })
@@ -41,16 +42,16 @@ const Login = () => {
         const { user, accessToken } = response.data;
 
         if (user && accessToken) {
-          Cookies.set("token", accessToken);
+          Cookies.set('token', accessToken);
           dispatch({
-            type: "setAuthDetails",
+            type: 'setAuthDetails',
             payload: {
               user: user,
               accessToken: accessToken,
             },
           });
 
-          return router.push("/");
+          return router.push('/');
         }
       })
       .catch((error) => {
@@ -58,10 +59,10 @@ const Login = () => {
           console.log(error.response);
           emailOrPasswordWrong(error.response.data.error);
         } else if (error.request) {
-          console.log("network error");
-          emailOrPasswordWrong("Network Error !!");
+          console.log('network error');
+          emailOrPasswordWrong('Network Error !!');
         } else {
-          console.log("Something went wrong!!");
+          console.log('Something went wrong!!');
         }
       });
   }
@@ -82,28 +83,24 @@ const Login = () => {
 
   useEffect(() => {
     if (state.accessToken && state.user) {
-      router.push("/");
+      router.push('/');
     }
   }, [state, router]);
 
   return (
-    <>
+    <Layout showSearch={true} showSymbol={true} title={'Login'}>
       <section className="xl:container mx-auto">
         <div className="max-w-4xl mx-auto my-8 bg-white dark:bg-gray-900 shadow-sm rounded-md overflow-hidden">
           <div className="p-3 ">
             <div className="text-center mt-10">
-              <h1 className="text-center text-5xl font-normal text-gray-500 dark:text-white">
-                Sign in
-              </h1>
-              <p className="mt-2 text-gray-600 mb-10">
-                Sign in to your Account
-              </p>
+              <h1 className="text-center text-5xl font-normal text-gray-500 dark:text-white">Sign in</h1>
+              <p className="mt-2 text-gray-600 mb-10">Sign in to your Account</p>
             </div>
 
             <Formik
               initialValues={{
-                email: "",
-                password: "",
+                email: '',
+                password: '',
               }}
               validationSchema={Schema}
               onSubmit={(values, actions) => {
@@ -130,9 +127,7 @@ const Login = () => {
                       />
 
                       {touched.email && errors.email && (
-                        <span className="error text-red-700 text-sm">
-                          {errors.email}
-                        </span>
+                        <span className="error text-red-700 text-sm">{errors.email}</span>
                       )}
                     </div>
 
@@ -140,16 +135,9 @@ const Login = () => {
                       <label htmlFor="password" className="select-none">
                         Password
                       </label>
-                      <Field
-                        id="password"
-                        name="password"
-                        placeholder="Password"
-                        component={PasswordField}
-                      />
+                      <Field id="password" name="password" placeholder="Password" component={PasswordField} />
                       {touched.password && errors.password && (
-                        <span className="error text-red-700 text-sm">
-                          {errors.password}
-                        </span>
+                        <span className="error text-red-700 text-sm">{errors.password}</span>
                       )}
                     </div>
 
@@ -158,9 +146,7 @@ const Login = () => {
                         <button
                           type="submit"
                           className={` text-white px-6 py-2 rounded-md shadow-lg transition duration-500 ease-in-out w-full ${
-                            isSubmitting
-                              ? "bg-gray-600 cursor-not-allowed"
-                              : "bg-blue-800 hover:bg-blue-600"
+                            isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-800 hover:bg-blue-600'
                           }`}
                           disabled={isSubmitting}
                         >
@@ -173,14 +159,12 @@ const Login = () => {
                           type="button"
                           onClick={(e) =>
                             onSubmitHandler({
-                              email: "anujmgr777@gmail.com",
-                              password: "password",
+                              email: 'anujmgr777@gmail.com',
+                              password: 'password',
                             })
                           }
                           className={` text-white px-6 py-2 rounded-md shadow-lg transition duration-500 ease-in-out w-full ${
-                            isSubmitting
-                              ? "bg-green-300 cursor-not-allowed"
-                              : "bg-green-600 hover:bg-green-800"
+                            isSubmitting ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-800'
                           }`}
                           disabled={isSubmitting}
                         >
@@ -190,14 +174,12 @@ const Login = () => {
 
                       <div className="mt-4">
                         <div className="flex justify-center">
-                          <span className="pr-2 text-gray-500">
-                            Don&apos;t Have Account?
-                          </span>
+                          <span className="pr-2 text-gray-500">Don&apos;t Have Account?</span>
                           <h1
                             className="hover:text-indigo-900 text-blue-800 font-bold transition duration-500 ease-in-out"
                             title="Signup Now"
                           >
-                            <Link href={"/register"} as={"/register"}>
+                            <Link href={'/register'} as={'/register'}>
                               Sign Up
                             </Link>
                           </h1>
@@ -231,7 +213,7 @@ const Login = () => {
         </div>
         <ToastContainer delay={7000} position="bottom-right" />
       </section>
-    </>
+    </Layout>
   );
 };
 

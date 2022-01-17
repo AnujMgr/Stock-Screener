@@ -10,6 +10,7 @@ import Custom404 from '../404';
 import Spinner from '../../components/Spinner';
 import FinancialTable from '../../components/FinancialTable/FinancialTable';
 import StockLayout from '../../components/layout/StockLayout';
+import Layout from '../../components/layout';
 
 export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -357,7 +358,7 @@ export function Company({
   ];
 
   return (
-    <StockLayout title={company.name}>
+    <Layout title={company.name} showSearch={true} showSymbol={true}>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
         <div className="grid grid-cols-1 sm:grid-cols-2 text-gray-900 dark:text-gray-50">
           <div>
@@ -447,18 +448,18 @@ export function Company({
         <div className="grid grid-cols-1 ">
           <div className=" gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0 text-gray-900 dark:text-gray-50">
             {/* <div className="col-span-3 md:col-span-3 gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0"> */}
-            <h2 className="font-bold text-xl mt-2 mb-4">Statistics Overview</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4  gap-4">
+            <h2 className="font-bold text-xl mb-4">Key Metrics</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {!Array.isArray(essentials) || !essentials.length ? (
                 <h1>Data Not Available !!</h1>
               ) : (
                 essentials.map((data) => (
-                  <div className="flex justify-between align-bottom mb-2 border-b border-gray-600" key={data.name}>
+                  <div className="flex flex-col mb-2" key={data.name}>
                     <p className="text-xs font-normal mb-2 flex items-baseline">
                       {data.name}{' '}
                       <span className="ml-2 relative" data-tip data-for="registerTip">
                         <InfoIcon
-                          customClass={'fill-current text-blue-600 dark:text-gray-500'}
+                          customClass={'fill-current text-blue-600 dark:text-green-500'}
                           height={14}
                           width={14}
                         />
@@ -490,6 +491,7 @@ export function Company({
         <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Peer Comparision</h2>
         <SortableTable columns={columns} data={dataList} highlightTopic={true} showCheck={false} />
       </section>
+
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
         <div className="flex justify-between">
           <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Corporate Actions</h2>
@@ -518,7 +520,7 @@ export function Company({
           </div>
         </div>
       </section>
-    </StockLayout>
+    </Layout>
   );
 }
 

@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-function SecondaryNavbar() {
+function MutualFundLayout() {
   const router = useRouter();
   const { slug } = router.query;
 
@@ -58,4 +58,4 @@ function SecondaryNavLink({ isActive, path, pathAs, name }) {
   );
 }
 
-export default SecondaryNavbar;
+export default MutualFundLayout;

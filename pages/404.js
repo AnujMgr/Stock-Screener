@@ -1,37 +1,33 @@
-import Link from "next/link";
-import React from "react";
-import SearchBar from "../components/searchbar";
-import { useTheme } from "next-themes";
+import Link from 'next/link';
+import React from 'react';
+import SearchBar from '../components/searchbar';
+import Layout from '../components/layout';
 
 export default function Custom404() {
-  const { theme } = useTheme();
-
   return (
-    <section className="xl:container mx-3 xl:mx-auto mt-8 px-2 py-5 md:p-5 mb-3">
-      <h1 className="text-9xl mt-8 text-center dark:text-red-400 text-indigo-400">
-        404
-      </h1>
-      <h1 className="text-3xl text-center mb-5 text-gray-700 dark:text-gray-50">
-        Sorry, Page Not Found
-      </h1>
-      <div className="md:flex justify-center w-full">
-        <SearchBar
-          borderRadiusBottom={"rounded-b-md"}
-          borderRadiusTop={"rounded-t-md"}
-          backgroundColor={"bg-gray-300 dark:bg-gray-700"}
-          padding={"py-0"}
-          itemHoverBackground={"hover:bg-gray-300 dark:hover:bg-gray-700"}
-          width={"w-full sm:w-3/4 md:w-96 mx-auto"}
-        />
-      </div>
-      <div className="text-center mt-8">
-        <button className="p-2 bg-blue-800 mx-3 text-white shadow-md rounded-md">
-          <Link href="/">Home</Link>
-        </button>
-        <Link href="/" className="p-2 bg-blue-600">
-          Contact
-        </Link>
-      </div>
-    </section>
+    <Layout showSearch={true} showSymbol={true} title={'Page Not Found'}>
+      <section className="xl:container mx-3 xl:mx-auto mt-8 px-2 py-5 md:p-5 mb-3">
+        <h1 className="text-9xl mt-8 text-center dark:text-red-400 text-indigo-400">404</h1>
+        <h1 className="text-3xl text-center mb-5 text-gray-700 dark:text-gray-50">Sorry, Page Not Found</h1>
+        <div className="md:flex justify-center w-full">
+          <SearchBar
+            borderRadiusBottom={'rounded-b-md'}
+            borderRadiusTop={'rounded-t-md'}
+            backgroundColor={'bg-gray-300 dark:bg-gray-700'}
+            padding={'py-0'}
+            itemHoverBackground={'hover:bg-gray-300 dark:hover:bg-gray-700'}
+            width={'w-full sm:w-3/4 md:w-96 mx-auto'}
+          />
+        </div>
+        <div className="text-center mt-8">
+          <button className="p-2 bg-blue-800 mx-3 text-white shadow-md rounded-md">
+            <Link href="/">Home</Link>
+          </button>
+          <Link href="/" className="p-2 bg-blue-600">
+            Contact
+          </Link>
+        </div>
+      </section>
+    </Layout>
   );
 }

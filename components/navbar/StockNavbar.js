@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/router";
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 function StockNavbar() {
   const router = useRouter();
@@ -13,14 +13,9 @@ function StockNavbar() {
           isActive={router.asPath === `/company/${slug}`}
           path={`/company/[slug]`}
           pathAs={`/company/${slug}`}
-          name={"Summary"}
+          name={'Summary'}
         />
-        <SecondaryNavLink
-          isActive={false}
-          path={`/`}
-          pathAs={`/`}
-          name={"Technicals"}
-        />
+        <SecondaryNavLink isActive={false} path={`/`} pathAs={`/`} name={'Technicals'} />
 
         <SecondaryNavLink
           isActive={
@@ -30,7 +25,7 @@ function StockNavbar() {
           }
           path={`/company/[slug]/financial-overview`}
           pathAs={`/company/${slug}/financial-overview`}
-          name={"Financials"}
+          name={'Financials'}
         />
         <SecondaryNavLink
           isActive={
@@ -39,7 +34,7 @@ function StockNavbar() {
           }
           path={`/company/[slug]/peer-comparision`}
           pathAs={`/company/${slug}/peer-comparision`}
-          name={"Peer Comparison"}
+          name={'Peer Comparison'}
         />
         {/* <MenuWithDropdown
           isActive={router.asPath.includes(`/company/${slug}/peer-comparision`)}
@@ -57,7 +52,7 @@ function SecondaryNavLink({ isActive, path, pathAs, name }) {
     <Link href={path} as={pathAs} passHref>
       <div
         className={`cursor-pointer dark:text-white text-gray-900 px-3 py-2 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center flex-none
-          ${isActive ? "border-indigo-700 dark:border-gray-300" : null}
+          ${isActive ? 'border-indigo-700 dark:border-gray-300' : null}
           `}
       >
         {name}
@@ -72,7 +67,7 @@ function MenuWithDropdown({ isActive, path, pathAs, name }) {
     <div className="relative">
       <div
         className={`cursor-pointer dark:text-white text-gray-900 px-3 py-2 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center flex-none
-          ${isActive ? "border-indigo-700 dark:border-gray-300" : null}
+          ${isActive ? 'border-indigo-700 dark:border-gray-300' : null}
           `}
       >
         {name}
@@ -81,7 +76,7 @@ function MenuWithDropdown({ isActive, path, pathAs, name }) {
         <Link href={path} as={pathAs} passHref>
           <div
             className={`cursor-pointer dark:text-white text-gray-900 px-3 py-2 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center flex-none
-          ${isActive ? "border-indigo-700 dark:border-gray-300" : null}
+          ${isActive ? 'border-indigo-700 dark:border-gray-300' : null}
           `}
           >
             {name}
