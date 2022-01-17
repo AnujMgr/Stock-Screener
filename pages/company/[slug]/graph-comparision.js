@@ -394,9 +394,8 @@ function GraphComparision({ company, peerCompanies, comparisionData, companies }
                   <div className="mb-2 text-center md:text-left col-span-10 md:col-span-2">
                     <button
                       type="submit"
-                      className="bg-blue-600 text-white h-9 px-5 rounded"
                       disabled={isSubmitting}
-                      className={`text-white h-9 px-5 rounded 
+                      className={`bg-blue-600 text-white h-9 px-5 rounded 
                       ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-600'}`}
                     >
                       Submit
@@ -410,12 +409,12 @@ function GraphComparision({ company, peerCompanies, comparisionData, companies }
 
         <div className="flex gap-3 p-2">
           <div className="flex gap-3 p-2">
-            <Link href={'/company/[slug]/peer-comparision'} as={`/company/${slug}/peer-comparision`}>
+            <Link href={'/company/[slug]/peer-comparision'} as={`/company/${slug}/peer-comparision`} passHref>
               <button className="border border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-900 dark:text-white px-4 py-1 rounded ">
                 Figures
               </button>
             </Link>
-            <Link href={'/company/[slug]/graph-comparision'} as={`/company/${slug}/graph-comparision`}>
+            <Link href={'/company/[slug]/graph-comparision'} as={`/company/${slug}/graph-comparision`} passHref>
               <button className="bg-blue-900 hover:bg-blue-800 dark:hover:bg-blue-800 text-white px-4 py-1 rounded">
                 Graph
               </button>

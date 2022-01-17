@@ -193,7 +193,7 @@ function SideBarNavLinks({ name, path, pathAs }) {
 
 function NavbarLink({ name, isActive, path, pathAs }) {
   return (
-    <Link href={path} as={pathAs}>
+    <Link href={path} as={pathAs} passHref>
       <div
         className={`
           cursor-pointer p-4 dark:text-white text-gray-900 dark:hover:border-gray-300 hover:border-indigo-700  

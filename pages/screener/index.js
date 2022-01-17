@@ -250,9 +250,8 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
                   <div className="mb-2 text-center md:text-left col-span-10 md:col-span-2">
                     <button
                       type="submit"
-                      className="bg-blue-600 text-white h-9 px-5 rounded"
                       disabled={isSubmitting}
-                      className={`text-white h-9 px-5 rounded 
+                      className={`text-white h-9 px-5 rounded  bg-blue-600
                       ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-600'}`}
                     >
                       Submit

@@ -144,7 +144,6 @@ export default function SearchBar({
                           itemHoverBackground={itemHoverBackground}
                           getItemProps={getItemProps}
                           index={index}
-                          key={item.id}
                         />
                       ))}
                   </>
