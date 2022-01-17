@@ -40,8 +40,9 @@ export default function SearchBar({
   const handleOnSelect = (item) => {
     // the item selected
     const slug = item.slug;
+    console.log(item);
     router.push({
-      pathname: '/company/[slug]',
+      pathname: item.industry.id == 1 ? '/company/[slug]' : item.industry.id == 3 ? '/mutual-fund/[slug]' : null,
       query: { slug: slug },
     });
   };
@@ -56,6 +57,7 @@ export default function SearchBar({
     }
   };
 
+  // Delay Input value
   const debounced = useDebouncedCallback((value) => {
     handleFetchRequest(value);
   }, 1000);
@@ -72,7 +74,6 @@ export default function SearchBar({
     >
       {({ getInputProps, getItemProps, getMenuProps, isOpen, inputValue, getRootProps }) => (
         <div className={`relative ${width ? width : 'w-11/12 sm:w-96 md:w-120'} `}>
-          {/* <label {...getLabelProps()}>Enter a fruit</label> */}
           <div
             className={` 
             ${borderRadiusTop ? borderRadiusTop : 'rounded-t-3xl'}
@@ -89,7 +90,9 @@ export default function SearchBar({
               ${backgroundColor ? backgroundColor : 'bg-white dark:bg-gray-700'}
                 focus:outline-none py-2.5 px-2 w-full`}
               {...getInputProps({
-                onChange: (e) => debounced(e.target.value),
+                onChange: (e) => {
+                  setLoading(true), debounced(e.target.value);
+                },
                 onKeyDown(e) {
                   if (e.key === 'Enter' && e.target.value.length > 3) {
                     handleOnEnter(items);
@@ -100,7 +103,6 @@ export default function SearchBar({
               ref={searchInputRef}
             />
           </div>
-
           {isOpen && inputValue ? ( // Avoid empty suggestion box on focus
             inputValue.length !== 0 ? (
               <div
@@ -158,9 +160,7 @@ export default function SearchBar({
 function SearchItem({ item, showSymbol, itemHoverBackground, getItemProps, index }) {
   return (
     <div
-      className={`${
-        itemHoverBackground ? itemHoverBackground : 'hover:bg-gray-200 dark:hover:bg-gray-800'
-      } 
+      className={`${itemHoverBackground ? itemHoverBackground : 'hover:bg-gray-200 dark:hover:bg-gray-800'} 
       flex justify-between px-6 py-2 cursor-pointer transition ease-in-out delay-150`}
       {...getItemProps({
         key: item.id,

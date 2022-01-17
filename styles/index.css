@@ -1,10 +1,10 @@
-@import url("https://use.typekit.net/yne7bjc.css");
+@import url('https://use.typekit.net/yne7bjc.css');
 
 :root {
   /* Your default theme */
   --color-bg-primary: #fdfeff;
   --color-bg-secondary: #edf2f7;
-  --color-bg-ordinary: theme("colors.gray.100");
+  --color-bg-ordinary: theme('colors.gray.100');
 
   --color-text-primary: #2d3748;
   --color-text-secondary: #4a5568;
@@ -13,10 +13,10 @@
   /* Buttons */
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --color-bg-primary: #2d3748;
   --color-bg-secondary: #283141;
-  --color-bg-ordinary: theme("colors.gray.600");
+  --color-bg-ordinary: theme('colors.gray.600');
 
   --color-text-primary: #f7fafc;
   --color-text-secondary: #e2e8f0;
@@ -84,7 +84,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 6rem;
+      max-width: 10rem;
     }
   }
 
@@ -92,12 +92,11 @@
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
   input:-webkit-autofill:active {
-    transition: background-color 50000s ease-in-out 0s,
-      color 5000s ease-in-out 0s;
+    transition: background-color 50000s ease-in-out 0s, color 5000s ease-in-out 0s;
   }
 
   .rs-table-row-header {
-    background: "blue";
+    background: 'blue';
   }
 
   @variants dark {
@@ -112,9 +111,7 @@
       @apply: bg-red-900;
       background-color: red;
     }
-    .rs-table-row-header {
-      background: "blue";
-    }
+
     .custom-scroll::-webkit-scrollbar {
       width: 1px;
       height: 0.4em;
@@ -137,6 +134,35 @@
     }
     .custom-scroll-light::-webkit-scrollbar-thumb {
       background: #d1d5db;
+    }
+
+    .table-comparision-company-light {
+      background-color: #e5e7eb;
+    }
+
+    .table-comparision-company-dark {
+      background-color: #1f2937;
+    }
+
+    .table-particular-topic-light {
+      background-color: #d1d5db !important;
+    }
+
+    .table-particular-topic-dark {
+      background-color: #1f2937 !important;
+    }
+    .active-graph-particular-light {
+      background-color: #059669 !important;
+    }
+    .active-graph-particular-dark {
+      background-color: #1f2937 !important;
+    }
+
+    .table-particular-light {
+      background-color: #f9fafb;
+    }
+    .table-particular-dark {
+      background-color: #111827;
     }
   }
 }

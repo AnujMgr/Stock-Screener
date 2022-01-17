@@ -16,7 +16,7 @@ function UserProfile({ user, logOut }) {
   }, []);
 
   const myLoader = ({ src, width, quality }) => {
-    return `https://picsum.photos/200/200?w=${width}&q=${quality || 75}`;
+    return `https://picsum.photos/id/1005/200/200?w=${width}&q=${quality || 75}`;
   };
 
   return (

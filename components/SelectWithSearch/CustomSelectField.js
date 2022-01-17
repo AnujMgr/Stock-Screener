@@ -43,7 +43,6 @@ const CustomSelectField = ({ options, field, form, isMultiSelect }) => {
   });
 
   const onChange = (option) => {
-    console.log(option);
     form.setFieldValue(field.name, isMultiSelect ? option.map((item) => item.value) : option.value);
   };
 

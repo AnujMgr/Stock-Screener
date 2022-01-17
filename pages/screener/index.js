@@ -1,8 +1,10 @@
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React from 'react';
+import Layout from '../../components/layout';
 import SortableTable from '../../components/SortableTable';
-import FormSelect from '../../Form/FormSelect';
 import prisma from '../../prisma/client';
+import { Field, Formik } from 'formik';
+import CustomSelectField from '../../components/SelectWithSearch/CustomSelectField';
 
 export async function getServerSideProps({ query }) {
   const screenerData = [];
@@ -18,7 +20,12 @@ export async function getServerSideProps({ query }) {
     },
   ];
   const dataList = [];
-  const fiscalYearList = [];
+  const fiscalYearList = await prisma.fiscalYears.findMany({
+    orderBy: {
+      fiscalYear: 'desc',
+    },
+  });
+  // const fiscalYearList = [];
 
   const industries = await prisma.industry.findMany();
 
@@ -31,7 +38,7 @@ export async function getServerSideProps({ query }) {
   if (!currentIndustry) {
     const dataList = null;
     const columns = null;
-    return { props: { columns, dataList, industries } };
+    return { props: { columns, dataList, industries, fiscalYearList } };
   }
 
   const companies = await prisma.company.findMany({
@@ -48,8 +55,7 @@ export async function getServerSideProps({ query }) {
     },
   });
 
-  if (companies.length <= 0) {
-    const fiscalYearList = [];
+  if (companies.length < 1) {
     return { props: { columns, dataList, industries, fiscalYearList } };
   }
 
@@ -100,20 +106,11 @@ export async function getServerSideProps({ query }) {
     //
   });
 
-  const currentFiscalYearFact = await prisma.financialStatementFact.findFirst({
-    where: {
-      companyId: companies[0].id,
-    },
-    orderBy: {
-      fiscalYear: 'desc',
-    },
-  });
-
-  for (let i = 0; i < 5; i++) {
-    var firstYear = parseInt(parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1);
-    var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
-    fiscalYearList.push(parseInt(firstYear - i) + '/' + parseInt(lastYear - i));
-  }
+  // for (let i = 0; i < 5; i++) {
+  //   var firstYear = parseInt(parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1);
+  //   var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
+  //   fiscalYearList.push(parseInt(firstYear - i) + '/' + parseInt(lastYear - i));
+  // }
 
   companies.map((company, i) => {
     var myobj = {};
@@ -136,15 +133,11 @@ export async function getServerSideProps({ query }) {
 
 export default function Screener({ columns, dataList, industries, fiscalYearList }) {
   const router = useRouter();
-  const { industry, quarter } = router.query;
-
-  const [industryOption, setIndustryOption] = useState(industry ? industry : 'commercial-banks');
-  const [quarterOption, setQuarterOption] = useState(quarter ? quarter : '0');
-  const [fiscalYearOption, setFiscalYearOption] = useState('');
+  const { industry, quarter, fiscalYear } = router.query;
 
   const industryOptions = [];
 
-  industries.map((industry) => industryOptions.push({ id: industry.slug, name: industry.name }));
+  industries.map((industry) => industryOptions.push({ value: industry.slug, label: industry.name }));
 
   if (columns == null) {
     return (
@@ -155,86 +148,206 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
   }
 
   const quarterOptions = [
-    { id: 'q1', name: 'Q1' },
-    { id: 'q2', name: 'Q2' },
-    { id: 'q3', name: 'Q3' },
-    { id: 'q4', name: 'Q4' },
+    { value: 'q1', label: 'Q1' },
+    { value: 'q2', label: 'Q2' },
+    { value: 'q3', label: 'Q3' },
+    { value: 'q4', label: 'Q4' },
   ];
 
   const fiscalYearOptions = fiscalYearList
-    ? fiscalYearList.map((fiscalYear) => ({
-        id: fiscalYear,
-        name: fiscalYear,
+    ? fiscalYearList.map((data) => ({
+        value: data.fiscalYear,
+        label: data.fiscalYear,
       }))
     : [];
 
+  const handleSubmission = (values) => {
+    const { industry, quarter, fiscalYear } = values;
+    router.push({
+      pathname: `/screener`,
+      query: {
+        industryType: industry,
+        fiscalYear: fiscalYear,
+        quarter: quarter,
+      },
+    });
+  };
+
   return (
-    <section className="xl:container mt-5 mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-md">
-      <div className="grid grid-cols-4 md:grid-cols-5 gap-1">
-        <div className="mb-4">
-          <FormSelect
-            control="select"
-            label="Industry Type"
-            name="Industry"
-            customClassName="rounded border border-gray-600"
-            value={industryOption}
-            options={industryOptions}
-            handleChange={(e) => {
-              setIndustryOption(e.target.value);
-              router.push({
-                pathname: `/screener`,
-                query: {
-                  industryType: e.target.value,
-                  fiscalYear: fiscalYearOption,
-                  quarter: quarterOption,
-                },
-              });
-            }}
-          />
-        </div>
-        <div className="mb-2 col-span-2 md:col-span-1">
-          <FormSelect
-            options={quarterOptions}
-            control="select"
-            label="Select Quarter"
-            name="quarter"
-            value={quarterOption}
-            customClassName="rounded border dark:border-gray-700 border-gray-400"
-            handleChange={(e) => {
-              setQuarterOption(e.target.value);
-              router.push({
-                pathname: `/screener`,
-                query: {
-                  industryType: industryOption,
-                  fiscalYear: fiscalYearOption,
-                  quarter: e.target.value,
-                },
-              });
-            }}
-          />
-        </div>
-        <div className="mb-2">
-          <FormSelect
-            customClassName="rounded border dark:border-gray-700 border-gray-400"
-            options={fiscalYearOptions}
-            control="select"
-            label="FiscalYear"
-            name="FiscalYear"
-            value={fiscalYearOption}
-            handleChange={(e) => {
-              setFiscalYearOption(e.target.value);
-              router.push({
-                pathname: `/screener`,
-                query: {
-                  industryType: industryOption,
-                  fiscalYear: e.target.value,
-                  quarter: quarterOption,
-                },
-              });
-            }}
-          />
-        </div>
-        {/* <div className="mb-2">
+    <Layout showSearch={true} showSymbol={true} title={'Screener'}>
+      <section className="xl:container mt-5 mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-md">
+        <Formik
+          initialValues={{
+            industry: industry ? industry : 'commercial-banks',
+            quarter: quarter ? quarter : 'q4',
+            fiscalYear: fiscalYear ? fiscalYear : '',
+            // statement: statementType ? statementType : '1',
+          }}
+          onSubmit={(values, actions) => {
+            setTimeout(() => {
+              // alert(JSON.stringify(values, null, 2));
+              handleSubmission(values);
+              actions.setSubmitting(false);
+            }, 1000);
+          }}
+        >
+          {({ handleSubmit, isSubmitting }) => {
+            return (
+              <form onSubmit={handleSubmit}>
+                {/* <CustomSelectField /> */}
+                <div className="grid grid-cols-10 gap-3">
+                  <div className="mb-2 col-span-5 md:col-span-2">
+                    <Field
+                      id="industry"
+                      name="industry"
+                      component={CustomSelectField}
+                      options={industryOptions}
+                      isMultiSelect={false}
+                    />
+                    <label htmlFor="industry" className="text-xs text-gray-800 dark:text-white">
+                      Companies
+                    </label>
+                  </div>
+                  <div className="mb-2 col-span-5 md:col-span-2">
+                    <Field
+                      id="quarter"
+                      name="quarter"
+                      component={CustomSelectField}
+                      options={quarterOptions}
+                      isMultiSelect={false}
+                    />
+                    <label htmlFor="quarter" className="text-xs text-gray-800 dark:text-white">
+                      Quarter
+                    </label>
+                  </div>
+
+                  <div className="mb-2 col-span-5 md:col-span-2">
+                    <Field
+                      id="fiscalYear"
+                      name="fiscalYear"
+                      component={CustomSelectField}
+                      options={fiscalYearOptions}
+                      isMultiSelect={false}
+                    />
+                    <label htmlFor="fiscalYear" className="text-xs text-gray-800 dark:text-white">
+                      Fiscal Year
+                    </label>
+                  </div>
+
+                  {/* <div className="mb-2 col-span-5 md:col-span-2">
+                    <Field
+                      id={'statement'}
+                      name="statement"
+                      component={CustomSelectField}
+                      options={financialStatementOptions}
+                      isMultiSelect={false}
+                    />
+                    <label htmlFor="statement" className="text-xs text-gray-800 dark:text-white">
+                      Statement Type
+                    </label>
+                  </div> */}
+
+                  <div className="mb-2 text-center md:text-left col-span-10 md:col-span-2">
+                    <button
+                      type="submit"
+                      className="bg-blue-600 text-white h-9 px-5 rounded"
+                      disabled={isSubmitting}
+                      className={`text-white h-9 px-5 rounded 
+                      ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-600'}`}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </form>
+            );
+          }}
+        </Formik>
+
+        {/* <div className="grid grid-cols-4 md:grid-cols-5 gap-1">
+          <div className="mb-4">
+            <FormSelect
+              control="select"
+              label="Industry Type"
+              name="Industry"
+              customClassName="rounded border border-gray-600"
+              value={industryOption}
+              options={industryOptions}
+              handleChange={(e) => {
+                setIndustryOption(e.target.value);
+                router.push({
+                  pathname: `/screener`,
+                  query: {
+                    industryType: e.target.value,
+                    fiscalYear: fiscalYearOption,
+                    quarter: quarterOption,
+                  },
+                });
+              }}
+            />
+          </div>
+          <div className="mb-2 col-span-2 md:col-span-1">
+            <SelectWithSearch
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
+              options={quarterOptions}
+              control="select"
+              label="Quarter"
+              name="quarter"
+              selectedValues={quarterOption}
+              handleChange={(e) => {
+                setQuarterOption(e.target.value);
+                router.push({
+                  pathname: `/screener`,
+                  query: {
+                    industryType: industryOption,
+                    fiscalYear: fiscalYearOption,
+                    quarter: e.target.value,
+                  },
+                });
+              }}
+            />
+            {/* <FormSelect
+              options={quarterOptions}
+              control="select"
+              label="Select Quarter"
+              name="quarter"
+              value={quarterOption}
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
+              handleChange={(e) => {
+                setQuarterOption(e.target.value);
+                router.push({
+                  pathname: `/screener`,
+                  query: {
+                    industryType: industryOption,
+                    fiscalYear: fiscalYearOption,
+                    quarter: e.target.value,
+                  },
+                });
+              }}
+            /> 
+          </div>
+          <div className="mb-2">
+            <FormSelect
+              customClassName="rounded border dark:border-gray-700 border-gray-400"
+              options={fiscalYearOptions}
+              control="select"
+              label="FiscalYear"
+              name="FiscalYear"
+              value={fiscalYearOption}
+              handleChange={(e) => {
+                setFiscalYearOption(e.target.value);
+                router.push({
+                  pathname: `/screener`,
+                  query: {
+                    industryType: industryOption,
+                    fiscalYear: e.target.value,
+                    quarter: quarterOption,
+                  },
+                });
+              }}
+            />
+          </div>
+          {/* <div className="mb-2">
           {industryOption == 0 ||
           quarterOption == 0 ||
           fiscalYearOption == 0 ? (
@@ -261,9 +374,10 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
               Submit
             </button>
           )}
+        </div> 
         </div> */}
-      </div>
-      <SortableTable columns={columns} data={dataList} />
-    </section>
+        <SortableTable columns={columns} data={dataList} />
+      </section>
+    </Layout>
   );
 }

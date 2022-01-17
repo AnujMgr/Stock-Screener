@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
+import Link from 'next/link';
 import prisma from '../../../prisma/client';
-import SelectWithSearch from '../../../components/SelectWithSearch';
-import FormSelect from '../../../Form/FormSelect';
-import { useTheme } from 'next-themes';
 import { useRouter } from 'next/router';
 import Custom404 from '../../404';
 import FinancialTable from '../../../components/FinancialTable';
 import { MinusIcon, PlusIcon } from '../../../utils/icons';
 import { Field, Formik } from 'formik';
 import CustomSelectField from '../../../components/SelectWithSearch/CustomSelectField';
+import StockLayout from '../../../components/layout/StockLayout';
 
 function checkStatementHasFact(data) {
   return data.some(function (statementline) {
@@ -34,16 +33,21 @@ export async function getServerSideProps({ query }) {
     },
   });
 
+  const fiscalYearList = await prisma.fiscalYears.findMany({
+    orderBy: {
+      fiscalYear: 'desc',
+    },
+  });
+
   const financialStatement = [];
   const columnsData = [];
   const dataList = [];
-  const fiscalYearList = [];
 
   // If given company slug is wrong then return
   if (company === null) {
     const companies = [];
     const data = [];
-    return { props: { company, companies, financialStatement, data } };
+    return { props: { company, companies, financialStatement, data, fiscalYearList } };
   }
 
   const peerCompanies = await prisma.company.findMany({
@@ -53,8 +57,6 @@ export async function getServerSideProps({ query }) {
   });
 
   const companyIds = [];
-
-  console.log(query);
 
   const companies = await prisma.company.findMany({
     where: {
@@ -151,23 +153,9 @@ export async function getServerSideProps({ query }) {
         data,
         dataList,
         columnsData,
+        fiscalYearList,
       },
     };
-  }
-
-  const currentFiscalYearFact = await prisma.financialStatementFact.findFirst({
-    where: {
-      companyId: Number(company.id),
-    },
-    orderBy: {
-      fiscalYear: 'desc',
-    },
-  });
-
-  for (let i = 0; i < 5; i++) {
-    var firstYear = parseInt(parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1);
-    var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
-    fiscalYearList.push(parseInt(firstYear - i) + '/' + parseInt(lastYear - i));
   }
 
   //This will skip topic and take first statement fact and push to columns
@@ -192,10 +180,8 @@ export async function getServerSideProps({ query }) {
   data.map((fact) => {
     var child = {};
     var myobj = {};
-    console.log(fact);
 
     fact.financialStatementLine.children.map((data) => {
-      console.log(data);
       data.financialStatementFact.map((myData) => {
         Object.assign(child, {
           [myData.companyId + '' + myData.fiscalYear + ' ' + myData.quarter]: myData.amount,
@@ -287,9 +273,9 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
   ];
 
   const fiscalYearOptions = fiscalYearList
-    ? fiscalYearList.map((fiscalYear) => ({
-        value: fiscalYear,
-        label: fiscalYear,
+    ? fiscalYearList.map((data) => ({
+        value: data.fiscalYear,
+        label: data.fiscalYear,
       }))
     : [];
 
@@ -332,12 +318,8 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
     });
   };
 
-  function handleChange(quarter) {
-    console.log(quarter);
-  }
-
   return (
-    <>
+    <StockLayout title={company.name}>
       <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
         <Formik
           initialValues={{
@@ -428,22 +410,16 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
         </Formik>
 
         <div className="flex gap-3 p-2">
-          <button
-            className={`${
-              quarter ? 'bg-blue-900 dark:bg-gray-700 dark:hover:bg-gray-800  text-white' : 'dark:hover:bg-gray-800'
-            } px-2 py-1 rounded`}
-            onClick={(e) => handleChange(true)}
-          >
-            Figures
-          </button>
-          <button
-            className={`${
-              quarter ? 'dark:hover:bg-gray-800' : 'bg-blue-900 dark:bg-gray-700 dark:hover:bg-gray-800 text-white'
-            } px-2 py-1 rounded`}
-            onClick={(e) => handleChange(false)}
-          >
-            Graph
-          </button>
+          <Link href={'/company/[slug]/peer-comparision'} as={`/company/${slug}/peer-comparision`}>
+            <button className="bg-blue-900 hover:bg-blue-800 dark:hover:bg-blue-800 text-white px-4 py-1 rounded">
+              Figures
+            </button>
+          </Link>
+          <Link href={'/company/[slug]/graph-comparision'} as={`/company/${slug}/graph-comparision`}>
+            <button className="border border-gray-800 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-900 dark:text-white px-4 py-1 rounded ">
+              Graph
+            </button>
+          </Link>
         </div>
 
         {dataList ? (
@@ -456,7 +432,7 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
           <h1 className="text-2xl text-center mt-5 text-gray-700 dark:text-gray-100">Sorry, Data Not available !!</h1>
         )}
       </section>
-    </>
+    </StockLayout>
   );
 }
 

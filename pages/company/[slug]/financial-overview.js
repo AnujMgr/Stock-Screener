@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import FinancialsHeader from '../../../components/HeaderMenu/FinancialsHeader';
 import CustomBarChart from '../../../components/charts/CustomBarChart';
+import StockLayout from '../../../components/layout/StockLayout';
 
 export async function getServerSideProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -82,7 +83,7 @@ function FinancialOverview({ facts, company }) {
   }
 
   return (
-    <>
+    <StockLayout title={company.name + `'s ` + 'financial overview'}>
       <FinancialsHeader statements={company.companyStatementDetails} slug={slug} active={0} />
       <section className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 md:p-5 mb-3 rounded-b-lg">
         <div className="flex gap-3 p-2">
@@ -115,7 +116,7 @@ function FinancialOverview({ facts, company }) {
           </div>
         </div>
       </section>
-    </>
+    </StockLayout>
   );
 }
 

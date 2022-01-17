@@ -232,3 +232,8 @@ model TrendingStock {
   startedAt          DateTime
   endAt              DateTime
 }
+
+model FiscalYears {
+  id                 Int      @id @default(autoincrement())
+  fiscalYear         String   @unique
+}

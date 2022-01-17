@@ -2,6 +2,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { MiniChart } from '../../../components/charts';
 import FinancialsHeader from '../../../components/HeaderMenu/FinancialsHeader';
+import StockLayout from '../../../components/layout/StockLayout';
 
 import prisma from '../../../prisma/client';
 
@@ -87,7 +88,7 @@ function Statistics({ company, companyRatios }) {
   const { slug } = router.query;
 
   return (
-    <>
+    <StockLayout>
       <FinancialsHeader statements={company.companyStatementDetails} slug={slug} active={'statistics'} />
 
       <section className="xl:container mx-3 xl:mx-auto py-5 mb-3 rounded-b-lg">
@@ -132,7 +133,7 @@ function Statistics({ company, companyRatios }) {
           </div>
         </div>
       </section> */}
-    </>
+    </StockLayout>
   );
 }
 

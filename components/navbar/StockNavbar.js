@@ -28,7 +28,10 @@ function StockNavbar() {
           name={'Financials'}
         />
         <SecondaryNavLink
-          isActive={router.asPath.includes(`/company/${slug}/peer-comparision`)}
+          isActive={
+            router.asPath.includes(`/company/${slug}/peer-comparision`) ||
+            router.asPath.includes(`/company/${slug}/graph-comparision`)
+          }
           path={`/company/[slug]/peer-comparision`}
           pathAs={`/company/${slug}/peer-comparision`}
           name={'Peer Comparison'}

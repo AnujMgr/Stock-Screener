@@ -22,7 +22,7 @@ const FinancialsHeader = ({ statements, slug, active }) => {
                 active == 0
                   ? 'bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 text-white dark:text-white hover:text-white transition duration-500'
                   : 'bg-white dark:bg-gray-900 hover:bg-blue-800 dark:hover:bg-blue-900 text-dark dark:text-white hover:text-white transition duration-500'
-              }  font-bold py-4 px-4 rounded-none md:rounded-tl-lg border-r border-gray-200 dark:border-gray-800`}
+              }  font-bold py-4 px-8 rounded-none md:rounded-tl-lg border-r border-gray-200 dark:border-gray-800`}
             >
               Overview
             </button>

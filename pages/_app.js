@@ -5,9 +5,6 @@ import 'nprogress/nprogress.css'; //styles of nprogress
 import '../styles/index.css';
 
 import { useRouter } from 'next/router';
-import StockLayout from '../components/layout/StockLayout';
-import Layout from '../components/layout';
-import RouteGuard from '../lib/RouteGuard/RouteGuard';
 import { AuthProvider } from '../lib/contexts/AuthContext';
 import { appRoutes } from '../utils/constants';
 
@@ -33,8 +30,9 @@ function MyApp({ Component, pageProps }) {
     Component.getLayout ||
     ((page) => (
       <AuthProvider>
-        <RouteGuard router={router} pathIsProtected={pathIsProtected}>
-          {!pathIsProtected ? (
+        {/* <RouteGuard router={router} pathIsProtected={pathIsProtected}> */}
+        {page}
+        {/* {!pathIsProtected ? (
             <Layout>{page}</Layout>
           ) : router.pathname.startsWith('/company/') ? (
             <StockLayout>{page}</StockLayout>
@@ -42,8 +40,8 @@ function MyApp({ Component, pageProps }) {
             <StockLayout>{page}</StockLayout>
           ) : (
             <Layout>{page}</Layout>
-          )}
-        </RouteGuard>
+          )} */}
+        {/* </RouteGuard> */}
       </AuthProvider>
     ));
 

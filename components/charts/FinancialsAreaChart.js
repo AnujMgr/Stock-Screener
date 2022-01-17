@@ -12,7 +12,7 @@ const FinancialsAreaChart = ({ data }) => {
       {/* </div> */}
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart
-          // height={400}
+          height={400}
           width={1300}
           data={data}
           margin={{
