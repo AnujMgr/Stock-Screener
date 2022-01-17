@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import Select from "react-select";
+import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 
 const SelectWithSearch = ({
   name,
@@ -26,26 +26,24 @@ const SelectWithSearch = ({
   const customStyles = {
     control: (base, state) => ({
       ...base,
-      background: controlBackgroundColor ? controlBackgroundColor : "#fff", // Search Control Background Color
-      borderColor: borderColor ? borderColor : "#374151",
-      color: "#000",
+      background: controlBackgroundColor ? controlBackgroundColor : '#1F2937', // Search Control Background Color
+      borderColor: borderColor ? borderColor : '#374151',
+      color: '#000',
     }),
     input: (base) => ({
       ...base,
-      color: "#111827", // User Search Input Color
+      color: '#111827', // User Search Input Color
     }),
     menu: (base) => ({
       ...base,
-      background: dropdownMenuBackgroundColor
-        ? dropdownMenuBackgroundColor
-        : "#F3F4F6",
+      background: dropdownMenuBackgroundColor ? dropdownMenuBackgroundColor : '#F3F4F6',
       marginTop: 0,
-      color: menuFontColor ? menuFontColor : "#fff", // Drop Down Item Color
+      color: menuFontColor ? menuFontColor : '#fff', // Drop Down Item Color
       zIndex: 999,
     }),
     singleValue: (base) => ({
       ...base,
-      color: "#000",
+      color: '#000',
     }),
   };
 
@@ -53,9 +51,9 @@ const SelectWithSearch = ({
     ...theme,
     colors: {
       ...theme.colors,
-      primary25: hoverMenuColor ? hoverMenuColor : "#E5E7EB", // Dropdown Item hover Background Color
-      primary: "#1D4ED8", // Select Option Background Color
-      color: "#000",
+      primary25: hoverMenuColor ? hoverMenuColor : '#E5E7EB', // Dropdown Item hover Background Color
+      primary: '#1D4ED8', // Select Option Background Color
+      color: '#000',
     },
   });
 

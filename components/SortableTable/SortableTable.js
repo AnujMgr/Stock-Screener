@@ -1,16 +1,12 @@
-import React from "react";
-import { useTable, useSortBy } from "react-table";
-import { SortDown, SortUp } from "../../utils/icons";
+import React from 'react';
+import { useTable, useSortBy } from 'react-table';
+import { SortDown, SortUp } from '../../utils/icons';
 
-function SortableTable({ data, columns, showCheck }) {
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    allColumns,
-  } = useTable({ columns, data, disableSortRemove: true }, useSortBy);
+function SortableTable({ data, columns, showCheck, highlightTopic }) {
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, allColumns } = useTable(
+    { columns, data, disableSortRemove: true },
+    useSortBy,
+  );
 
   return (
     <div className="grid">
@@ -19,8 +15,7 @@ function SortableTable({ data, columns, showCheck }) {
           {allColumns.map((column) => (
             <div key={column.id}>
               <label>
-                <input type="checkbox" {...column.getToggleHiddenProps()} />{" "}
-                {column.id}
+                <input type="checkbox" {...column.getToggleHiddenProps()} /> {column.id}
               </label>
             </div>
           ))}
@@ -35,20 +30,18 @@ function SortableTable({ data, columns, showCheck }) {
                 <tr
                   key={key}
                   {...headerGroup.getHeaderGroupProps()}
-                  className="my-table text-sm font-semibold tracking-wide text-left text-gray-900 uppercase border-b border-gray-300 dark:border-blue-800 bg-gray-100 dark:text-white dark:bg-blue-900"
+                  className="my-table text-sm font-semibold tracking-wide text-left uppercase border-b border-gray-300 dark:border-blue-800 text-white bg-blue-900"
                 >
                   {headerGroup.headers.map((column) => {
                     const { key } = column.getHeaderProps();
                     return (
                       <th
                         key={key}
-                        className="px-4 py-4 whitespace-nowrap sticky left-0 bg-gray-100 dark:bg-blue-900 dark:border-gray-700"
-                        {...column.getHeaderProps(
-                          column.getSortByToggleProps()
-                        )}
+                        className="px-4 py-4 whitespace-nowrap sticky left-0 dark:border-gray-700"
+                        {...column.getHeaderProps(column.getSortByToggleProps())}
                       >
                         <h1 className="whitespace-nowrap inline-flex select-none items-end">
-                          {column.render("Header")}
+                          {column.render('Header')}
 
                           <span className="ml-2">
                             {column.isSorted ? (
@@ -58,7 +51,7 @@ function SortableTable({ data, columns, showCheck }) {
                                 <SortUp height="22" />
                               )
                             ) : (
-                              ""
+                              ''
                             )}
                           </span>
                         </h1>
@@ -76,12 +69,15 @@ function SortableTable({ data, columns, showCheck }) {
             {rows.map((row) => {
               prepareRow(row);
               const { key } = row.getRowProps();
-
               return (
                 <tr
                   key={key}
                   {...row.getRowProps()}
-                  className="text-gray-700 dark:text-gray-50 dark:hover:bg-gray-800 hover:bg-gray-100 group even:bg-gray-500"
+                  className={`${
+                    highlightTopic && row.original.topic === 'topic'
+                      ? 'bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-semibold'
+                      : 'bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-50 dark:hover:bg-gray-800 hover:bg-gray-100 font-medium'
+                  }`}
                 >
                   {row.cells.map((cell) => {
                     const { key } = cell.getCellProps();
@@ -91,11 +87,11 @@ function SortableTable({ data, columns, showCheck }) {
                         key={key}
                         {...cell.getCellProps([
                           {
-                            className: `px-4 py-3 whitespace-nowrap sticky left-0 dark:bg-gray-900 bg-white dark:group-hover:bg-gray-800 group-hover:bg-gray-100 ${cell.column.className}`,
+                            className: `px-4 py-3 whitespace-nowrap sticky left-0 ${cell.column.className}`,
                           },
                         ])}
                       >
-                        {cell.render("Cell")}
+                        {cell.render('Cell')}
                       </td>
                     );
                   })}

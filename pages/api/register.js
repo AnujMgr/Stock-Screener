@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import prisma from "../../prisma/client";
-import bcrypt from "bcryptjs";
+import prisma from '../../prisma/client';
+import bcrypt from 'bcryptjs';
 
 const Register = async (req, res) => {
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     const data = req.body;
 
     const isAlreadyMember = await prisma.user.findFirst({
@@ -22,7 +22,7 @@ const Register = async (req, res) => {
     if (isAlreadyMember) {
       return res.json({
         error: true,
-        message: "Email or Phonenumber you provided already exists !",
+        message: 'Email or Phonenumber you provided already exists !',
       });
     }
 
@@ -38,7 +38,7 @@ const Register = async (req, res) => {
 
     res.json({ success: true });
   } else {
-    res.json({ error: true, message: "Method Not Alowed" });
+    res.json({ error: true, message: 'Method Not Alowed' });
     // throw new Error(
     //   `The HTTP ${req.method} method is not supported at this route.`
     // );

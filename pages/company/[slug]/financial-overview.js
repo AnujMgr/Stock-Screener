@@ -1,8 +1,8 @@
-import prisma from "../../../prisma/client";
-import { useState } from "react";
-import { useRouter } from "next/router";
-import FinancialsHeader from "../../../components/HeaderMenu/FinancialsHeader";
-import CustomBarChart from "../../../components/charts/CustomBarChart";
+import prisma from '../../../prisma/client';
+import { useState } from 'react';
+import { useRouter } from 'next/router';
+import FinancialsHeader from '../../../components/HeaderMenu/FinancialsHeader';
+import CustomBarChart from '../../../components/charts/CustomBarChart';
 
 export async function getServerSideProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -24,7 +24,7 @@ export async function getServerSideProps({ params }) {
         include: {
           financialStatementFact: {
             where: {
-              quarter: "Q4",
+              quarter: 'q4',
               companyId: company.id,
             },
           },
@@ -32,7 +32,7 @@ export async function getServerSideProps({ params }) {
       },
     },
     orderBy: {
-      sequence: "asc",
+      sequence: 'asc',
     },
   });
 
@@ -40,12 +40,10 @@ export async function getServerSideProps({ params }) {
     if (statement.financialStatementLine.financialStatementFact.length > 0)
       facts.push({
         name: statement.financialStatementLine.name,
-        facts: statement.financialStatementLine.financialStatementFact.map(
-          (line) => ({
-            amount: line.amount,
-            fiscalYear: line.fiscalYear,
-          })
-        ),
+        facts: statement.financialStatementLine.financialStatementFact.map((line) => ({
+          amount: line.amount,
+          fiscalYear: line.fiscalYear,
+        })),
       });
   });
 
@@ -70,7 +68,7 @@ function FinancialOverview({ facts, company }) {
         fiscalYear: fact.fiscalYear,
         assets: fact.amount,
         liabilities: facts[1].facts[index].amount,
-      })
+      }),
     );
 
     facts[2].facts.map((fact, index) =>
@@ -79,24 +77,18 @@ function FinancialOverview({ facts, company }) {
         fiscalYear: fact.fiscalYear,
         revenue: fact.amount,
         netIncome: facts[3].facts[index].amount,
-      })
+      }),
     );
   }
 
   return (
     <>
-      <FinancialsHeader
-        statements={company.companyStatementDetails}
-        slug={slug}
-        active={0}
-      />
+      <FinancialsHeader statements={company.companyStatementDetails} slug={slug} active={0} />
       <section className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 md:p-5 mb-3 rounded-b-lg">
         <div className="flex gap-3 p-2">
           <button
             className={`${
-              quarter
-                ? "bg-blue-900 dark:bg-gray-700 dark:hover:bg-gray-800  text-white"
-                : "dark:hover:bg-gray-800"
+              quarter ? 'bg-blue-900 dark:bg-gray-700 dark:hover:bg-gray-800  text-white' : 'dark:hover:bg-gray-800'
             } px-2 py-1 rounded`}
             onClick={(e) => handleChange(true)}
           >
@@ -104,9 +96,7 @@ function FinancialOverview({ facts, company }) {
           </button>
           <button
             className={`${
-              quarter
-                ? "dark:hover:bg-gray-800"
-                : "bg-blue-900 dark:bg-gray-700 dark:hover:bg-gray-800 text-white"
+              quarter ? 'dark:hover:bg-gray-800' : 'bg-blue-900 dark:bg-gray-700 dark:hover:bg-gray-800 text-white'
             } px-2 py-1 rounded`}
             onClick={(e) => handleChange(false)}
           >
@@ -116,26 +106,12 @@ function FinancialOverview({ facts, company }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
           <div className="p-2 bg-white dark:bg-gray-900 rounded-lg ">
-            <h1 className="mb-3 dark:text-gray-200 font-semibold">
-              Income Statement
-            </h1>
-            <CustomBarChart
-              data={balanceSheetData}
-              dataKey1="assets"
-              dataKey2="liabilities"
-              height={300}
-            />
+            <h1 className="mb-3 dark:text-gray-200 font-semibold">Income Statement</h1>
+            <CustomBarChart data={balanceSheetData} dataKey1="assets" dataKey2="liabilities" height={300} />
           </div>
           <div className="p-2 bg-white dark:bg-gray-900 rounded-lg ">
-            <h1 className="mb-3 dark:text-gray-200 font-semibold">
-              Balance Sheet
-            </h1>
-            <CustomBarChart
-              data={profitLossData}
-              dataKey1="revenue"
-              dataKey2="netIncome"
-              height={300}
-            />
+            <h1 className="mb-3 dark:text-gray-200 font-semibold">Balance Sheet</h1>
+            <CustomBarChart data={profitLossData} dataKey1="revenue" dataKey2="netIncome" height={300} />
           </div>
         </div>
       </section>

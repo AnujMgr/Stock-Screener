@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import prisma from '../../../prisma/client';
-import SelectWithSearch from '../../../components/SelectWithSearch';
-import FormSelect from '../../../Form/FormSelect';
-import { useTheme } from 'next-themes';
 import { useRouter } from 'next/router';
 import Custom404 from '../../404';
 import FinancialTable from '../../../components/FinancialTable';
 import { MinusIcon, PlusIcon } from '../../../utils/icons';
 import { Field, Formik } from 'formik';
 import CustomSelectField from '../../../components/SelectWithSearch/CustomSelectField';
+import BarChartForComparision from '../../../components/charts/BarChartForComparision';
 
 function checkStatementHasFact(data) {
   return data.some(function (statementline) {
@@ -37,7 +35,6 @@ export async function getServerSideProps({ query }) {
   const financialStatement = [];
   const columnsData = [];
   const dataList = [];
-  const fiscalYearList = [];
 
   // If given company slug is wrong then return
   if (company === null) {
@@ -87,7 +84,6 @@ export async function getServerSideProps({ query }) {
                   ? {
                       companyId: { in: companyIds },
                       quarter: query.quarter,
-                      fiscalYear: query.fiscalYear,
                     }
                   : {
                       companyId: { in: companyIds },
@@ -102,7 +98,6 @@ export async function getServerSideProps({ query }) {
               ? {
                   companyId: { in: companyIds },
                   quarter: query.quarter,
-                  fiscalYear: query.fiscalYear,
                 }
               : {
                   companyId: { in: companyIds },
@@ -155,21 +150,6 @@ export async function getServerSideProps({ query }) {
     };
   }
 
-  const currentFiscalYearFact = await prisma.financialStatementFact.findFirst({
-    where: {
-      companyId: Number(company.id),
-    },
-    orderBy: {
-      fiscalYear: 'desc',
-    },
-  });
-
-  for (let i = 0; i < 5; i++) {
-    var firstYear = parseInt(parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1);
-    var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
-    fiscalYearList.push(parseInt(firstYear - i) + '/' + parseInt(lastYear - i));
-  }
-
   //This will skip topic and take first statement fact and push to columns
   data.some(function (statementline) {
     const facts = statementline.financialStatementLine.financialStatementFact;
@@ -189,7 +169,7 @@ export async function getServerSideProps({ query }) {
     }
   });
 
-  data.map((fact) => {
+  data.map((fact, i) => {
     var child = {};
     var myobj = {};
     console.log(fact);
@@ -218,21 +198,24 @@ export async function getServerSideProps({ query }) {
           subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
         });
 
-    dataList.push({ ...myobj, topic: fact.financialStatementLine.unit });
+    dataList.push({ id: i, ...myobj, topic: fact.financialStatementLine.unit });
   });
 
   // Pass post data to the page via props
   return {
-    props: { company, peerCompanies, dataList, columnsData, fiscalYearList },
+    props: { company, peerCompanies, dataList, columnsData, data },
   };
 }
 
-function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, columnsData }) {
+function GraphComparision({ company, peerCompanies, dataList, columnsData, data }) {
   //To Avoid React Hook "useState" is called conditionally error.
   //React Hooks must be called in the exact same order in every component render.
 
   const router = useRouter();
   const { slug, statementType, quarter, fiscalYear } = router.query;
+
+  const [graphData, setGraphData] = useState([]);
+  const maxFilters = 5;
 
   if (!company) {
     return <Custom404 />;
@@ -286,13 +269,6 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
     { value: 'q4', label: 'Q4' },
   ];
 
-  const fiscalYearOptions = fiscalYearList
-    ? fiscalYearList.map((fiscalYear) => ({
-        value: fiscalYear,
-        label: fiscalYear,
-      }))
-    : [];
-
   if (peerCompanies)
     peerCompanies.map((comp) => {
       if (!(comp.id == company.id)) {
@@ -320,13 +296,12 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
   );
 
   const handleSubmission = (values) => {
-    const { quarter, companies, fiscalYear, statement } = values;
+    const { quarter, companies, statement } = values;
     router.push({
       pathname: `/company/${slug}/peer-comparision`,
       query: {
         companies: companies,
         quarter: quarter,
-        fiscalYear: fiscalYear,
         statementType: statement,
       },
     });
@@ -336,6 +311,22 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
     console.log(quarter);
   }
 
+  const handleSelection = (selectedData) => {
+    if (graphData.length === 0) {
+      setGraphData([selectedData]);
+    } else if (graphData.some((data) => data.id === selectedData.id)) {
+      const removedData = graphData.filter(function (data) {
+        return data.id !== selectedData.id;
+      });
+      setGraphData(removedData);
+      //   setGraphData(graphData.splice(index, 1));
+    } else if (graphData.length < maxFilters) {
+      setGraphData([selectedData, ...graphData]);
+    }
+  };
+
+  console.log(graphData);
+
   return (
     <>
       <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
@@ -343,7 +334,6 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
           initialValues={{
             companies: [],
             quarter: quarter ? quarter : 'q4',
-            fiscalYear: fiscalYear ? fiscalYear : '',
             statement: statementType ? statementType : '1',
           }}
           onSubmit={(values, actions) => {
@@ -381,19 +371,6 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
                     />
                     <label htmlFor="quarter" className="text-xs text-gray-800 dark:text-white">
                       Quarter
-                    </label>
-                  </div>
-
-                  <div className="mb-2 col-span-5 md:col-span-2">
-                    <Field
-                      id="fiscalYear"
-                      name="fiscalYear"
-                      component={CustomSelectField}
-                      options={fiscalYearOptions}
-                      isMultiSelect={false}
-                    />
-                    <label htmlFor="fiscalYear" className="text-xs text-gray-800 dark:text-white">
-                      Fiscal Year
                     </label>
                   </div>
 
@@ -446,18 +423,44 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
           </button>
         </div>
 
-        {dataList ? (
-          <div className="grid">
-            <div className="w-full overflow-hidden shadow-xs">
-              <FinancialTable data={dataList} columns={columns} highlightTopic={true} />
-            </div>
-          </div>
-        ) : (
-          <h1 className="text-2xl text-center mt-5 text-gray-700 dark:text-gray-100">Sorry, Data Not available !!</h1>
-        )}
+        <BarChartForComparision />
+
+        <h1 className="text-center text-xl mt-5 mb-5">Filters</h1>
+
+        <div className="flex flex-wrap gap-2">
+          {dataList.map((data) => (
+            <CustomFilter
+              key={data.particular}
+              data={data}
+              handleClick={handleSelection}
+              selectedData={graphData}
+              maxFilters={maxFilters}
+            />
+          ))}
+        </div>
       </section>
     </>
   );
 }
 
-export default FinancialStatement;
+function CustomFilter({ data, handleClick, selectedData, maxFilters }) {
+  const [isActive, setActive] = useState(false);
+  return (
+    <div
+      className={`py-2.5 px-4 rounded-full flex-auto max-w-xs text-center cursor-pointer select-none 
+      ${
+        isActive
+          ? 'bg-blue-700 text-white'
+          : 'bg-gray-200 text-gray-800 hover:bg-gray-300 transition duration-500 ease-in-out'
+      }`}
+      onClick={(e) => {
+        selectedData.length < maxFilters ? setActive(!isActive) : setActive(false);
+        handleClick(data);
+      }}
+    >
+      <h1>{data.particular}</h1>
+    </div>
+  );
+}
+
+export default GraphComparision;

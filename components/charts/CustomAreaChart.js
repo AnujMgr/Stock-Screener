@@ -9,22 +9,25 @@ import {
   ResponsiveContainer,
   Brush,
   Bar,
-  CartesianGrid,
 } from "recharts";
 import { useTheme } from "next-themes";
 
-const PriceChart = ({ priceHistory }) => {
+const CustomAreaChart = ({
+  data,
+  dataKeyForArea,
+  showPeriodSelector,
+  dataLength,
+}) => {
   const { theme } = useTheme();
   const [timeSpan, setTimeSpan] = useState(false);
   const [activeMenu, setActiveMenu] = useState("default");
 
   const color = theme == "light" ? "black" : "white";
-
-  const lengthOfPrice = priceHistory.length;
-  const data = [...priceHistory];
+  var dataLength = data.length; // length of data
+  var periodData = [...data]; // copy data to period data
 
   if (timeSpan !== false) {
-    data.length = timeSpan;
+    periodData.length = timeSpan;
   }
 
   function toggleTimeSpan(timespan, menu) {
@@ -34,83 +37,20 @@ const PriceChart = ({ priceHistory }) => {
 
   return (
     <Fragment>
-      <div className="flex justify-between px-3">
-        <div className="rounded-md">
-          {lengthOfPrice > 30 && (
-            <button
-              className={`px-3 py-1  ${
-                activeMenu === "1m" &&
-                "bg-blue-700 dark:bg-indigo-900 text-gray-100"
-              }`}
-              onClick={(e) => toggleTimeSpan(30, "1m")}
-            >
-              1M
-            </button>
-          )}
-          {lengthOfPrice > 90 && (
-            <button
-              className={`px-3 py-1  ${
-                activeMenu === "3m" &&
-                "bg-blue-700 dark:bg-indigo-800 text-gray-100"
-              }`}
-              onClick={(e) => toggleTimeSpan(90, "3m")}
-            >
-              3M
-            </button>
-          )}
-          {lengthOfPrice > 180 && (
-            <button
-              className={`px-3 py-1  ${
-                activeMenu === "6m" &&
-                "bg-blue-700 dark:bg-indigo-800 text-gray-100"
-              }`}
-              onClick={(e) => toggleTimeSpan(180, "6m")}
-            >
-              6M
-            </button>
-          )}
-          {lengthOfPrice > 360 && (
-            <button
-              className={`px-3 py-1  ${
-                activeMenu === "1yrs" &&
-                "bg-blue-700 dark:bg-indigo-800 text-gray-100"
-              }`}
-              onClick={(e) => toggleTimeSpan(360, "1yrs")}
-            >
-              1yrs
-            </button>
-          )}
-          {lengthOfPrice > 1800 && (
-            <button
-              className={`px-3 py-1  ${
-                activeMenu === "5yrs" &&
-                "bg-blue-700 dark:bg-indigo-800 text-gray-100"
-              }`}
-              onClick={(e) => toggleTimeSpan(1800, "5yrs")}
-            >
-              5yrs
-            </button>
-          )}
-          {/* <button
-            className={`px-3 py-1  ${
-              activeMenu === "default" &&
-              "bg-blue-700 dark:bg-indigo-800 text-gray-100"
-            }`}
-            onClick={(e) => toggleTimeSpan(lengthOfPrice, "default")}
-          >
-            Max
-          </button> */}
-        </div>
-        {/* <div className="flex gap-2">
-          <button className="border rounded-sm py-1 px-3">PE</button>
-          <button className="border rounded-sm py-1 px-3">Volume</button>
-        </div> */}
-      </div>
+      {/* <div className="flex justify-between px-3"> */}
+      {showPeriodSelector ? (
+        <PeriodSelector
+          dataLength={dataLength}
+          toggleTimeSpan={toggleTimeSpan}
+          activeMenu={activeMenu}
+        />
+      ) : null}
+      {/* </div> */}
       <ResponsiveContainer width="100%" height={400}>
         <AreaChart
           height={400}
           width={1300}
-          data={data}
+          data={periodData}
           margin={{
             top: 20,
             right: 0,
@@ -135,7 +75,7 @@ const PriceChart = ({ priceHistory }) => {
 
           <Area
             type="monotone"
-            dataKey="closingPrice"
+            dataKey={dataKeyForArea}
             stroke={theme == "light" ? "#03e08b" : "#2451B7"}
             fill="url(#color)"
             strokeWidth={1.6}
@@ -190,6 +130,69 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
+const PeriodSelector = ({ dataLength, toggleTimeSpan, activeMenu }) => {
+  if (dataLength < 30) return <></>;
+  return (
+    <div className="rounded-sm border border-gray-500 dark:border-gray-500 overflow-hidden">
+      {dataLength >= 30 && (
+        <button
+          className={`px-3 py-1  ${
+            activeMenu === "1m" &&
+            "bg-blue-700 dark:bg-indigo-900 text-gray-100"
+          }`}
+          onClick={(e) => toggleTimeSpan(30, "1m")}
+        >
+          1M
+        </button>
+      )}
+      {dataLength >= 90 && (
+        <button
+          className={`px-3 py-1  ${
+            activeMenu === "3m" &&
+            "bg-blue-700 dark:bg-indigo-800 text-gray-100"
+          }`}
+          onClick={(e) => toggleTimeSpan(90, "3m")}
+        >
+          3M
+        </button>
+      )}
+      {dataLength >= 180 && (
+        <button
+          className={`px-3 py-1  ${
+            activeMenu === "6m" &&
+            "bg-blue-700 dark:bg-indigo-800 text-gray-100"
+          }`}
+          onClick={(e) => toggleTimeSpan(180, "6m")}
+        >
+          6M
+        </button>
+      )}
+      {dataLength > 360 && (
+        <button
+          className={`px-3 py-1  ${
+            activeMenu === "1yrs" &&
+            "bg-blue-700 dark:bg-indigo-800 text-gray-100"
+          }`}
+          onClick={(e) => toggleTimeSpan(360, "1yrs")}
+        >
+          1yrs
+        </button>
+      )}
+      {dataLength > 1800 && (
+        <button
+          className={`px-3 py-1  ${
+            activeMenu === "5yrs" &&
+            "bg-blue-700 dark:bg-indigo-800 text-gray-100"
+          }`}
+          onClick={(e) => toggleTimeSpan(1800, "5yrs")}
+        >
+          5yrs
+        </button>
+      )}
+    </div>
+  );
+};
+
 const CustomizedAxisTick = ({ x, y, payload, color }) => {
   const dateTip = moment(new Date(payload.value))
     .format("MMM YYYY")
@@ -211,4 +214,4 @@ const CustomizedAxisTick = ({ x, y, payload, color }) => {
   );
 };
 
-export default PriceChart;
+export default CustomAreaChart;

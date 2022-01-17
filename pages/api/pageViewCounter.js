@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import prisma from "../../prisma/client";
-import checkAuth from "./middleware/checkAuthServer";
+import prisma from '../../prisma/client';
+import checkAuth from './middleware/checkAuthServer';
 
 async function pageViewCounter(req, res) {
-  if (req.method === "POST") {
+  if (req.method === 'POST') {
     const { companyId } = req.body;
 
     Date.prototype.addDays = function (days) {
@@ -60,9 +60,7 @@ async function pageViewCounter(req, res) {
     }
     res.status(200).send();
   } else {
-    throw new Error(
-      `The HTTP ${req.method} method is not supported at this route.`
-    );
+    throw new Error(`The HTTP ${req.method} method is not supported at this route.`);
   }
 }
 
