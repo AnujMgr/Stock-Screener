@@ -68,6 +68,7 @@ export default function SearchBar({
 
   return (
     <Downshift
+      id="SearchBar"
       onChange={(selection) => (selection ? handleOnSelect(selection) : 'Selection Cleared')}
       //   onInputValueChange={(value) => handleFetchRequest(value)}
       itemToString={(item) => (item ? item.name : '')}

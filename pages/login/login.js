@@ -51,7 +51,7 @@ const Login = () => {
             },
           });
 
-          return router.push('/');
+          return router.reload('/');
         }
       })
       .catch((error) => {
