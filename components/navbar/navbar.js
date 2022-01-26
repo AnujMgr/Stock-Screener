@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ToggleTheme from '../ToggleTheme';
 import SearchBar from '../searchbar';
@@ -8,7 +8,8 @@ import { useAuth } from '../../lib/contexts/AuthContext';
 import UserProfile from './UserProfile';
 import { useMediaQuery } from 'react-responsive';
 
-function Navbar({ showSearch, showSymbol }) {
+function Navbar({ showSearch, showSymbol, searchBarWidth }) {
+  const [mounted, setMounted] = useState(false);
   const [hidden, setHidden] = useState(true);
   const [isOpen, setOpen] = useState(true);
   const router = useRouter();
@@ -29,6 +30,16 @@ function Navbar({ showSearch, showSymbol }) {
 
   const isTabletOrMobile = useMediaQuery({ query: '(max-width: 992px)' });
 
+  function handleOpen({ value }) {
+    setOpen(value);
+  }
+
+  useEffect(() => {
+    setMounted(true);
+  });
+
+  if (!mounted) return null;
+
   return (
     <>
       {!isTabletOrMobile ? (
@@ -45,7 +56,7 @@ function Navbar({ showSearch, showSymbol }) {
                     <SearchBar
                       borderRadiusBottom={'rounded-b-md'}
                       borderRadiusTop={'rounded-t-md'}
-                      width={'w-full md:w-full sm:w-3/4 mr-auto'}
+                      width={`md:w-full sm:w-3/4 mr-auto ${searchBarWidth ? searchBarWidth : 'w-full'}`}
                       backgroundColor={'bg-gray-200 dark:bg-gray-800'}
                       padding={'py-0'}
                       itemHoverBackground={'hover:bg-gray-300 dark:hover:bg-gray-700'}
@@ -112,13 +123,7 @@ function Navbar({ showSearch, showSymbol }) {
                 )}
                 <ToggleTheme />
 
-                <button
-                  onClick={(e) => setOpen(!open)}
-                  className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600 
-                  hover:text-white dark:hover:bg-gray-900 transition duration-500 ease-in-out "
-                >
-                  <HamburgerIcon height={24} width={24} customClass={'fill-current text-white dark:text-white'} />
-                </button>
+                <HamburgerButton setOpen={handleOpen} />
               </div>
             </div>
             {!hidden ? (
@@ -135,7 +140,7 @@ function Navbar({ showSearch, showSymbol }) {
             ) : null}
           </div>
 
-          <SideBar isOpen={isOpen} setOpen={setOpen} />
+          <SideBar isOpen={isOpen} setOpen={setOpen} user={user} logout={logOut} />
           {/* Overlay When Sidebar is Open */}
           {isOpen ? null : (
             <div
@@ -149,7 +154,7 @@ function Navbar({ showSearch, showSymbol }) {
   );
 }
 
-function SideBar({ isOpen, setOpen }) {
+function SideBar({ user, logout, isOpen, setOpen }) {
   return (
     <div
       className={`bg-gray-50 dark:bg-gray-800 dark:border-gray-600 lg:hidden h-screen 
@@ -163,23 +168,42 @@ function SideBar({ isOpen, setOpen }) {
             Analytics
           </Link>
         </h1>
-        <button
-          onClick={(e) => setOpen(true)}
-          className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-800 hover:bg-blue-600
-           hover:text-white dark:hover:bg-gray-900 transition duration-500 ease-in-out"
-        >
-          <HamburgerIcon height={24} width={24} customClass={'fill-current text-white dark:text-white'} />
-        </button>
+        <div className="flex gap-2">
+          <ToggleTheme />
+
+          <HamburgerButton setOpen={setOpen} />
+        </div>
       </div>
       <div className="flex flex-col ">
         <SideBarNavLinks name={'Home'} path={'/'} pathAs={'/'} />
         <SideBarNavLinks name={'Screener'} path={'/screener'} pathAs={'/screener'} />
         <SideBarNavLinks name={'Listing'} path={'/'} pathAs={'/'} />
         <SideBarNavLinks name={'Market'} path={'/'} pathAs={'/'} />
+        {user && Object.keys(user).length !== 0 ? (
+          <div className="p-4 dark:text-white text-gray-900 border-transparent border-b-2 flex-grow-0 inline-flex items-center">
+            <button onClick={logout}>Logout</button>
+          </div>
+        ) : (
+          <div className="p-4 dark:text-white text-gray-900 border-transparent border-b-2 flex-grow-0 inline-flex items-center">
+            <Link href="/login">Login</Link>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+const HamburgerButton = ({ setOpen }) => {
+  return (
+    <button
+      onClick={(e) => setOpen(true)}
+      className="lg:hidden block p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-900 hover:bg-blue-600
+   hover:text-white dark:hover:bg-gray-700 transition duration-500 ease-in-out"
+    >
+      <HamburgerIcon height={24} width={24} customClass={'fill-current text-white dark:text-white'} />
+    </button>
+  );
+};
 
 function SideBarNavLinks({ name, path, pathAs }) {
   return (

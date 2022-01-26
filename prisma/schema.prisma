@@ -33,9 +33,7 @@ model Company {
 
   companyStatementDetails CompanyStatementDetails @relation(fields: [statementsId], references: [id])
   statementsId            Int
-
-  // financialStatements   FinancialStatementFact[] // I dont think there is necessity of Relation between company and financial fact
-  companyPrice CompanyPrice[]
+  companyPrice            CompanyPrice[]
 }
 
 model CompanyStatementDetails {
@@ -147,7 +145,6 @@ model ActionStatementFact {
   amount                String
 }
 
-
 model User {
   id             Int               @id @default(autoincrement())
   name           String            @db.VarChar(50)
@@ -159,25 +156,27 @@ model User {
   subscription   UserSubscription? @relation(fields: [subscriptionId], references: [id]) // references `id` of `Profile`
   subscriptionId Int?              @unique
   role           Role?             @relation(fields: [roleId], references: [id]) // references `id` of `Profile`
-  roleId        Int?
+  roleId         Int?              @unique
+  watchList      WatchList?
+  portfolio      Portfolio?
 }
 
 model Role {
-  id             Int               @id @default(autoincrement())
-  name           String
-  user           User?
+  id   Int    @id @default(autoincrement())
+  name String
+  user User?
 }
 
 model Profile {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userId    Int
-  avtar     String
-  FirstName String   @db.VarChar(25)
-  LastName  String   @db.VarChar(25)
-  birthDate  DateTime
-  Address    String
-  createdAt DateTime @default(now())
-  status    Boolean  @default(true)
+  avtar     String?
+  FirstName String?   @db.VarChar(25)
+  LastName  String?   @db.VarChar(25)
+  birthDate DateTime?
+  Address   String?
+  createdAt DateTime  @default(now())
+  status    Boolean   @default(true)
   user      User?
 }
 
@@ -224,16 +223,41 @@ model Offer {
   durationEndDate    DateTime
 }
 
-
-model TrendingStock {
-  id                 Int      @id @default(autoincrement())
-  companyId          Int @unique
-  views              Float
-  startedAt          DateTime
-  endAt              DateTime
+model FiscalYears {
+  id         Int    @id @default(autoincrement())
+  fiscalYear String @unique
 }
 
-model FiscalYears {
-  id                 Int      @id @default(autoincrement())
-  fiscalYear         String   @unique
+model WatchList {
+  id            Int             @id @default(autoincrement())
+  user          User?           @relation(fields: [userId], references: [id]) // references `id` of `Profile`
+  userId        Int?            @unique
+  watchlistfact WatchListFact[]
+}
+
+model WatchListFact {
+  id          Int        @id @default(autoincrement())
+  companyId   Int // relation scalar field  (used in the `@relation` attribute above)
+  watchlist   WatchList? @relation(fields: [watchlistId], references: [id]) // references `id` of `Profile`
+  watchlistId Int?       @unique
+}
+
+model Portfolio {
+  id     Int   @id @default(autoincrement())
+  user   User? @relation(fields: [userId], references: [id]) // references `id` of `Profile`
+  userId Int?  @unique
+  portfoliofact PortfolioFact[]
+}
+
+model PortfolioFact {
+  id          Int             @id @default(autoincrement())
+  companyId   Int // relation scalar field  (used in the `@relation` attribute above)
+  boughtDate  DateTime
+  boughtPrice Float
+  quantity    Float
+  children    PortfolioFact[] @relation("children")
+  parent      PortfolioFact?  @relation("children", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId    Int?
+  portfolio   Portfolio? @relation(fields: [portfolioId], references: [id]) // references `id` of `Profile`
+  portfolioId Int?       @unique
 }

@@ -9,7 +9,6 @@ import prisma from '../../prisma/client';
 import Custom404 from '../404';
 import Spinner from '../../components/Spinner';
 import FinancialTable from '../../components/FinancialTable/FinancialTable';
-import StockLayout from '../../components/layout/StockLayout';
 import Layout from '../../components/layout';
 
 export async function getStaticProps({ params }) {

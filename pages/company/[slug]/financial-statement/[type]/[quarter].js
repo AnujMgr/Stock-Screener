@@ -8,6 +8,7 @@ import { MinusIcon, PlusIcon } from '../../../../../utils/icons';
 import Custom404 from '../../../../404';
 import ToggleBox from '../../../../../components/ToggleBox';
 import StockLayout from '../../../../../components/layout/StockLayout';
+import SelectWithSearch from '../../../../../components/SelectWithSearch/SelectWithSearch';
 
 function checkStatementHasFact(data) {
   return data.some(function (statementline) {
@@ -239,16 +240,19 @@ export async function getStaticPaths() {
 function FinancialStatement({ company, dataList, columnsData }) {
   const router = useRouter();
   const { slug, type, quarter } = router.query;
-  const [quarterValue, setQuarterValue] = useState(quarter ? quarter : 'qtr-to-qtr');
   const [showGraph, setShowGraph] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const quarterOptions = [
-    { id: 'q1', name: 'Q1' },
-    { id: 'q2', name: 'Q2' },
-    { id: 'q3', name: 'Q3' },
-    { id: 'q4', name: 'Q4' },
-    { id: 'qtr-to-qtr', name: 'Quarter To Quarter' },
+    { value: 'q1', label: 'Q1' },
+    { value: 'q2', label: 'Q2' },
+    { value: 'q3', label: 'Q3' },
+    { value: 'q4', label: 'Q4' },
+    { value: 'qtr-to-qtr', label: 'Quarter To Quarter' },
   ];
+  const [quarterValue, setQuarterValue] = useState(
+    quarter ? quarterOptions.find((e) => e.value === quarter) : 'qtr-to-qtr',
+  );
 
   useEffect(() => {
     /* It will prevent => if quarter is Q1 in balance sheet when i click on profit and loss
@@ -296,7 +300,12 @@ function FinancialStatement({ company, dataList, columnsData }) {
     ...columnsData,
   ];
 
-  console.log(dataList);
+  useEffect(() => {
+    setMounted(true);
+  });
+
+  if (!mounted) return null;
+
   return (
     <StockLayout>
       <FinancialsHeader
@@ -307,8 +316,18 @@ function FinancialStatement({ company, dataList, columnsData }) {
 
       <section className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-b-lg">
         <div className="flex justify-between w-full">
-          <div className="flex flex-col mb-4 md:w-52">
-            <FormSelect
+          <div className="flex flex-col mb-4 w-60">
+            <SelectWithSearch
+              selectedValue={quarterValue}
+              options={quarterOptions}
+              handleChange={(e) => {
+                setQuarterValue(e);
+                router.push({
+                  pathname: `/company/${slug}/financial-statement/${type ? type : 'balance-sheet'}/${e.value}`,
+                });
+              }}
+            />
+            {/* <FormSelect
               control="select"
               label="Quarter"
               name="quarter"
@@ -321,7 +340,7 @@ function FinancialStatement({ company, dataList, columnsData }) {
                   pathname: `/company/${slug}/financial-statement/${type ? type : 'balance-sheet'}/${e.target.value}`,
                 });
               }}
-            />
+            /> */}
           </div>
 
           <ToggleBox

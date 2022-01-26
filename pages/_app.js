@@ -1,47 +1,34 @@
 import Router from 'next/router';
-import NProgress from 'nprogress'; //nprogress module
 
-import 'nprogress/nprogress.css'; //styles of nprogress
+import { AuthProvider } from '../lib/contexts/AuthContext';
+import { useState } from 'react';
+import TopBarProgress from 'react-topbar-progress-indicator';
 import '../styles/index.css';
 
-import { useRouter } from 'next/router';
-import { AuthProvider } from '../lib/contexts/AuthContext';
-import { appRoutes } from '../utils/constants';
-
-Router.events.on('routeChangeStart', () => NProgress.start());
-Router.events.on('routeChangeComplete', () => NProgress.done());
-Router.events.on('routeChangeError', () => NProgress.done());
-NProgress.configure({ showSpinner: false });
-
 function MyApp({ Component, pageProps }) {
-  const router = useRouter();
+  const [progress, setProgress] = useState(false);
 
-  let unprotectedRoutes = [
-    appRoutes.LOGIN_PAGE,
-    appRoutes.REGISTER_PAGE,
-    // appRoutes.HOME_PAGE,
-  ];
-  let pathIsProtected = unprotectedRoutes.indexOf(router.pathname) === -1;
-  /**
-   * @var pathIsProtected Checks if path exists in the unprotectedRoutes routes array
-   */
+  Router.events.on('routeChangeStart', () => {
+    setProgress(true);
+    //function will fired when route change started
+  });
+
+  Router.events.on('routeChangeComplete', () => {
+    setProgress(false);
+    //function will fired when route change ended
+  });
+
+  TopBarProgress.config({
+    shadowBlur: 0,
+    barThickness: 3,
+  });
 
   const getLayout =
     Component.getLayout ||
     ((page) => (
       <AuthProvider>
-        {/* <RouteGuard router={router} pathIsProtected={pathIsProtected}> */}
+        {progress && <TopBarProgress />}
         {page}
-        {/* {!pathIsProtected ? (
-            <Layout>{page}</Layout>
-          ) : router.pathname.startsWith('/company/') ? (
-            <StockLayout>{page}</StockLayout>
-          ) : router.pathname.startsWith('/mutual-fund/') ? (
-            <StockLayout>{page}</StockLayout>
-          ) : (
-            <Layout>{page}</Layout>
-          )} */}
-        {/* </RouteGuard> */}
       </AuthProvider>
     ));
 

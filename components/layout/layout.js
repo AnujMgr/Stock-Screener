@@ -2,7 +2,7 @@ import Footer from '../footer/footer';
 import Navbar from '../navbar';
 import Head from 'next/head';
 
-const Layout = ({ children, title, showSearch, showSymbol }) => {
+const Layout = ({ children, title, showSearch, showSymbol, searchBarWidth }) => {
   return (
     <>
       <Head>
@@ -14,7 +14,7 @@ const Layout = ({ children, title, showSearch, showSymbol }) => {
       </Head>
       <div className="grid grid-rows-3 min-h-screen">
         <section className="row-span-full">
-          <Navbar showSearch={showSearch} showSymbol={showSymbol} />
+          <Navbar showSearch={showSearch} showSymbol={showSymbol} searchBarWidth={searchBarWidth} />
           <main className="row-end-auto">{children}</main>
         </section>
         <Footer />

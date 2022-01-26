@@ -90,6 +90,7 @@ export default function SearchBar({
               className={`
               ${backgroundColor ? backgroundColor : 'bg-white dark:bg-gray-700'}
                 focus:outline-none py-2.5 px-2 w-full`}
+              type="text"
               {...getInputProps({
                 onChange: (e) => {
                   setLoading(true), debounced(e.target.value);
@@ -125,7 +126,7 @@ export default function SearchBar({
                 ) : (
                   <>
                     {showSymbol ? (
-                      <div className="px-6 flex justify-between">
+                      <div className="mb-3 px-6 flex justify-between">
                         <h1 className="font-semibold">Stock</h1>
                         <h1 className="font-semibold">Symbol</h1>
                       </div>

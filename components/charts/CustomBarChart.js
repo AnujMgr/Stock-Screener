@@ -1,10 +1,15 @@
 import { useTheme } from 'next-themes';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Fragment } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const CustomBarChart = ({ data, dataKey1, dataKey2, height }) => {
   const { theme } = useTheme();
+
+  const [mounted, setMounted] = useState(false); // To avoid SSR error
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart

@@ -2,10 +2,11 @@ import Link from 'next/link';
 import React from 'react';
 import SearchBar from '../components/searchbar';
 import Layout from '../components/layout';
+import Router from 'next/router';
 
 export default function Custom404() {
   return (
-    <Layout showSearch={true} showSymbol={true} title={'Page Not Found'}>
+    <Layout showSearch={true} showSymbol={true} title={'Page Not Found'} searchBarWidth={'lg:w-10/12'}>
       <section className="xl:container mx-3 xl:mx-auto mt-8 px-2 py-5 md:p-5 mb-3">
         <h1 className="text-9xl mt-8 text-center dark:text-red-400 text-indigo-400">404</h1>
         <h1 className="text-3xl text-center mb-5 text-gray-700 dark:text-gray-50">Sorry, Page Not Found</h1>
@@ -19,13 +20,15 @@ export default function Custom404() {
             width={'w-full sm:w-3/4 md:w-96 mx-auto'}
           />
         </div>
-        <div className="text-center mt-8">
-          <button className="p-2 bg-blue-800 mx-3 text-white shadow-md rounded-md">
+        <div className="flex gap-2 text-center mt-8 justify-center">
+          <button className="p-2 bg-blue-800 text-white shadow-md rounded-md">
             <Link href="/">Home</Link>
           </button>
-          <Link href="/" className="p-2 bg-blue-600">
-            Contact
-          </Link>
+          <button onClick={(e) => Router.back()} className="p-2 bg-gray-900 text-white shadow-md rounded-md">
+            <Link href="/" className="p-2 bg-blue-600">
+              Go Back
+            </Link>
+          </button>
         </div>
       </section>
     </Layout>

@@ -6,7 +6,6 @@ import { createAccessToken, createRefreshToken, sendRefreshToken } from '../../l
 const Register = async (req, res) => {
   if (req.method === 'POST') {
     const data = req.body.data;
-    console.log(data);
 
     const isAlreadyMember = await prisma.user.findFirst({
       where: {
@@ -36,6 +35,24 @@ const Register = async (req, res) => {
         password: bcrypt.hashSync(data.password, 10),
       },
     });
+
+    if (user) {
+      await prisma.profile.create({
+        data: {
+          userId: user.id,
+        },
+      });
+      await prisma.watchList.create({
+        data: {
+          userId: user.id,
+        },
+      });
+      await prisma.portfolio.create({
+        data: {
+          userId: user.id,
+        },
+      });
+    }
 
     const token = createRefreshToken(user);
     sendRefreshToken(res, token);

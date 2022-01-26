@@ -1,15 +1,18 @@
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import ReactTooltip from 'react-tooltip';
 import { CustomAreaChart, StockHoldingChart } from '../../components/charts';
 import PriceCounter from '../../components/PriceCounter/PriceCounter';
 import SortableTable from '../../components/SortableTable';
-import { InfoIcon } from '../../utils/icons';
+import { BookMarkFillIcon, BookMarkIcon, InfoIcon } from '../../utils/icons';
 import prisma from '../../prisma/client';
 import Custom404 from '../404';
 import Spinner from '../../components/Spinner';
 import FinancialTable from '../../components/FinancialTable/FinancialTable';
 import StockLayout from '../../components/layout/StockLayout';
+import { useAuth } from '../../lib/contexts/AuthContext';
+import { company } from 'faker/lib/locales/az';
+import axios from 'axios';
 
 export async function getStaticProps({ params }) {
   const company = await prisma.company.findFirst({
@@ -355,6 +358,48 @@ export function Company({
 
     ...companyActionColumnData,
   ];
+  const [state] = useAuth();
+  const { user, accessToken } = state;
+  const [watchlistData, setWatchListData] = useState([]);
+
+  const [mounted, setMounted] = useState(false); // To avoid SSR error
+  useEffect(async () => {
+    setMounted(true);
+    if (accessToken) {
+      const watchlists = await axios
+        .get(`/api/watchlist`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then((response) => {
+          console.log(response);
+          setWatchListData(response.data);
+        })
+        .catch((error) => {
+          console.log('Something went wrong!!');
+        });
+    }
+  }, []);
+
+  const toggleWatchList = async (data) => {
+    await axios
+      .post(`/api/watchlist`, data, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log('Something went wrong!!');
+      });
+  };
+
+  console.log(watchlistData);
 
   return (
     <StockLayout title={company.name}>
@@ -376,31 +421,43 @@ export function Company({
             </div>
           </div>
 
-          <div className="mt-4 sm:mt-0">
-            <p className="font-light text-gray-900 dark:text-gray-200">PRICE</p>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
-              Rs.&nbsp;
-              {!Array.isArray(priceHistory) || !priceHistory.length
-                ? 'NaN'
-                : priceHistory[0].closingPrice.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-            </h1>
-            <>
-              {!Array.isArray(priceHistory) || !priceHistory.length ? (
-                <PriceCounter isRising={false} amount="321" rate="2.1" />
-              ) : (
-                <PriceCounter
-                  isRising={priceHistory[0].closingPrice > priceHistory[0].previousClosing}
-                  amount={Number(priceHistory[0].priceDifference)}
-                  rate={(
-                    (Number(priceHistory[0].priceDifference) / Number(priceHistory[0].closingPrice)) *
-                    100
-                  ).toFixed(2)}
-                />
-              )}
-            </>
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-3">
+            <div className="mt-4 sm:mt-0">
+              <p className="font-light text-gray-900 dark:text-gray-200">PRICE</p>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
+                Rs.&nbsp;
+                {!Array.isArray(priceHistory) || !priceHistory.length
+                  ? 'NaN'
+                  : priceHistory[0].closingPrice.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+              </h1>
+              <>
+                {!Array.isArray(priceHistory) || !priceHistory.length ? (
+                  <PriceCounter isRising={false} amount="321" rate="2.1" />
+                ) : (
+                  <PriceCounter
+                    isRising={priceHistory[0].closingPrice > priceHistory[0].previousClosing}
+                    amount={Number(priceHistory[0].priceDifference)}
+                    rate={(
+                      (Number(priceHistory[0].priceDifference) / Number(priceHistory[0].closingPrice)) *
+                      100
+                    ).toFixed(2)}
+                  />
+                )}
+              </>
+            </div>
+            <div className="flex">
+              <WatchListButton
+                handleOnClick={toggleWatchList}
+                user={user}
+                company={company}
+                isInWatchList={false}
+                activeWidth={'w-36'}
+                inactiveWidth={'w-52'}
+              />
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 text-gray-900 dark:text-gray-50">
@@ -431,7 +488,12 @@ export function Company({
         <h2 className="font-semibold text-xl mb-4 text-gray-900 dark:text-gray-200">Price History</h2>
 
         <div className="grid grid-cols-1">
-          <CustomAreaChart data={priceHistory} dataKeyForArea={'closingPrice'} showPeriodSelector={true} />
+          <CustomAreaChart
+            data={priceHistory}
+            dataKeyForArea={'closingPrice'}
+            showPeriodSelector={true}
+            showBush={true}
+          />
 
           <a
             href="#"
@@ -447,33 +509,38 @@ export function Company({
         <div className="grid grid-cols-1 ">
           <div className=" gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0 text-gray-900 dark:text-gray-50">
             {/* <div className="col-span-3 md:col-span-3 gap-4 bg-white dark:bg-gray-900 shadow p-3 rounded-lg mb-4 lg:mb-0"> */}
-            <h2 className="font-bold text-xl mt-2 mb-4">Statistics Overview</h2>
+            <h2 className="font-semibold text-xl mt-2 mb-4">Statistics Overview</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4  gap-4">
               {!Array.isArray(essentials) || !essentials.length ? (
                 <h1>Data Not Available !!</h1>
               ) : (
                 essentials.map((data) => (
-                  <div className="flex justify-between align-bottom mb-2 border-b border-gray-600" key={data.name}>
-                    <p className="text-xs font-normal mb-2 flex items-baseline">
+                  <div
+                    className="flex justify-between align-bottom mb-2 border-b dark:border-gray-600 border-gray-300"
+                    key={data.name}
+                  >
+                    <p className="text-md font-normal mb-2 flex items-baseline">
                       {data.name}{' '}
                       <span className="ml-2 relative" data-tip data-for="registerTip">
                         <InfoIcon
-                          customClass={'fill-current text-blue-600 dark:text-gray-500'}
+                          customClass={'fill-current text-blue-500 dark:text-gray-500'}
                           height={14}
                           width={14}
                         />
                       </span>
                     </p>
-                    <ReactTooltip
-                      id="registerTip"
-                      place="top"
-                      effect="solid"
-                      // backgroundColor="#374151"
-                      className="max-w-xs rounded-lg shadow-md bg-white"
-                    >
-                      Market capitalization is the aggregate valuation of the company based on its current share price
-                      and the total number of outstanding shares.
-                    </ReactTooltip>
+                    {mounted ? (
+                      <ReactTooltip
+                        id="registerTip"
+                        place="top"
+                        effect="solid"
+                        // backgroundColor="#374151"
+                        className="max-w-xs rounded-lg shadow-md bg-white"
+                      >
+                        Market capitalization is the aggregate valuation of the company based on its current share price
+                        and the total number of outstanding shares.
+                      </ReactTooltip>
+                    ) : null}
                     <h4 className="m-0 font-bold text-md mb-3 text-gray-800 dark:text-gray-300">
                       {data.unit === '""' || data.unit !== 'Rs' ? '' : data.unit} {data.amount.toLocaleString()}{' '}
                       {data.unit === '""' || data.unit === 'Rs' ? '' : data.unit}
@@ -490,6 +557,7 @@ export function Company({
         <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Peer Comparision</h2>
         <SortableTable columns={columns} data={dataList} highlightTopic={true} showCheck={false} />
       </section>
+
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
         <div className="flex justify-between">
           <h2 className="font-bold text-xl mb-4 text-gray-900 dark:text-gray-200">Corporate Actions</h2>
@@ -521,5 +589,31 @@ export function Company({
     </StockLayout>
   );
 }
+
+const WatchListButton = ({ isInWatchList, activeWidth, inactiveWidth, handleOnClick, user, company }) => {
+  return (
+    <button
+      className={`group flex w-auto px-3 border border-blue-900 text-blue-900 py-2 rounded-md hover:bg-blue-900 hover:text-white 
+      ${isInWatchList ? 'bg-blue-900' : null}`}
+      onClick={(e) => handleOnClick({ userId: user.id, companyId: company.id })}
+    >
+      {isInWatchList ? (
+        <BookMarkFillIcon customClass="fill-current text-white" height="24" width="20" />
+      ) : (
+        <BookMarkIcon
+          customClass="fill-current text-blue-900 dark:text-gray-200 group-hover:text-white"
+          height="24"
+          width="20"
+        />
+      )}
+      <div
+        className={`w-0 overflow-hidden h-0 group-hover:${isInWatchList ? inactiveWidth : activeWidth} 
+        group-hover:h-auto transition-all ease-in-out duration-500 items-center`}
+      >
+        <span className="ml-3 whitespace-nowrap"> {isInWatchList ? 'Remove From WatchList' : 'Add to WatchList'}</span>
+      </div>
+    </button>
+  );
+};
 
 export default Company;

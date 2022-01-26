@@ -1,5 +1,3 @@
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
 import MicroChart from '../components/charts/MicroChart';
 import SearchBar from '../components/searchbar';
 import Link from 'next/link';

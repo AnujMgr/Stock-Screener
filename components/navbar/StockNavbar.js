@@ -51,7 +51,7 @@ function SecondaryNavLink({ isActive, path, pathAs, name }) {
   return (
     <Link href={path} as={pathAs} passHref>
       <div
-        className={`cursor-pointer dark:text-white text-gray-900 px-3 py-2 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center flex-none
+        className={`cursor-pointer dark:text-white text-gray-900 px-3 py-3 hover:border-indigo-700 dark:hover:border-gray-300 transition duration-500 ease-in-out border-transparent border-b-2 flex-grow-0 inline-flex items-center flex-none
           ${isActive ? 'border-indigo-700 dark:border-gray-300' : null}
           `}
       >

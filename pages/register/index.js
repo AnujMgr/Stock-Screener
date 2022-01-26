@@ -15,7 +15,6 @@ const Register = () => {
   //For Form
   const [state, dispatch] = useAuth();
   const router = useRouter();
-  console.log(dispatch);
 
   const Schema = Yup.object().shape({
     name: Yup.string().required('This field is required'),

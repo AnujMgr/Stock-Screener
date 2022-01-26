@@ -1,37 +1,16 @@
-import React from "react";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  Legend,
-} from "recharts";
+import React from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
 
-const COLORS = ["#1E40AF", "#10B981", "#FFBB28", "#FF8042"];
+const COLORS = ['#1E40AF', '#10B981', '#FFBB28', '#FF8042'];
 
 const RADIAN = Math.PI / 180;
-const renderCustomizedLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-  index,
-}) => {
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
   const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text
-      x={x}
-      y={y}
-      fill="white"
-      textAnchor={x > cx ? "start" : "end"}
-      dominantBaseline="central"
-    >
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
       {`${(percent * 100).toFixed(0)}%`}
     </text>
   );
@@ -55,10 +34,7 @@ const StockHoldingChart = ({ data }) => {
               strokeWidth={1}
             >
               {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
@@ -67,11 +43,8 @@ const StockHoldingChart = ({ data }) => {
       </div>
       <div className="flex gap-4 justify-center">
         {data.map((holding, index) => (
-          <div className="flex flex-row" key={holding.name}>
-            <div
-              className="h-3.5 w-3.5 mr-2 mt-0.5"
-              style={{ backgroundColor: COLORS[index] }}
-            ></div>
+          <div className="flex flex-row items-center" key={holding.name}>
+            <div className="h-3.5 w-3.5 mr-2 mt-0.5" style={{ backgroundColor: COLORS[index] }}></div>
             <p className="text-gray-900 dark:text-gray-200">
               {holding.name}: {Number(holding.value).toLocaleString()}
             </p>
@@ -96,17 +69,10 @@ const CustomTooltip = ({ active, payload, label }) => {
       <>
         {payload.map(({ value, name }) => {
           return (
-            <div
-              key={value}
-              className="bg-gray-800 p-2 text-gray-900 dark:text-gray-200"
-            >
+            <div key={value} className="bg-gray-800 p-2 text-gray-900 dark:text-gray-200">
               <p className="text-xs text-white dark:text-gray-200">
-                {name}:{" "}
-                <span>
-                  {typeof value === "number"
-                    ? value.toLocaleString()
-                    : (0).toFixed(1).toLocaleString()}
-                </span>
+                {name}:{' '}
+                <span>{typeof value === 'number' ? value.toLocaleString() : (0).toFixed(1).toLocaleString()}</span>
               </p>
             </div>
           );

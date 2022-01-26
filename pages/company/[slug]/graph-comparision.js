@@ -4,8 +4,6 @@ import Link from 'next/link';
 import prisma from '../../../prisma/client';
 import { useRouter } from 'next/router';
 import Custom404 from '../../404';
-import FinancialTable from '../../../components/FinancialTable';
-import { MinusIcon, PlusIcon } from '../../../utils/icons';
 import { Field, Formik } from 'formik';
 import CustomSelectField from '../../../components/SelectWithSearch/CustomSelectField';
 import MultipleLineGraph from '../../../components/charts/MultipleLineGraph';
@@ -63,8 +61,6 @@ export async function getServerSideProps({ query }) {
         : { in: [query.slug] },
     },
   });
-
-  console.log(companies);
 
   companies.map((company) => companyIds.push(company.id));
   var lengthOfFacts = 0;
@@ -179,56 +175,6 @@ export async function getServerSideProps({ query }) {
         facts: facts,
       });
   });
-
-  //This will skip topic and take first statement fact and push to columns
-  // data.some(function (statementline) {
-  //   const facts = statementline.financialStatementLine.financialStatementFact;
-  //   if (statementline.financialStatementLine.unit !== 'topic') {
-  //     return facts.map((fact) => {
-  //       fact.companyId == company.id
-  //         ? columnsData.unshift({
-  //             Header: companies.find((item) => item.id === fact.companyId).name,
-  //             accessor: fact.companyId + '' + fact.fiscalYear + ' ' + fact.quarter,
-  //             className: 'bg-gray-200 dark:bg-gray-800 border-b dark:border-gray-700 border-white',
-  //           })
-  //         : columnsData.push({
-  //             Header: companies.find((item) => item.id === fact.companyId).name,
-  //             accessor: fact.companyId + '' + fact.fiscalYear + ' ' + fact.quarter,
-  //           });
-  //     });
-  //   }
-  // });
-
-  // data.map((fact, i) => {
-  //   var child = {};
-  //   var myobj = {};
-  //   console.log(fact);
-
-  //   fact.financialStatementLine.children.map((data) => {
-  //     data.financialStatementFact.map((myData) => {
-  //       Object.assign(child, {
-  //         [myData.companyId + '' + myData.fiscalYear + ' ' + myData.quarter]: myData.amount,
-  //         name: data.name,
-  //         topic: data.unit,
-  //       });
-  //     });
-  //   });
-
-  //   fact.financialStatementLine.financialStatementFact.length > 0
-  //     ? fact.financialStatementLine.financialStatementFact.map((data) => {
-  //         Object.assign(myobj, {
-  //           particular: fact.financialStatementLine.name,
-  //           [data.companyId + '' + data.fiscalYear + ' ' + data.quarter]: data.amount,
-  //           subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
-  //         });
-  //       })
-  //     : Object.assign(myobj, {
-  //         particular: fact.financialStatementLine.name,
-  //         subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
-  //       });
-
-  //   dataList.push({ id: i, ...myobj, topic: fact.financialStatementLine.unit });
-  // });
 
   // Pass post data to the page via props
   return {

@@ -15,7 +15,7 @@ const StockLayout = ({ children, title }) => {
       </Head>
       <div className="grid grid-rows-3 min-h-screen">
         <section className="row-span-full">
-          <Navbar showSearch={true} showSymbol={true} />
+          <Navbar showSearch={true} showSymbol={true} searchBarWidth={'lg:w-10/12'} />
           <StockNavbar />
           <main className="row-end-auto">{children}</main>
         </section>

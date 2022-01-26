@@ -1,12 +1,13 @@
-import { verify } from "jsonwebtoken";
+import axios from 'axios';
+import { verify } from 'jsonwebtoken';
 
 const checkAuth = (handler) => {
   return async (req, res) => {
     try {
-      const authorization = req.headers["authorization"];
-      if (!authorization) throw new Error("not authenticated");
+      const authorization = req.headers['authorization'];
+      if (!authorization) throw new Error('not authenticated');
 
-      const token = authorization.split(" ")[1];
+      const token = authorization.split(' ')[1];
 
       verify(token, process.env.ACCESS_TOKEN_SECRET);
 
@@ -14,8 +15,8 @@ const checkAuth = (handler) => {
     } catch (e) {
       console.log(e);
       res.status(400).json({
-        status: "error",
-        message: "Unauthorized Access!!",
+        status: 'error',
+        message: 'Unauthorized Access!!',
       });
       // throw new Error(`You are not authorized in this route.`);
     }

@@ -1,10 +1,20 @@
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout';
 import SortableTable from '../../components/SortableTable';
 import prisma from '../../prisma/client';
 import { Field, Formik } from 'formik';
 import CustomSelectField from '../../components/SelectWithSearch/CustomSelectField';
+
+const filterByReference = (arr1, arr2) => {
+  let res = [];
+  res = arr1.filter((el) => {
+    return !arr2.find((element) => {
+      return element.id === el.id;
+    });
+  });
+  return res;
+};
 
 export async function getServerSideProps({ query }) {
   const screenerData = [];
@@ -12,11 +22,11 @@ export async function getServerSideProps({ query }) {
     {
       Header: 'Company',
       accessor: 'Company',
-      className: 'table-title',
+      className: 'table-title bg-white dark:bg-gray-900 px-4 py-4 sticky left-0 ',
     },
     {
-      Header: 'Price',
-      accessor: 'Price',
+      Header: 'LTP',
+      accessor: 'LTP',
     },
   ];
   const dataList = [];
@@ -27,7 +37,12 @@ export async function getServerSideProps({ query }) {
   });
   // const fiscalYearList = [];
 
-  const industries = await prisma.industry.findMany();
+  const industries = await prisma.industry.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+  });
 
   const currentIndustry = await prisma.industry.findFirst({
     where: {
@@ -47,6 +62,9 @@ export async function getServerSideProps({ query }) {
     },
     include: {
       companyPrice: {
+        select: {
+          closingPrice: true,
+        },
         take: 1,
         orderBy: {
           date: 'desc',
@@ -69,7 +87,7 @@ export async function getServerSideProps({ query }) {
           financialStatementFact: {
             where: {
               quarter: query.quarter ? query.quarter : '',
-              fiscalYear: query.fiscalYear ? query.fiscalYear : '',
+              fiscalYear: query.fiscalYear ? query.fiscalYear : fiscalYearList[0].fiscalYear,
             },
             orderBy: [
               {
@@ -106,27 +124,42 @@ export async function getServerSideProps({ query }) {
     //
   });
 
-  // for (let i = 0; i < 5; i++) {
-  //   var firstYear = parseInt(parseInt(currentFiscalYearFact.fiscalYear.slice(-4)) - 1);
-  //   var lastYear = parseInt(currentFiscalYearFact.fiscalYear.slice(-4));
-  //   fiscalYearList.push(parseInt(firstYear - i) + '/' + parseInt(lastYear - i));
-  // }
-
-  companies.map((company, i) => {
+  companies.map((company) => {
     var myobj = {};
-    screenerData.map((screener) => {
-      if (company.id === screener.companyId) {
+
+    screenerData.some((value) => {
+      if (value['companyId'] === company.id) {
         Object.assign(myobj, {
-          [screener.name]: screener.amount,
+          [value.name]: value.amount,
         });
       }
     });
-
     Object.assign(myobj, { ['Company']: company.name });
-    Object.assign(myobj, { ['Price']: '123' });
-
+    Object.assign(myobj, {
+      ['LTP']:
+        company.companyPrice.length > 0 ? company.companyPrice[company.companyPrice.length - 1].closingPrice : 'NaN',
+    });
     dataList.push(myobj);
   });
+
+  // companies.map((company, i) => {
+  //   var myobj = {};
+  //   screenerData.map((screener) => {
+  //     if (company.id === screener.companyId) {
+  //       Object.assign(myobj, {
+  //         [screener.name]: screener.amount,
+  //       });
+  //     }
+  //   });
+
+  //   Object.assign(myobj, { ['Company']: company.name });
+  //   Object.assign(myobj, {
+  //     ['LTP']:
+  //       company.companyPrice.length > 0 ? company.companyPrice[company.companyPrice.length - 1].closingPrice : 'NaN',
+  //   });
+
+  //   dataList.push(myobj);
+  // });
 
   return { props: { columns, dataList, industries, fiscalYearList } };
 }
@@ -173,14 +206,20 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
     });
   };
 
+  const [mounted, setMounted] = useState(false); // To avoid SSR error
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
   return (
-    <Layout showSearch={true} showSymbol={true} title={'Screener'}>
+    <Layout showSearch={true} showSymbol={true} title={'Screener'} searchBarWidth={'lg:w-10/12'}>
       <section className="xl:container mt-5 mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 md:rounded-md">
+        <h2 className="text-2xl mb-4">Screener</h2>
         <Formik
           initialValues={{
             industry: industry ? industry : 'commercial-banks',
             quarter: quarter ? quarter : 'q4',
-            fiscalYear: fiscalYear ? fiscalYear : '',
+            fiscalYear: fiscalYear ? fiscalYear : fiscalYearList[0].fiscalYear,
             // statement: statementType ? statementType : '1',
           }}
           onSubmit={(values, actions) => {
@@ -263,118 +302,6 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
           }}
         </Formik>
 
-        {/* <div className="grid grid-cols-4 md:grid-cols-5 gap-1">
-          <div className="mb-4">
-            <FormSelect
-              control="select"
-              label="Industry Type"
-              name="Industry"
-              customClassName="rounded border border-gray-600"
-              value={industryOption}
-              options={industryOptions}
-              handleChange={(e) => {
-                setIndustryOption(e.target.value);
-                router.push({
-                  pathname: `/screener`,
-                  query: {
-                    industryType: e.target.value,
-                    fiscalYear: fiscalYearOption,
-                    quarter: quarterOption,
-                  },
-                });
-              }}
-            />
-          </div>
-          <div className="mb-2 col-span-2 md:col-span-1">
-            <SelectWithSearch
-              customClassName="rounded border dark:border-gray-700 border-gray-400"
-              options={quarterOptions}
-              control="select"
-              label="Quarter"
-              name="quarter"
-              selectedValues={quarterOption}
-              handleChange={(e) => {
-                setQuarterOption(e.target.value);
-                router.push({
-                  pathname: `/screener`,
-                  query: {
-                    industryType: industryOption,
-                    fiscalYear: fiscalYearOption,
-                    quarter: e.target.value,
-                  },
-                });
-              }}
-            />
-            {/* <FormSelect
-              options={quarterOptions}
-              control="select"
-              label="Select Quarter"
-              name="quarter"
-              value={quarterOption}
-              customClassName="rounded border dark:border-gray-700 border-gray-400"
-              handleChange={(e) => {
-                setQuarterOption(e.target.value);
-                router.push({
-                  pathname: `/screener`,
-                  query: {
-                    industryType: industryOption,
-                    fiscalYear: fiscalYearOption,
-                    quarter: e.target.value,
-                  },
-                });
-              }}
-            /> 
-          </div>
-          <div className="mb-2">
-            <FormSelect
-              customClassName="rounded border dark:border-gray-700 border-gray-400"
-              options={fiscalYearOptions}
-              control="select"
-              label="FiscalYear"
-              name="FiscalYear"
-              value={fiscalYearOption}
-              handleChange={(e) => {
-                setFiscalYearOption(e.target.value);
-                router.push({
-                  pathname: `/screener`,
-                  query: {
-                    industryType: industryOption,
-                    fiscalYear: e.target.value,
-                    quarter: quarterOption,
-                  },
-                });
-              }}
-            />
-          </div>
-          {/* <div className="mb-2">
-          {industryOption == 0 ||
-          quarterOption == 0 ||
-          fiscalYearOption == 0 ? (
-            <button
-              disabled
-              className="bg-gray-600 text-white h-9 px-5 rounded cursor-not-allowed"
-            >
-              Submit
-            </button>
-          ) : (
-            <button
-              onClick={(e) =>
-                router.push({
-                  pathname: `/screener`,
-                  query: {
-                    industryType: industryOption,
-                    quarter: quarterOption,
-                    fiscalYear: fiscalYearOption,
-                  },
-                })
-              }
-              className="bg-blue-600 text-white h-9 px-5 rounded"
-            >
-              Submit
-            </button>
-          )}
-        </div> 
-        </div> */}
         <SortableTable columns={columns} data={dataList} />
       </section>
     </Layout>

@@ -88,7 +88,7 @@ const Login = () => {
   }, [state, router]);
 
   return (
-    <Layout showSearch={true} showSymbol={true} title={'Login'}>
+    <Layout showSearch={true} showSymbol={true} title={'Login'} searchBarWidth={'lg:w-10/12'}>
       <section className="xl:container mx-auto">
         <div className="max-w-4xl mx-auto my-8 bg-white dark:bg-gray-900 shadow-sm rounded-md overflow-hidden">
           <div className="p-3 ">

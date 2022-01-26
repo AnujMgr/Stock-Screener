@@ -408,7 +408,7 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
           }}
         </Formik>
 
-        <div className="flex gap-3 p-2">
+        <div className="flex gap-3 py-2">
           <Link href={'/company/[slug]/peer-comparision'} as={`/company/${slug}/peer-comparision`} passHref>
             <button className="bg-blue-900 hover:bg-blue-800 dark:hover:bg-blue-800 text-white px-4 py-1 rounded">
               Figures
