@@ -109,7 +109,6 @@ const financialStatementLine = [
   },
   {
     name: "Assets",
-
     parentId: null,
     unit: "topic",
   },
@@ -121,7 +120,6 @@ const financialStatementLine = [
     name: "Balance with Banks",
     parentId: null,
   },
-
   {
     name: "Investments",
     parentId: null,

@@ -56,6 +56,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Svg Bavckground */}
       <svg
         className="fill-current text-purple-900 dark:text-gray-900"
         xmlns="http://www.w3.org/2000/svg"
@@ -117,6 +118,189 @@ export default function Home() {
                 </tr>
               </tbody>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="xl:container mx-3 xl:mx-auto mt-8 rounded-lg text-gray-900 dark:text-gray-50">
+        <h1 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-10">Market Overview</h1>
+        <div className="grid grid-col-1 md:grid-cols-2 gap-3">
+          <div className="p-3">
+            <h1 className="text-xl mb-3">Top Gainers</h1>
+            <div className="not-prose relative bg-slate-50 rounded-md overflow-hidden dark:bg-teal-900">
+              <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/25 "></div>
+              <div className="relative rounded-md overflow-auto">
+                <div className="shadow-sm overflow-hidden mt-6">
+                  <table className="border-collapse table-fixed w-full text-sm">
+                    <thead>
+                      <tr>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          Symbol
+                        </th>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          LTP
+                        </th>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pr-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          Point Change
+                        </th>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pr-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          % Change
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white dark:bg-slate-900">
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          NABIL
+                        </td>
+
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          398.28
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          36.2
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          10.0
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          NIFRA
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          398.28
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          133.80
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          10.0
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          LEC
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          428.2
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          34.50
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          10
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          BNHC
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          560.40
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          50.90
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          9.99
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-md dark:border-white/5"></div>
+            </div>
+          </div>
+          <div className="p-3">
+            <h1 className="text-xl mb-3">Top Losers</h1>
+
+            <div className="not-prose relative bg-slate-50 rounded-md overflow-hidden dark:bg-teal-900">
+              <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-900 "></div>
+              <div className="relative rounded-md overflow-auto">
+                <div className="shadow-sm overflow-hidden mt-6">
+                  <table className="border-collapse table-fixed w-full text-sm">
+                    <thead>
+                      <tr>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pl-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          Symbol
+                        </th>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          LTP
+                        </th>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pr-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          Point Change
+                        </th>
+                        <th className="border-b dark:border-slate-600 font-medium p-4 pr-8 pt-0 pb-3 text-slate-400 dark:text-slate-200 text-left">
+                          % Change
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white dark:bg-slate-900">
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          NABIL
+                        </td>
+
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          398.28
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          36.2
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          10.0
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          NIFRA
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          398.28
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 text-slate-500 dark:text-slate-400">
+                          133.80
+                        </td>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          10.0
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          LEC
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          428.2
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          34.50
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          10
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="border-b border-slate-100 dark:border-slate-700 p-4 pl-8 text-slate-500 dark:text-slate-400">
+                          BNHC
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          560.40
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 text-slate-500 dark:text-slate-400">
+                          50.90
+                        </td>
+                        <td className="border-b border-slate-200 dark:border-slate-600 p-4 pr-8 text-slate-500 dark:text-slate-400">
+                          9.99
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="absolute inset-0 pointer-events-none border border-black/5 rounded-md dark:border-white/5"></div>
+            </div>
           </div>
         </div>
       </section>

@@ -1,5 +1,5 @@
 import { verify } from 'jsonwebtoken';
-import { createAccessToken, sendRefreshToken, createRefreshToken } from '../../lib/functions/auth';
+import { sendRefreshToken, createRefreshToken, createAccessToken } from '../../lib/functions/auth';
 
 import cookie from 'cookie';
 import prisma from '../../prisma/client';

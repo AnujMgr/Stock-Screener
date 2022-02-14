@@ -18,7 +18,7 @@ export async function getServerSideProps({ params }) {
 
   const data = await prisma.financialStatementLineSequence.findMany({
     where: {
-      financialStatementId: 1,
+      financialStatementId: 8,
     },
     include: {
       financialStatementLine: {
@@ -70,17 +70,17 @@ function FinancialOverview({ facts, company }) {
         assets: fact.amount,
         liabilities: facts[1].facts[index].amount,
       }),
-    );
+    );}
 
-    facts[2].facts.map((fact, index) =>
-      profitLossData.push({
-        id: index,
-        fiscalYear: fact.fiscalYear,
-        revenue: fact.amount,
-        netIncome: facts[3].facts[index].amount,
-      }),
-    );
-  }
+  //   facts[2].facts.map((fact, index) =>
+  //     profitLossData.push({
+  //       id: index,
+  //       fiscalYear: fact.fiscalYear,
+  //       revenue: fact.amount,
+  //       netIncome: facts[3].facts[index].amount,
+  //     }),
+  //   );
+  // }
 
   return (
     <StockLayout title={company.name + `'s ` + 'financial overview'}>

@@ -13,7 +13,7 @@ export const ToggleTheme = () => {
   return (
     <div>
       <button
-        className="p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-900 hover:bg-blue-600 hover:text-white dark:hover:bg-gray-700
+        className="p-2 shadow-md rounded bg-blue-700 text-white dark:bg-gray-900 hover:bg-blue-600 hover:text-white dark:hover:bg-slate-800
         transition duration-500 ease-in-out "
         aria-label="Toggle Dark Mode"
         type="button"

@@ -5,7 +5,7 @@ import { useAuth } from '../../lib/contexts/AuthContext';
 import { useRouter } from 'next/router';
 import Cookies from 'js-cookie';
 import { Field, Formik } from 'formik';
-import PasswordField from '../../Form/PasswordField';
+import { PasswordField } from '../../components/FormikComponents';
 import * as Yup from 'yup';
 import axios from 'axios';
 import Layout from '../../components/layout';
@@ -81,14 +81,14 @@ const Login = () => {
 
   const emailOrPasswordWrong = (text) => toast.error(text);
 
-  useEffect(() => {
-    if (state.accessToken && state.user) {
-      router.push('/');
-    }
-  }, [state, router]);
+  // useEffect(() => {
+  //   if (state.accessToken && state.user) {
+  //     router.push('/');
+  //   }
+  // }, [state, router]);
 
   return (
-    <Layout showSearch={true} showSymbol={true} title={'Login'} searchBarWidth={'lg:w-10/12'}>
+    <Layout showSearch={false} showSymbol={true} title={'Login'} searchBarWidth={'lg:w-10/12'}>
       <section className="xl:container mx-auto">
         <div className="max-w-4xl mx-auto my-8 bg-white dark:bg-gray-900 shadow-sm rounded-md overflow-hidden">
           <div className="p-3 ">

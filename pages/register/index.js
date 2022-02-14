@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { useTheme } from 'next-themes';
 import { Field, Formik } from 'formik';
 import * as Yup from 'yup';
-import PasswordField from '../../Form/PasswordField';
+import { PasswordField } from '../../components/FormikComponents';
 import { toast, ToastContainer } from 'react-toast';
 import { useRouter } from 'next/router';
 import axios from 'axios';

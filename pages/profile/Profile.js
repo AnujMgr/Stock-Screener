@@ -1,4 +1,7 @@
+import { Field, Formik } from 'formik';
 import React from 'react';
+import { CustomAreaChart } from '../../components/charts';
+import { FormikInput } from '../../components/FormikComponents';
 import ProfileLayout from '../../components/layout/ProfileLayout';
 import SortableTable from '../../components/SortableTable/SortableTable';
 
@@ -139,34 +142,23 @@ function Profile() {
   ];
 
   return (
-    <ProfileLayout showSearch={true} showSymbol={true}>
+    <ProfileLayout showSearch={true} showSymbol={true} title={`Profile Page`}>
       <main className="xl:container mt-3 mx-1 md:mx-3 xl:mx-auto px-2">
-        <div className="p-3 shadow bg-white dark:bg-gray-900 rounded-md">
-          {/* <h1 className="text-2xl mb-3">My Portfolio</h1> */}
-          <SortableTable columns={columns} data={tableData} />
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-white border-b-2 border-rose-500 p-3">
+            <h1>Total Investment</h1>
+            <p>Rs. 200</p>
+          </div>
+          <div className="bg-white border-b-2 border-yellow-500 p-3">
+            <h1>Total Investment</h1>
+            <p>Rs. 200</p>
+          </div>
+          <div className="bg-white border-b-2 border-blue-700 p-3">
+            <h1>Total Investment</h1>
+            <p>Rs. 200</p>
+          </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          {/* <div className="shadow-sm bg-white dark:bg-gray-900 rounded-sm overflow-hidden">
-                <div className="bg-gray-700">
-                  <div className="px-3 py-2">
-                    <h1 className="text-xs">ASSET STRUCTURE</h1>
-                  </div>
-                </div>
-                <StockHoldingChart data={holdingData} />
-              </div>
-
-              <div className="shadow-sm bg-white dark:bg-gray-900 rounded-sm overflow-hidden">
-                <div className="bg-gray-700">
-                  <div className="px-3 py-2">
-                    <h1 className="text-xs">MY ASSET</h1>
-                  </div>
-                  <div className="flex px-3">
-                    <h1>Stock</h1>
-                  </div>
-                </div>
-              </div> */}
-        </div>
+        <div className="p-3 shadow bg-white dark:bg-gray-900 rounded-md"></div>
       </main>
     </ProfileLayout>
   );

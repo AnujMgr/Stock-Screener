@@ -6,7 +6,7 @@ function ProfilePageNavbar() {
   const router = useRouter();
 
   return (
-    <div className="opacity-95 sticky top-0 shadow-md border-b-1 bg-white dark:bg-gray-700  z-30 grid border-t dark:border-gray-600">
+    <div className="opacity-95 sticky top-0 shadow-md border-b-1 bg-white/50 dark:bg-gray-900/60 backdrop-blur-md z-30 grid border-t dark:border-gray-600">
       <div className="xl:container mx-auto flex items-center overflow-x-auto custom-scroll no-scroll w-full">
         <SecondaryNavLink
           isActive={router.asPath === `/profile`}

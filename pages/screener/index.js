@@ -4,7 +4,7 @@ import Layout from '../../components/layout';
 import SortableTable from '../../components/SortableTable';
 import prisma from '../../prisma/client';
 import { Field, Formik } from 'formik';
-import CustomSelectField from '../../components/SelectWithSearch/CustomSelectField';
+import { CustomSelectField } from '../../components/FormikComponents';
 
 const filterByReference = (arr1, arr2) => {
   let res = [];
@@ -37,12 +37,7 @@ export async function getServerSideProps({ query }) {
   });
   // const fiscalYearList = [];
 
-  const industries = await prisma.industry.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+  const industries = await prisma.industry.findMany({});
 
   const currentIndustry = await prisma.industry.findFirst({
     where: {
@@ -175,7 +170,7 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
   if (columns == null) {
     return (
       <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
-        <h1>Data Not Available!</h1>
+        <h1>Data Not Available !</h1>
       </section>
     );
   }
@@ -195,6 +190,7 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
     : [];
 
   const handleSubmission = (values) => {
+    console.log(values);
     const { industry, quarter, fiscalYear } = values;
     router.push({
       pathname: `/screener`,

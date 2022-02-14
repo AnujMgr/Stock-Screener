@@ -20,7 +20,6 @@ const CustomAreaChart = ({ data, dataKeyForArea, showPeriodSelector, dataLength,
     setTimeSpan(timespan);
     setActiveMenu(menu);
   }
-
   return (
     <Fragment>
       {/* <div className="flex justify-between px-3"> */}

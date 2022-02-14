@@ -11,56 +11,58 @@ const AddToWatchList = async (req, res) => {
   if (req.method === 'GET') {
     const watchlists = await prisma.watchList.findMany({
       where: {
-        userId: userId,
+        userId: Number(userId),
       },
       include: {
         watchlistfact: {
           where: {
-            companyId: companyId,
+            companyId: Number(companyId),
           },
         },
       },
     });
     return res.json({ watchlists });
   }
-  console.log('----------------------');
   const watchList = await prisma.watchList.findFirst({
     where: {
-      userId: userId,
+      userId: Number(userId),
     },
   });
 
-  if (!watchList)
-    await prisma.watchList.create({
-      data: {
-        userId: userId,
-      },
-    });
-
   const isAlreadyAddedInWatchList = await prisma.watchListFact.findFirst({
     where: {
-      companyId: companyId,
+      companyId: Number(companyId),
       watchlistId: Number(watchList.id),
     },
   });
 
   if (req.method === 'POST') {
     if (!isAlreadyAddedInWatchList) {
-      const fact = await prisma.watchListFact.create({
+      await prisma.watchListFact.create({
         data: {
           companyId: companyId,
           watchlistId: watchList.id,
         },
       });
-      res.json({ fact });
-    } else if (isAlreadyAddedInWatchList) {
-      const fact = await prisma.watchListFact.delete({
+      return res.json({ isInList: true, message: 'Successfully Added to WatchList !' });
+    } else res.json({ isInList: true, message: 'Already in List !' });
+  } else if (req.method === 'DELETE') {
+    if (isAlreadyAddedInWatchList) {
+      const currentWatchList = await prisma.watchListFact.findFirst({
         where: {
+          companyId: companyId,
           watchlistId: watchList.id,
         },
       });
-      res.json({ fact });
-    }
+
+      await prisma.watchListFact.delete({
+        where: {
+          id: currentWatchList.id,
+          // companyId: Number(companyId),
+        },
+      });
+      return res.json({ isInList: false, message: 'Successfully Removed From WatchList !' });
+    } else res.json({ isInList: false, message: 'Couldn`t remove not in list !' });
   } else {
     res.json({ error: true, message: 'Method Not Alowed !' });
   }

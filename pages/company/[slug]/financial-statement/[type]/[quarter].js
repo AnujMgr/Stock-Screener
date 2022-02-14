@@ -2,7 +2,6 @@ import prisma from '../../../../../prisma/client';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import FinancialsHeader from '../../../../../components/HeaderMenu/FinancialsHeader';
-import FormSelect from '../../../../../Form/FormSelect';
 import FinancialTable from '../../../../../components/FinancialTable';
 import { MinusIcon, PlusIcon } from '../../../../../utils/icons';
 import Custom404 from '../../../../404';
@@ -14,7 +13,7 @@ function checkStatementHasFact(data) {
   return data.some(function (statementline) {
     // topic don't have financialStatementFact so ignore
     // if data dont have any financialStatementFact the return empty array, no need to go further
-    if (statementline.financialStatementLine.unit !== 'topic')
+    if (statementline.financialStatementLine.type !== 'topic')
       if (statementline.financialStatementLine.financialStatementFact.length > 0) {
         return true;
       } else {
@@ -60,7 +59,7 @@ export async function getStaticProps({ params }) {
         parentId: null,
       },
     },
-    include: {
+    select: {
       financialStatementLine: {
         include: {
           children: {
@@ -139,9 +138,10 @@ export async function getStaticProps({ params }) {
   }
 
   //This will skip topic and take first statement fact and push to columns
+  //For Header of Table
   data.some(function (statementline) {
     const facts = statementline.financialStatementLine.financialStatementFact;
-    if (statementline.financialStatementLine.unit !== 'topic') {
+    if (statementline.financialStatementLine.type !== 'topic') {
       return facts.map((fact) => {
         columnsData.push({
           Header: fact.fiscalYear + ' ' + fact.quarter,
@@ -152,40 +152,48 @@ export async function getStaticProps({ params }) {
   });
 
   data.map((fact) => {
-    var child = {};
     var myobj = {};
+    var childList = [];
 
     fact.financialStatementLine.children.map((data) => {
-      data.financialStatementFact.map((myData) => {
-        Object.assign(child, {
-          [myData.fiscalYear + ' ' + myData.quarter]: myData.amount.toLocaleString(),
-          particular: data.name,
-          topic: data.unit,
+      var child = {};
+      //Avoid empty data in table
+      if (data.financialStatementFact.length) {
+        data.financialStatementFact.map((myData) => {
+          Object.assign(child, {
+            [myData.fiscalYear + ' ' + myData.quarter]: myData.amount.toLocaleString(),
+            particular: data.name,
+            topic: data.type,
+          });
+        });
+        childList.push(child);
+      }
+    });
+    // childList.push(child);
+
+    //Without this Topic part will not be visible
+    if (fact.financialStatementLine.type === 'topic')
+      Object.assign(myobj, {
+        topic: fact.financialStatementLine.type,
+        particular: fact.financialStatementLine.name,
+        subRows: [],
+      });
+    else
+      fact.financialStatementLine.financialStatementFact.map((data) => {
+        Object.assign(myobj, {
+          topic: fact.financialStatementLine.type,
+          particular: fact.financialStatementLine.name,
+          [data.fiscalYear + ' ' + data.quarter]: data.amount.toLocaleString(),
+          subRows: fact.financialStatementLine.children.length > 0 ? childList : [],
         });
       });
-    });
-
-    fact.financialStatementLine.financialStatementFact.length > 0
-      ? fact.financialStatementLine.financialStatementFact.map((data) => {
-          Object.assign(myobj, {
-            topic: fact.financialStatementLine.unit,
-            particular: fact.financialStatementLine.name,
-            [data.fiscalYear + ' ' + data.quarter]: data.amount.toLocaleString(),
-            subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
-          });
-        })
-      : Object.assign(myobj, {
-          topic: fact.financialStatementLine.unit,
-          particular: fact.financialStatementLine.name,
-          subRows: fact.financialStatementLine.children.length > 0 ? [child] : [],
-        });
 
     dataList.push({ ...myobj });
   });
 
   // Pass post data to the page via props
   return {
-    props: { company, dataList, columnsData },
+    props: { company, dataList, columnsData, data },
     revalidate: 10, // In seconds};
   };
 }
@@ -237,11 +245,13 @@ export async function getStaticPaths() {
   };
 }
 
-function FinancialStatement({ company, dataList, columnsData }) {
+function FinancialStatement({ company, dataList, columnsData, data }) {
   const router = useRouter();
   const { slug, type, quarter } = router.query;
   const [showGraph, setShowGraph] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  console.log(dataList);
 
   const quarterOptions = [
     { value: 'q1', label: 'Q1' },
@@ -268,7 +278,7 @@ function FinancialStatement({ company, dataList, columnsData }) {
       id: 'expander', // Make sure it has an ID
       Header: 'SN',
 
-      Cell: function OrderItems({ row }) {
+      Cell: ({ row }) => {
         // Use the row.canExpand and row.getToggleRowExpandedProps prop getter
         // to build the toggle for expanding a row
         return row.canExpand ? (
@@ -283,10 +293,10 @@ function FinancialStatement({ company, dataList, columnsData }) {
               },
             })}
           >
-            {row.isExpanded ? (
-              <PlusIcon width={15} customClass="fill-current dark:text-gray-400 text-gray-200" />
+            {!row.isExpanded ? (
+              <PlusIcon width={18} customClass="fill-current dark:text-gray-400 text-gray-500" />
             ) : (
-              <MinusIcon width={15} customClass="fill-current text-gray-400" />
+              <MinusIcon width={18} customClass="fill-current text-gray-500" />
             )}
           </span>
         ) : null;
@@ -307,7 +317,7 @@ function FinancialStatement({ company, dataList, columnsData }) {
   if (!mounted) return null;
 
   return (
-    <StockLayout>
+    <StockLayout title={type}>
       <FinancialsHeader
         statements={company.companyStatementDetails}
         slug={slug}
@@ -327,20 +337,6 @@ function FinancialStatement({ company, dataList, columnsData }) {
                 });
               }}
             />
-            {/* <FormSelect
-              control="select"
-              label="Quarter"
-              name="quarter"
-              customClassName="rounded border border-gray-600"
-              value={quarterValue}
-              options={quarterOptions}
-              handleChange={(e) => {
-                setQuarterValue(e.target.value);
-                router.push({
-                  pathname: `/company/${slug}/financial-statement/${type ? type : 'balance-sheet'}/${e.target.value}`,
-                });
-              }}
-            /> */}
           </div>
 
           <ToggleBox

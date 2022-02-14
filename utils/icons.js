@@ -68,7 +68,7 @@ const PlusIcon = ({ height, width, color, customClass }) => {
       // fill={width ? `${color}` : "currentColor"}
       viewBox="0 0 16 16"
     >
-      <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z" />
+        <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z"/>
     </svg>
   );
 };
@@ -83,7 +83,7 @@ const MinusIcon = ({ height, width, color, customClass }) => {
       fill={width ? `${color}` : 'currentColor'}
       viewBox="0 0 16 16"
     >
-      <path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
+      <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm2.5 7.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1 0-1z"/>
     </svg>
   );
 };
@@ -349,6 +349,22 @@ const BookMarkFillIcon = ({ height, width, customClass, color }) => {
   );
 };
 
+const CameraIcon = ({ height, width, customClass, color }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      height={height !== null ? `${height}` : '24'}
+      width={width !== null ? `${width}` : '24'}
+      fill={color !== null ? `${color}` : 'currentColor'}
+      viewBox="0 0 16 16"
+      className={customClass}
+    >
+      <path d="M10.5 8.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z" />
+      <path d="M2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2zm.5 2a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm9 2.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z" />{' '}
+    </svg>
+  );
+};
+
 export {
   MoonIcon,
   SunIcon,
@@ -372,4 +388,5 @@ export {
   Briefcase,
   BookMarkIcon,
   BookMarkFillIcon,
+  CameraIcon,
 };

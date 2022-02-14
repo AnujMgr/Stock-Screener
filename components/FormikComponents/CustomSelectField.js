@@ -47,6 +47,7 @@ const CustomSelectField = ({ options, field, form, isMultiSelect }) => {
   };
 
   const getValue = () => {
+    console.log(options);
     if (options) {
       return isMultiSelect
         ? options.filter((option) => field.value.indexOf(option.value) >= 0)

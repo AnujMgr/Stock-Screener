@@ -11,7 +11,6 @@ import Spinner from '../../components/Spinner';
 import FinancialTable from '../../components/FinancialTable/FinancialTable';
 import StockLayout from '../../components/layout/StockLayout';
 import { useAuth } from '../../lib/contexts/AuthContext';
-import { company } from 'faker/lib/locales/az';
 import axios from 'axios';
 
 export async function getStaticProps({ params }) {
@@ -37,10 +36,28 @@ export async function getStaticProps({ params }) {
     where: {
       companySlug: params.slug,
     },
+    select: {
+      closingPrice: true,
+      tradedShares: true,
+      amount: true,
+      noOfTransactions: true,
+      date: true,
+    },
     orderBy: {
       date: 'desc',
     },
   });
+
+  const currentPrice = await prisma.companyPrice.findFirst({
+    where: {
+      companySlug: params.slug,
+    },
+
+    orderBy: {
+      date: 'desc',
+    },
+  });
+
   const companyIds = [];
 
   const companies = await prisma.company.findMany({
@@ -296,6 +313,7 @@ export async function getStaticProps({ params }) {
       stockholdingFacts,
       companyActionColumnData,
       actionDataList,
+      currentPrice,
     },
     revalidate: 10, // In seconds};
   };
@@ -323,6 +341,7 @@ export function Company({
   columnsData,
   companyActionColumnData,
   actionDataList,
+  currentPrice,
 }) {
   const router = useRouter();
   // const [state] = useAuth();
@@ -360,29 +379,42 @@ export function Company({
   ];
   const [state] = useAuth();
   const { user, accessToken } = state;
-  const [watchlistData, setWatchListData] = useState([]);
+  const [haswatchlistData, setHasWatchListData] = useState(false);
+  const [loadingWatchList, setLoadingWatchList] = useState(false);
 
   const [mounted, setMounted] = useState(false); // To avoid SSR error
-  useEffect(async () => {
+
+  useEffect(() => {
     setMounted(true);
-    if (accessToken) {
-      const watchlists = await axios
-        .get(`/api/watchlist`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        })
-        .then((response) => {
-          console.log(response);
-          setWatchListData(response.data);
-        })
-        .catch((error) => {
-          console.log('Something went wrong!!');
-        });
-    }
   }, []);
 
-  const toggleWatchList = async (data) => {
+  useEffect(async () => {
+    if (accessToken) {
+      await checkIsInWatchList({ userId: user.id, companyId: company.id });
+    }
+  }, [accessToken]);
+
+  const checkIsInWatchList = async (data) => {
+    await axios
+      .get(`/api/watchlist/checkisinlist`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          userId: data.userId,
+          companyId: data.companyId,
+        },
+      })
+      .then((response) => {
+        setHasWatchListData(response.data.isInWatchList);
+      })
+      .catch((error) => {
+        console.log('Something went wrong!!');
+      });
+  };
+
+  const addToWatchList = async (data) => {
+    setLoadingWatchList(true);
     await axios
       .post(`/api/watchlist`, data, {
         headers: {
@@ -392,81 +424,103 @@ export function Company({
         },
       })
       .then((response) => {
-        console.log(response);
+        setHasWatchListData(response.data.isInList);
+        setLoadingWatchList(false);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const removeFromWatchList = async (data) => {
+    setLoadingWatchList(true);
+
+    await axios
+      .delete(`/api/watchlist`, {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        data,
+      })
+      .then((response) => {
+        setHasWatchListData(response.data.isInList);
+        setLoadingWatchList(false);
       })
       .catch((error) => {
         console.log('Something went wrong!!');
       });
   };
 
-  console.log(watchlistData);
-
   return (
     <StockLayout title={company.name}>
       <section className="xl:container mx-3 xl:mx-auto mt-8 bg-white dark:bg-gray-900 p-3 shadow rounded-lg">
-        <div className="grid grid-cols-1 sm:grid-cols-2 text-gray-900 dark:text-gray-50">
-          <div>
+        <div className="grid grid-cols-1 md:grid-cols-2 text-gray-900 dark:text-gray-50">
+          <div className="mb-4">
             <h1 className="text-2xl font-normal mb-2">{company.name}</h1>
-            <div className="flex flex-col md:flex-row">
-              <p className="mr-3 ">
-                NEPSE:{' '}
+            <div className="flex flex-wrap gap-3 mt-2">
+              <p>
+                NEPSE:
                 <span className="text-white bg-blue-700 px-2 py-1 font-light uppercase rounded-sm">
                   {company.symbol}
                 </span>
               </p>
-              <p className="mr-3 mt-3 md:mt-0">
+              <p>
                 SECTOR:
                 <span className="px-2 py-1 font-bold ">{company.industry.name}</span>
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-3">
-            <div className="mt-4 sm:mt-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-3">
+            <div className="mt-4 md:mt-0">
               <p className="font-light text-gray-900 dark:text-gray-200">PRICE</p>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
                 Rs.&nbsp;
-                {!Array.isArray(priceHistory) || !priceHistory.length
+                {currentPrice
+                  ? currentPrice.closingPrice.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  : 'NaN'}
+                {/* {!Array.isArray(priceHistory) || !priceHistory.length
                   ? 'NaN'
                   : priceHistory[0].closingPrice.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
-                    })}
+                    })} */}
               </h1>
               <>
-                {!Array.isArray(priceHistory) || !priceHistory.length ? (
-                  <PriceCounter isRising={false} amount="321" rate="2.1" />
-                ) : (
+                {currentPrice ? (
                   <PriceCounter
-                    isRising={priceHistory[0].closingPrice > priceHistory[0].previousClosing}
-                    amount={Number(priceHistory[0].priceDifference)}
-                    rate={(
-                      (Number(priceHistory[0].priceDifference) / Number(priceHistory[0].closingPrice)) *
-                      100
-                    ).toFixed(2)}
+                    isRising={currentPrice.closingPrice > currentPrice.previousClosing}
+                    amount={Number(currentPrice.priceDifference)}
+                    rate={((Number(currentPrice.priceDifference) / Number(currentPrice.closingPrice)) * 100).toFixed(2)}
                   />
-                )}
+                ) : null}
               </>
             </div>
             <div className="flex">
               <WatchListButton
-                handleOnClick={toggleWatchList}
+                handleOnClick={haswatchlistData ? removeFromWatchList : addToWatchList}
                 user={user}
                 company={company}
-                isInWatchList={false}
-                activeWidth={'w-36'}
-                inactiveWidth={'w-52'}
+                isInWatchList={haswatchlistData}
+                activeWidth="group-hover:w-36"
+                inactiveWidth="group-hover:w-52"
+                loading={loadingWatchList}
               />
             </div>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 text-gray-900 dark:text-gray-50">
           <div className="pt-5 bg-white dark:bg-gray-900 rounded-lg">
-            <p className="text-lg">Rs. 100</p>
+            <p className="text-lg">Rs. {currentPrice ? currentPrice.minPrice : 'NaN'}</p>
             <p className="text-gray-400 text-xs">Today&apos;s Low</p>
           </div>
           <div className="pt-5 bg-white dark:bg-gray-900 rounded-lg">
-            <p className="text-lg">Rs. 500</p>
+            <p className="text-lg">Rs. {currentPrice ? currentPrice.maxPrice : 'NaN'}</p>
             <p className="text-gray-400 text-xs">Today&apos;s High</p>
           </div>
           <div className="pt-5 bg-white dark:bg-gray-900 ">
@@ -590,12 +644,13 @@ export function Company({
   );
 }
 
-const WatchListButton = ({ isInWatchList, activeWidth, inactiveWidth, handleOnClick, user, company }) => {
+const WatchListButton = ({ isInWatchList, activeWidth, inactiveWidth, handleOnClick, user, company, loading }) => {
   return (
     <button
       className={`group flex w-auto px-3 border border-blue-900 text-blue-900 py-2 rounded-md hover:bg-blue-900 hover:text-white 
-      ${isInWatchList ? 'bg-blue-900' : null}`}
+      ${isInWatchList ? 'bg-blue-900' : null}  ${loading ? 'cursor-not-allowed' : null}`}
       onClick={(e) => handleOnClick({ userId: user.id, companyId: company.id })}
+      disabled={loading}
     >
       {isInWatchList ? (
         <BookMarkFillIcon customClass="fill-current text-white" height="24" width="20" />
@@ -607,8 +662,9 @@ const WatchListButton = ({ isInWatchList, activeWidth, inactiveWidth, handleOnCl
         />
       )}
       <div
-        className={`w-0 overflow-hidden h-0 group-hover:${isInWatchList ? inactiveWidth : activeWidth} 
-        group-hover:h-auto transition-all ease-in-out duration-500 items-center`}
+        className={`w-0 overflow-hidden h-0 ${
+          isInWatchList ? inactiveWidth : activeWidth
+        } group-hover:h-auto transition-all ease-in-out duration-500 items-center`}
       >
         <span className="ml-3 whitespace-nowrap"> {isInWatchList ? 'Remove From WatchList' : 'Add to WatchList'}</span>
       </div>

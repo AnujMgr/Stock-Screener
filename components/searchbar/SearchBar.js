@@ -37,12 +37,23 @@ export default function SearchBar({
     }
   };
 
+  function companyByIndustry(item) {
+    switch (item.industry.id) {
+      case 1:
+        // code block
+        return '/company/[slug]';
+      case 3:
+        return '/company/[slug]';
+      default:
+        return null;
+    }
+  }
+
   const handleOnSelect = (item) => {
     // the item selected
     const slug = item.slug;
-    console.log(item);
     router.push({
-      pathname: item.industry.id == 1 ? '/company/[slug]' : item.industry.id == 3 ? '/mutual-fund/[slug]' : null,
+      pathname: '/company/[slug]',
       query: { slug: slug },
     });
   };
@@ -81,7 +92,7 @@ export default function SearchBar({
             ${borderRadiusBottom ? borderRadiusBottom : 'rounded-b-3xl'}
             ${backgroundColor ? backgroundColor : 'bg-white dark:bg-gray-700'}
             ${padding ? padding : 'py-1'}
-            relative flex items-center px-5
+            relative flex items-center px-5 z-50
             `}
             {...getRootProps({}, { suppressRefError: true })}
           >
@@ -112,7 +123,7 @@ export default function SearchBar({
                 ${borderRadiusBottom ? borderRadiusBottom : 'rounded-b-3xl'}
                 ${backgroundColor ? backgroundColor : 'bg-white dark:bg-gray-700'}
                 ${showSymbol ? 'pb-6' : 'pb-1'}
-                  absolute top-8 w-full pt-4 z-max-1`}
+                  absolute top-7 w-full pt-4 z-40`}
                 {...getMenuProps()}
               >
                 {inputValue.length < 4 ? (
@@ -126,7 +137,7 @@ export default function SearchBar({
                 ) : (
                   <>
                     {showSymbol ? (
-                      <div className="mb-3 px-6 flex justify-between">
+                      <div className="mt-3 mb-3 px-6 flex justify-between">
                         <h1 className="font-semibold">Stock</h1>
                         <h1 className="font-semibold">Symbol</h1>
                       </div>

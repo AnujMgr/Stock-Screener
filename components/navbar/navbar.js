@@ -43,7 +43,7 @@ function Navbar({ showSearch, showSymbol, searchBarWidth }) {
   return (
     <>
       {!isTabletOrMobile ? (
-        <div className="shadow-sm bg-white dark:bg-gray-700 border-fuchsia-100 border-gray-100 dark:border-gray-600">
+        <div className="shadow-sm bg-white dark:bg-gray-900/60 ">
           <div className="xl:container mx-auto flex items-center px-4">
             <h1 className="text-2xl text-primary dark:text-white lg:mr-6">
               <Link href="/">Analytics</Link>
@@ -54,7 +54,7 @@ function Navbar({ showSearch, showSymbol, searchBarWidth }) {
                 <div className="pt-2 flex-1">
                   {showSearch ? (
                     <SearchBar
-                      borderRadiusBottom={'rounded-b-md'}
+                      borderRadiusBottom={'rounded-b-md border border-gray-300 dark:border-gray-700'}
                       borderRadiusTop={'rounded-t-md'}
                       width={`md:w-full sm:w-3/4 mr-auto ${searchBarWidth ? searchBarWidth : 'w-full'}`}
                       backgroundColor={'bg-gray-200 dark:bg-gray-800'}
@@ -101,7 +101,7 @@ function Navbar({ showSearch, showSymbol, searchBarWidth }) {
         </div>
       ) : (
         <>
-          <div className="shadow-sm border-b-1 bg-white dark:bg-gray-700 border-fuchsia-100 border-b border-gray-100 dark:border-gray-600">
+          <div className="shadow-sm border-b-1 bg-white dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-900">
             <div className="xl:container mx-auto flex justify-between items-center px-4">
               <div>
                 <h1 className="text-2xl dark:text-white text-gray-900 mr-6">
@@ -157,7 +157,7 @@ function Navbar({ showSearch, showSymbol, searchBarWidth }) {
 function SideBar({ user, logout, isOpen, setOpen }) {
   return (
     <div
-      className={`bg-gray-50 dark:bg-gray-800 dark:border-gray-600 lg:hidden h-screen 
+      className={`bg-gray-50 dark:bg-gray-800 dark:bg-gray-900/30 backdrop-blur-md lg:hidden h-screen 
       w-full max-w-md fixed top-0 bottom-0 z-max-2 shadow-md transition-all duration-500 ease-in-out ${
         isOpen ? '-left-full' : 'left-0'
       }`}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import prisma from '../../../prisma/client';
 import { useRouter } from 'next/router';
@@ -6,7 +6,7 @@ import Custom404 from '../../404';
 import FinancialTable from '../../../components/FinancialTable';
 import { MinusIcon, PlusIcon } from '../../../utils/icons';
 import { Field, Formik } from 'formik';
-import CustomSelectField from '../../../components/SelectWithSearch/CustomSelectField';
+import { CustomSelectField } from '../../../components/FormikComponents';
 import StockLayout from '../../../components/layout/StockLayout';
 
 function checkStatementHasFact(data) {
@@ -219,6 +219,7 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
 
   const router = useRouter();
   const { slug, statementType, quarter, fiscalYear } = router.query;
+  const [mounted, setMounted] = useState(false);
 
   if (!company) {
     return <Custom404 />;
@@ -317,6 +318,12 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
       },
     });
   };
+
+  useEffect(() => {
+    setMounted(true);
+  });
+
+  if (!mounted) return null;
 
   return (
     <StockLayout title={company.name}>

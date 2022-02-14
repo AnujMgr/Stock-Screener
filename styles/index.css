@@ -223,7 +223,7 @@
     background: 'blue';
   }
 
-  @variants dark {
+  @layer utilities {
     .toggle-checkbox:checked {
       right: 0;
       /* border-color: #68d391; */
@@ -260,6 +260,10 @@
       background: #d1d5db;
     }
 
+    .table-header-bg {
+      background: #1e3a8a !important;
+    }
+
     .table-comparision-company-light {
       background-color: #e5e7eb;
     }
@@ -269,11 +273,11 @@
     }
 
     .table-particular-topic-light {
-      background-color: #bfdbfe !important;
+      background-color: #cffafe !important;
     }
 
     .table-particular-topic-dark {
-      background-color: #064e3b !important;
+      background-color: #1f2937 !important;
     }
     .active-graph-particular-light {
       background-color: #059669 !important;
@@ -298,4 +302,22 @@
 input:checked ~ .dot {
   transform: translateX(100%);
   background-color: #48bb78;
+}
+
+@layer components {
+  .table-td {
+    @apply px-4 py-3 whitespace-nowrap sticky left-0 group-hover:bg-gray-100 dark:group-hover:bg-gray-800;
+  }
+  .table-td-graph-active {
+    @apply dark:bg-green-700 font-medium text-white;
+  }
+  .table-td-graph-inactive {
+    @apply dark:hover:bg-gray-800 hover:bg-gray-100 font-normal text-gray-900 dark:text-gray-50;
+  }
+  .table-td-is-topic {
+    @apply bg-white dark:bg-gray-800 font-bold;
+  }
+  .table-tr-topic {
+    @apply bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-semibold;
+  }
 }

@@ -7,7 +7,10 @@ function StockNavbar() {
   const { slug } = router.query;
 
   return (
-    <div className="opacity-95 sticky top-0 shadow-md border-b-1 bg-white dark:bg-gray-700  z-30 grid border-t dark:border-gray-600">
+    <div
+      className="grid sticky z-30 top-0 shadow-md  
+      bg-white/50 dark:bg-gray-900/70 backdrop-blur-md"
+    >
       <div className="xl:container mx-auto flex items-center overflow-x-auto custom-scroll no-scroll w-full">
         <SecondaryNavLink
           isActive={router.asPath === `/company/${slug}`}
