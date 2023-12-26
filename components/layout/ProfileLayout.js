@@ -35,7 +35,7 @@ function ProfileLayout({ children, title }) {
             <input ref={inputRef} type="file" className="hidden" />
           </div>
           <h1 className="text-xl select-none">{user.name}</h1>
-
+          <p className="text-xs mt-1">🚀 Experienced Frontend Developer | React JS | Next JS | JavaScript | TypeScript</p>
           <p className="text-xs mt-1">Joined At 2020</p>
         </div>
       </section>
@@ -54,8 +54,8 @@ const UserProfilePic = () => {
       className="rounded-full object-cover"
       src={'/'}
       loader={myLoader}
-      width="120px"
-      height="120px"
+      width="120"
+      height="120"
       layout="intrinsic"
       alt="Profile Picture"
     />

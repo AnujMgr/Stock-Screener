@@ -388,13 +388,14 @@ export function Company({
     setMounted(true);
   }, []);
 
-  useEffect(async () => {
-    if (accessToken) {
-      await checkIsInWatchList({ userId: user.id, companyId: company.id });
-    }
+  useEffect(() => {
+    // if (accessToken) {
+    checkIsInWatchList({ userId: user.id, companyId: company.id });
+    // }
   }, [accessToken]);
 
   const checkIsInWatchList = async (data) => {
+    if (!accessToken) return {};
     await axios
       .get(`/api/watchlist/checkisinlist`, {
         headers: {
@@ -480,9 +481,9 @@ export function Company({
                 Rs.&nbsp;
                 {currentPrice
                   ? currentPrice.closingPrice.toLocaleString(undefined, {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
                   : 'NaN'}
                 {/* {!Array.isArray(priceHistory) || !priceHistory.length
                   ? 'NaN'
@@ -662,9 +663,8 @@ const WatchListButton = ({ isInWatchList, activeWidth, inactiveWidth, handleOnCl
         />
       )}
       <div
-        className={`w-0 overflow-hidden h-0 ${
-          isInWatchList ? inactiveWidth : activeWidth
-        } group-hover:h-auto transition-all ease-in-out duration-500 items-center`}
+        className={`w-0 overflow-hidden h-0 ${isInWatchList ? inactiveWidth : activeWidth
+          } group-hover:h-auto transition-all ease-in-out duration-500 items-center`}
       >
         <span className="ml-3 whitespace-nowrap"> {isInWatchList ? 'Remove From WatchList' : 'Add to WatchList'}</span>
       </div>

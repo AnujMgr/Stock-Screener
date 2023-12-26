@@ -64,7 +64,7 @@ function FinancialOverview({ facts, company }) {
 
   if (Array.isArray(facts) && facts.length) {
     facts[0].facts.map((fact, index) =>
-      balanceSheetData.push({
+      balanceSheetData.push({ 
         id: index,
         fiscalYear: fact.fiscalYear,
         assets: fact.amount,
@@ -85,7 +85,7 @@ function FinancialOverview({ facts, company }) {
   return (
     <StockLayout title={company.name + `'s ` + 'financial overview'}>
       <FinancialsHeader statements={company.companyStatementDetails} slug={slug} active={0} />
-      <section className="xl:container mx-0 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 md:p-5 mb-3 rounded-b-lg">
+      <section className="px-2 mx-0 mb-3 bg-white rounded-b-lg shadow xl:container md:mx-3 xl:mx-auto dark:bg-gray-900 md:p-5">
         <div className="flex gap-3 p-2">
           <button
             className={`${
@@ -105,13 +105,13 @@ function FinancialOverview({ facts, company }) {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
-          <div className="p-2 bg-white dark:bg-gray-900 rounded-lg ">
-            <h1 className="mb-3 dark:text-gray-200 font-semibold">Income Statement</h1>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
+          <div className="p-2 bg-white rounded-lg dark:bg-gray-900 ">
+            <h1 className="mb-3 font-semibold dark:text-gray-200">Income Statement</h1>
             <CustomBarChart data={balanceSheetData} dataKey1="assets" dataKey2="liabilities" height={300} />
           </div>
-          <div className="p-2 bg-white dark:bg-gray-900 rounded-lg ">
-            <h1 className="mb-3 dark:text-gray-200 font-semibold">Balance Sheet</h1>
+          <div className="p-2 bg-white rounded-lg dark:bg-gray-900 ">
+            <h1 className="mb-3 font-semibold dark:text-gray-200">Balance Sheet</h1>
             <CustomBarChart data={profitLossData} dataKey1="revenue" dataKey2="netIncome" height={300} />
           </div>
         </div>

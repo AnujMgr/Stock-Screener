@@ -145,15 +145,15 @@ function Profile() {
     <ProfileLayout showSearch={true} showSymbol={true} title={`Profile Page`}>
       <main className="xl:container mt-3 mx-1 md:mx-3 xl:mx-auto px-2">
         <div className="grid grid-cols-3 gap-3 mb-4">
-          <div className="bg-white border-b-2 border-rose-500 p-3">
+          <div className="bg-white dark:bg-gray-900 border-b-2 border-rose-500 p-3">
             <h1>Total Investment</h1>
             <p>Rs. 200</p>
           </div>
-          <div className="bg-white border-b-2 border-yellow-500 p-3">
+          <div className="bg-white dark:bg-gray-900 border-b-2 border-yellow-500 p-3">
             <h1>Total Investment</h1>
             <p>Rs. 200</p>
           </div>
-          <div className="bg-white border-b-2 border-blue-700 p-3">
+          <div className="bg-white dark:bg-gray-900 border-b-2 border-blue-700 p-3">
             <h1>Total Investment</h1>
             <p>Rs. 200</p>
           </div>

@@ -18,7 +18,15 @@ function StockNavbar() {
           pathAs={`/company/${slug}`}
           name={'Summary'}
         />
-        <SecondaryNavLink isActive={false} path={`/`} pathAs={`/`} name={'Technicals'} />
+        {/* <SecondaryNavLink isActive={false} path={`/`} pathAs={`/`} name={'Technicals'} /> */}
+        <SecondaryNavLink
+          isActive={
+            router.asPath.includes(`/company/${slug}/technicals`)
+          }
+          path={`/company/[slug]/technicals`}
+          pathAs={`/company/${slug}/technicals`}
+          name={'Technicals'}
+        />
 
         <SecondaryNavLink
           isActive={

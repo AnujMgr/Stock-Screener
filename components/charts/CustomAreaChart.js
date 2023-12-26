@@ -9,7 +9,7 @@ const CustomAreaChart = ({ data, dataKeyForArea, showPeriodSelector, dataLength,
   const [activeMenu, setActiveMenu] = useState('default');
 
   const color = theme !== 'dark' ? 'black' : 'white';
-  var dataLength = data.length; // length of data
+  // var dataLength = data.length; // length of data
   var periodData = [...data]; // copy data to period data
 
   if (timeSpan !== false) {

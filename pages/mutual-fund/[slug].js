@@ -383,9 +383,9 @@ export function Company({
               {!Array.isArray(priceHistory) || !priceHistory.length
                 ? 'NaN'
                 : priceHistory[0].closingPrice.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
             </h1>
             <>
               {!Array.isArray(priceHistory) || !priceHistory.length ? (
@@ -510,9 +510,12 @@ export function Company({
             <div className="p-3">
               <ul className="">
                 <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
-                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
-                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
-                <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
+                <li className="pb-3"> The bank has a very low ROE track record. Average ROE of 3 years is -17.33%</li>
+                <li className="pb-3">
+                  The bank has a very low ROA track record. Average ROA of 3 years is -1.98% The bank has a very low
+                  ROA track record. Average ROA of 3 years is -1.98%
+                </li>
+                <li className="pb-3">The bank has a very low ROE track record. Average ROE of 3 years is -17.33%</li>
                 <li className="pb-3">The bank has a very low ROA track record. Average ROA of 3 years is -1.98%</li>
               </ul>
             </div>
