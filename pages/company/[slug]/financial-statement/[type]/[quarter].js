@@ -270,6 +270,10 @@ function FinancialStatement({ company, dataList, columnsData, data }) {
     setQuarterValue(quarterValue ? quarterValue : 'qtr-to-qtr');
   }, [quarter, quarterValue]);
 
+  useEffect(() => {
+    setMounted(true);
+  });
+
   if (!company) {
     return <Custom404 />;
   }
@@ -310,9 +314,7 @@ function FinancialStatement({ company, dataList, columnsData, data }) {
     ...columnsData,
   ];
 
-  useEffect(() => {
-    setMounted(true);
-  });
+
 
   if (!mounted) return null;
 

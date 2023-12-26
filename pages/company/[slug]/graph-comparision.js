@@ -5,7 +5,7 @@ import prisma from '../../../prisma/client';
 import { useRouter } from 'next/router';
 import Custom404 from '../../404';
 import { Field, Formik } from 'formik';
-import CustomSelectField from '../../../components/SelectWithSearch/CustomSelectField';
+import CustomSelectField from '../../../components/FormikComponents/CustomSelectField';
 import MultipleLineGraph from '../../../components/charts/MultipleLineGraph';
 import StockLayout from '../../../components/layout/StockLayout';
 
@@ -101,13 +101,13 @@ export async function getServerSideProps({ query }) {
           financialStatementFact: {
             where: query.hasOwnProperty('quarter')
               ? {
-                  companyId: { in: companyIds },
-                  quarter: query.quarter,
-                }
+                companyId: { in: companyIds },
+                quarter: query.quarter,
+              }
               : {
-                  companyId: { in: companyIds },
-                  quarter: 'Q4',
-                },
+                companyId: { in: companyIds },
+                quarter: 'Q4',
+              },
             take: lengthOfFacts,
             orderBy: [
               {
@@ -405,11 +405,10 @@ function CustomFilter({ data, handleClick, active }) {
   return (
     <div
       className={`py-2 px-4 rounded-full flex-auto max-w-xs text-center cursor-pointer select-none 
-      ${
-        active
+      ${active
           ? 'bg-blue-700 text-white'
           : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-50 hover:bg-gray-300 transition duration-500 ease-in-out'
-      }`}
+        }`}
       onClick={(e) => {
         // selectedData[0].name === data.name ? setActive(true) : setActive(false);
         handleClick(data);

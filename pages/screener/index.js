@@ -166,7 +166,8 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
   const industryOptions = [];
 
   industries.map((industry) => industryOptions.push({ value: industry.slug, label: industry.name }));
-
+  const [mounted, setMounted] = useState(false); // To avoid SSR error
+  useEffect(() => setMounted(true), []);
   if (columns == null) {
     return (
       <section className="xl:container mx-1 md:mx-3 xl:mx-auto bg-white dark:bg-gray-900 shadow px-2 py-2 md:p-5 mb-3 rounded-0 md:rounded-lg mt-4">
@@ -202,8 +203,7 @@ export default function Screener({ columns, dataList, industries, fiscalYearList
     });
   };
 
-  const [mounted, setMounted] = useState(false); // To avoid SSR error
-  useEffect(() => setMounted(true), []);
+  
 
   if (!mounted) return null;
 

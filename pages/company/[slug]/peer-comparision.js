@@ -220,6 +220,9 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
   const router = useRouter();
   const { slug, statementType, quarter, fiscalYear } = router.query;
   const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  });
 
   if (!company) {
     return <Custom404 />;
@@ -319,10 +322,7 @@ function FinancialStatement({ company, peerCompanies, fiscalYearList, dataList, 
     });
   };
 
-  useEffect(() => {
-    setMounted(true);
-  });
-
+  
   if (!mounted) return null;
 
   return (

@@ -76,7 +76,7 @@ if(watchlist)
       symbol: list.company.symbol,
       ltp: list.company.companyPrice.length > 0 ? list.company.companyPrice[0].closingPrice : 'NaN',
       previousClosing: list.company.companyPrice.length > 0 ? list.company.companyPrice[0].previousClosing : 'NaN',
-    });
+    }); 
   });
 
   return (

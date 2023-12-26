@@ -346,13 +346,7 @@ export function Company({
   const router = useRouter();
   // const [state] = useAuth();
 
-  if (!company) {
-    return <Custom404 />;
-  }
 
-  if (router.isFallback) {
-    return <Spinner />;
-  }
 
   const columns = [
     {
@@ -453,6 +447,14 @@ export function Company({
         console.log('Something went wrong!!');
       });
   };
+
+  if (!company) {
+    return <Custom404 />;
+  }
+
+  if (router.isFallback) {
+    return <Spinner />;
+  }
 
   return (
     <StockLayout title={company.name}>
