@@ -19,7 +19,7 @@ export default function Footer() {
         </a>
         {/* <InstagramIcon customClass="fill-current text-white dark:text-white" height="30" width="30" /> */}
         <TwitterIcon customClass="fill-current text-white dark:text-white" height="30" width="30" />
-      </div>
+      </div> bg-gray-800 flex-grow text-white dark:bg-gray-800 p-1 h-10 rounded outline-none w-full text-md px-3
       <div className="flex items-center justify-center mt-5 gap-4 text-xs">
         <p className="text-white">Info</p>
         <p className="text-white">Support</p>

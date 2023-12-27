@@ -118,13 +118,19 @@ const Login = () => {
                       <label htmlFor="email" className="select-none">
                         Email
                       </label>
-                      <Field
+                      <input className="bg-gray-200 flex-grow text-gray-800 dark:text-gray-200 dark:bg-gray-800 p-1 h-10 rounded outline-none w-full text-md px-3"
+                        id="email"
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                      />
+                      {/* <Field
                         id="email"
                         type="email"
                         name="email"
                         component={CustomInputComponent}
                         placeholder="Email"
-                      />
+                      /> */}
 
                       {touched.email && errors.email && (
                         <span className="error text-red-700 text-sm">{errors.email}</span>
@@ -135,7 +141,13 @@ const Login = () => {
                       <label htmlFor="password" className="select-none">
                         Password
                       </label>
-                      <Field id="password" name="password" placeholder="Password" component={PasswordField} />
+                      {/* <Field id="password" name="password" placeholder="Password" component={PasswordField} /> */}
+                      <input className="bg-gray-200 flex-grow text-gray-800 dark:text-gray-200 dark:bg-gray-800 p-1 h-10 rounded outline-none w-full text-md px-3"
+                        id="password"
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                      />
                       {touched.password && errors.password && (
                         <span className="error text-red-700 text-sm">{errors.password}</span>
                       )}
