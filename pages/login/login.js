@@ -114,7 +114,7 @@ const Login = () => {
               {({ errors, handleSubmit, touched, isSubmitting }) => {
                 return (
                   <form onSubmit={handleSubmit}>
-                    <div className="max-w-sm mx-auto mt-3">
+                    <div className="max-w-sm mx-auto mt-3 flex flex-col">
                       <label htmlFor="email" className="select-none">
                         Email
                       </label>
@@ -145,9 +145,8 @@ const Login = () => {
                       <div className="mt-5">
                         <button
                           type="submit"
-                          className={` text-white px-6 py-2 rounded-md shadow-lg transition duration-500 ease-in-out w-full ${
-                            isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-800 hover:bg-blue-600'
-                          }`}
+                          className={` text-white px-6 py-2 rounded-md shadow-lg transition duration-500 ease-in-out w-full ${isSubmitting ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-800 hover:bg-blue-600'
+                            }`}
                           disabled={isSubmitting}
                         >
                           Login
@@ -163,9 +162,8 @@ const Login = () => {
                               password: 'password',
                             })
                           }
-                          className={` text-white px-6 py-2 rounded-md shadow-lg transition duration-500 ease-in-out w-full ${
-                            isSubmitting ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-800'
-                          }`}
+                          className={` text-white px-6 py-2 rounded-md shadow-lg transition duration-500 ease-in-out w-full ${isSubmitting ? 'bg-green-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-800'
+                            }`}
                           disabled={isSubmitting}
                         >
                           Demo Login

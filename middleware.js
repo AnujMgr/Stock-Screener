@@ -1,4 +1,4 @@
-// import { verify } from 'jsonwebtoken';
+import { verify } from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import * as jose from 'jose';
 
@@ -22,4 +22,8 @@ export async function middleware(req) {
 
   //   return NextResponse.next();
 }
+export const config = {
+  matcher: ['/company/:path*', '/profile', '/screener', '/technicals', '/listings/:path*'],
+}
+
 export default middleware;
